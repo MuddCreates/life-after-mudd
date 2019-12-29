@@ -1,0 +1,11 @@
+{
+  "name": "life-after-mudd",
+  "version": "0",
+  "repository": "https://github.com/MuddCreates/life-after-mudd",
+  "author": "Radon Rosborough <radon.neon@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "parcel-bundler": "^1.12.4"
+  }
+}

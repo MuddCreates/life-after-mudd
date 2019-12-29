@@ -6,12 +6,12 @@ app = flask.Flask(__name__)
 
 @app.route("/")
 def get_index():
-    return flask.send_file("static/index.html")
+    return flask.send_file("dist/index.html")
 
 
 @app.route("/<path>")
 def get_static_file(path):
-    return flask.send_from_directory("static", path)
+    return flask.send_from_directory("dist", path)
 
 
 @app.route("/api/v1/responses")
