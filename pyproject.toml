@@ -8,6 +8,7 @@ authors = ["Radon Rosborough <radon.neon@gmail.com>"]
 python = "^3.8"
 gspread = "^3.1"
 oauth2client = "^4.1"
+flask = "^1.1"
 
 [tool.poetry.dev-dependencies]
 

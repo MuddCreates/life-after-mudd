@@ -1,2 +1,3 @@
+/__pycache__/
 .oauth-private-key.json
 responses.json
