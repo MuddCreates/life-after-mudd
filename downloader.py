@@ -25,20 +25,22 @@ def parse_form_responses(responses):
     assert header == [
         "Timestamp",
         "Email Address",
+        "Your name",
         "Your major",
         "What are you doing?",
         "At what company, school, or organization?",
-        "In what city or state?",
+        "In what city?",
         "Anything else to say?",
     ]
     return [
         {
             "email": row[1],
-            "major": row[2],
-            "path": row[3],
-            "org": row[4],
-            "location": row[5],
-            "comments": row[6],
+            "name": row[2],
+            "major": row[3],
+            "path": row[4],
+            "org": row[5],
+            "city": row[6],
+            "comments": row[7],
         }
         for row in rest
     ]
