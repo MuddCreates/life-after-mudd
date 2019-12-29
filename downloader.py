@@ -1,4 +1,7 @@
+#!/usr/bin/env python3
+
 import json
+import os
 
 import gspread
 import oauth2client.service_account
@@ -44,3 +47,14 @@ def parse_form_responses(responses):
         }
         for row in rest
     ]
+
+
+def download_form_responses():
+    responses = parse_form_responses(get_form_responses())
+    with open("responses.json.tmp", "w") as f:
+        json.dump(responses, f)
+    os.rename("responses.json.tmp", "responses.json")
+
+
+if __name__ == "__main__":
+    download_form_responses()
