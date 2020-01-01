@@ -9,9 +9,16 @@ def get_index():
     return flask.send_file("dist/index.html")
 
 
+@app.route("/admin")
+def get_admin():
+    return flask.send_file("dist/admin.html")
+
+
 @app.route("/<path>")
 def get_static_file(path):
-    return flask.send_from_directory("dist", path)
+    if not path.endswith(".html"):
+        return flask.send_from_directory("dist", path)
+    flask.abort(404)
 
 
 @app.route("/api/v1/responses")
