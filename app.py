@@ -21,10 +21,19 @@ def get_static_file(path):
     flask.abort(404)
 
 
-@app.route("/api/v1/responses")
-def get_responses():
+@app.route("/api/v1/admin/data")
+def get_admin_data():
     try:
-        with open("responses.json") as f:
+        with open("data-admin.json") as f:
+            return flask.jsonify(json.load(f))
+    except (OSError, json.JSONDecodeError):
+        return "Data not available", 500
+
+
+@app.route("/api/v1/data")
+def get_data():
+    try:
+        with open("data-public.json") as f:
             return flask.jsonify(json.load(f))
     except (OSError, json.JSONDecodeError):
         return "Data not available", 500

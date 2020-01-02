@@ -68,13 +68,13 @@ def write_form_responses(worksheet, responses):
 def download_form_responses():
     worksheet = get_worksheet()
     responses = read_form_responses(worksheet)
-    with open("responses.json.tmp", "w") as f:
+    with open("data-admin.tmp", "w") as f:
         json.dump(responses, f)
-    os.rename("responses.json.tmp", "responses.json")
+    os.rename("data-admin.tmp", "data-admin")
 
 
 def upload_form_responses():
-    with open("responses.json") as f:
+    with open("data-admin") as f:
         responses = json.load(f)
     worksheet = get_worksheet()
     write_form_responses(worksheet, responses)
