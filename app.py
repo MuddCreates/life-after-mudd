@@ -1,5 +1,6 @@
 import flask
 import json
+import os
 
 app = flask.Flask(__name__)
 
@@ -28,6 +29,17 @@ def get_admin_data():
             return flask.jsonify(json.load(f))
     except (OSError, json.JSONDecodeError):
         return "Data not available", 500
+
+
+@app.route("/api/v1/admin/data", methods=["POST"])
+def set_admin_data():
+    try:
+        data = flask.request.get_json()
+        with open("data-admin.json.tmp", "w") as f:
+            json.dump(data, f)
+        os.rename("data-admin.json.tmp", "data-admin.json")
+    except OSError:
+        return "Failed to write data", 500
 
 
 @app.route("/api/v1/data")
