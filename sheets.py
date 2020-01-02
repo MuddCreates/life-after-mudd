@@ -10,13 +10,13 @@ import oauth2client.service_account
 
 COLUMNS = (
     ("Timestamp", "timestamp"),
-    ("Email Address", "email-raw"),
-    ("Your name", "name-raw"),
-    ("Your major", "major-raw"),
-    ("What are you doing?", "path-raw"),
-    ("At what company, school, or organization?", "org-raw"),
-    ("In what city and state?", "city-state-raw"),
-    ("Anything else to say?", "comment-raw"),
+    ("Email Address", "emailRaw"),
+    ("Your name", "nameRaw"),
+    ("Your major", "majorRaw"),
+    ("What are you doing?", "pathRaw"),
+    ("At what company, school, or organization?", "orgRaw"),
+    ("In what city and state?", "cityStateRaw"),
+    ("Anything else to say?", "commentRaw"),
     ("", "blank"),
     ("Processed", "processed"),
     ("Email", "email"),
@@ -24,12 +24,12 @@ COLUMNS = (
     ("Major", "major"),
     ("Path", "path"),
     ("Organization", "org"),
-    ("Organization latitude", "org-lat"),
-    ("Organization longitude", "org-long"),
+    ("Organization latitude", "orgLat"),
+    ("Organization longitude", "orgLong"),
     ("City", "city"),
     ("State", "state"),
-    ("City latitude", "city-lat"),
-    ("City longitude", "city-long"),
+    ("City latitude", "cityLat"),
+    ("City longitude", "cityLong"),
 )
 
 
@@ -68,13 +68,13 @@ def write_form_responses(worksheet, responses):
 def download_form_responses():
     worksheet = get_worksheet()
     responses = read_form_responses(worksheet)
-    with open("data-admin.tmp", "w") as f:
+    with open("data-admin.json.tmp", "w") as f:
         json.dump(responses, f)
-    os.rename("data-admin.tmp", "data-admin")
+    os.rename("data-admin.json.tmp", "data-admin.json")
 
 
 def upload_form_responses():
-    with open("data-admin") as f:
+    with open("data-admin.json") as f:
         responses = json.load(f)
     worksheet = get_worksheet()
     write_form_responses(worksheet, responses)
