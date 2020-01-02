@@ -28,6 +28,7 @@ COLUMNS = (
     ("Organization longitude", "orgLong"),
     ("City", "city"),
     ("State", "state"),
+    ("Country", "country"),
     ("City latitude", "cityLat"),
     ("City longitude", "cityLong"),
 )

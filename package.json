@@ -7,6 +7,7 @@
   "private": true,
   "dependencies": {
     "babel-polyfill": "^6.26.0",
-    "parcel-bundler": "^1.12.4"
+    "parcel-bundler": "^1.12.4",
+    "usa-states": "^0.0.5"
   }
 }
