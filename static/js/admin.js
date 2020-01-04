@@ -78,13 +78,13 @@ function fillDefaults(responses) {
     if (r.processed) {
       return r;
     }
-    r.email = r.email || r.emailRaw.replace("g.hmc.edu", "hmc.edu");
-    r.name = r.name || r.nameRaw;
-    r.major = r.major || r.majorRaw;
-    r.path = r.path || r.pathRaw;
-    r.org = r.org || r.orgRaw;
+    r.email = r.email || r.rawEmail.replace("g.hmc.edu", "hmc.edu");
+    r.name = r.name || r.rawName;
+    r.major = r.major || r.rawMajor;
+    r.path = r.path || r.rawPath;
+    r.org = r.org || r.rawOrg;
     if (!(r.city && r.state && r.country)) {
-      const csc = parseCityStateCountry(r.cityStateRaw);
+      const csc = parseCityStateCountry(r.rawCityState);
       r.city = r.city || csc.city;
       r.state = r.state || csc.state;
       r.country = r.country || csc.country;
@@ -216,12 +216,12 @@ function populateForm() {
   const responses = $("body").data("responses");
   const idx = $("body").data("idx");
   const r = responses[idx];
-  $("#name-raw-input").val(r.nameRaw);
-  $("#email-raw-input").val(r.emailRaw);
-  $("#major-raw-input").val(r.majorRaw);
-  $("#path-raw-input").val(r.pathRaw);
-  $("#org-raw-input").val(r.orgRaw);
-  $("#city-state-raw-input").val(r.cityStateRaw);
+  $("#name-raw-input").val(r.rawName);
+  $("#email-raw-input").val(r.rawEmail);
+  $("#major-raw-input").val(r.rawMajor);
+  $("#path-raw-input").val(r.rawPath);
+  $("#org-raw-input").val(r.rawOrg);
+  $("#city-state-raw-input").val(r.rawCityState);
   $("#name-input").val(r.name);
   $("#email-input").val(r.email);
   $("#major-input").val(r.major);
@@ -232,7 +232,7 @@ function populateForm() {
   $("#country-input").val(r.country);
   const cityQuery = r.processed
     ? [r.city, r.state, r.country].join(", ")
-    : r.cityStateRaw;
+    : r.rawCityState;
   $("#city-map")
     .data("search")
     .query(cityQuery);
@@ -245,7 +245,7 @@ function populateForm() {
     }
     $("#org-map")
       .data("search")
-      .query(r.org || r.orgRaw);
+      .query(r.org || r.rawOrg);
   };
   const prevOnResults = $("#city-map").data("onResults");
   if (prevOnResults) {

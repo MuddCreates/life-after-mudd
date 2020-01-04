@@ -10,19 +10,19 @@ import oauth2client.service_account
 
 COLUMNS = (
     ("Timestamp", "timestamp"),
-    ("Email Address", "emailRaw"),
-    ("Your first and last name", "nameRaw"),
-    ("Your major", "majorRaw"),
-    ("What are you doing *after* this summer?", "pathRaw"),
-    ("At what company, school, or organization?", "orgRaw"),
-    ("In what city and state?", "cityStateRaw"),
-    ("What are you doing this summer?", "summerPathRaw"),
+    ("Email Address", "rawEmail"),
+    ("Your first and last name", "rawName"),
+    ("Your major", "rawMajor"),
+    ("What are you doing *after* this summer?", "rawPath"),
+    ("At what company, school, or organization?", "rawOrg"),
+    ("In what city and state?", "rawCityState"),
+    ("What are you doing this summer?", "rawSummerPath"),
     (
         "At what company, school, or organization (if different for the summer)?",
-        "summerOrgRaw",
+        "rawSummerOrg",
     ),
-    ("In what city and state (if different for the summer)?", "summerCityStateRaw"),
-    ("Anything else to say?", "commentRaw"),
+    ("In what city and state (if different for the summer)?", "rawSummerCityState"),
+    ("Anything else you want to share?", "rawComment"),
     ("", "blank"),
     ("Processed", "processed"),
     ("Email", "email"),
@@ -37,6 +37,15 @@ COLUMNS = (
     ("Country", "country"),
     ("City latitude", "cityLat"),
     ("City longitude", "cityLong"),
+    ("Summer path", "summerPath"),
+    ("Summer organization", "summerOrg"),
+    ("Summer organization latitude", "summerOrgLat"),
+    ("Summer organization longitude", "summerOrgLong"),
+    ("Summer city", "summerCity"),
+    ("Summer state", "summerState"),
+    ("Summer country", "summerCountry"),
+    ("Summer city latitude", "summerCityLat"),
+    ("Summer city longitude", "summerCityLong"),
 )
 
 
@@ -57,7 +66,12 @@ def get_worksheet():
 
 def read_form_responses(worksheet):
     header, *rows = worksheet.get_all_values()
-    assert header == [name for name, _ in COLUMNS], header
+    expected_header = [name for name, _ in COLUMNS]
+    if header != expected_header:
+        for x, y in zip(expected_header, header):
+            if x != y:
+                print("expected {}, got {}".format(x, y), file=sys.stderr)
+        assert False
     return [{key: value for (_, key), value in zip(COLUMNS, row)} for row in rows]
 
 
