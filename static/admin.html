@@ -40,148 +40,226 @@
       <div class="container">
         <div class="row">
           <div class="col">
-            <select class="custom-select" id="response-dropdown"></select>
-          </div>
-          <div class="col">
-            <button type="button" class="btn btn-primary">Next</button>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col">
-            <div class="form-group">
-              <label>Name</label>
-              <input
-                type="text"
-                class="form-control"
-                readonly
-                id="name-raw-input"
-              />
+            <div class="container">
+              <div class="row header-row">
+                <div class="col">
+                  <select class="custom-select" id="response-dropdown"></select>
+                </div>
+                <div class="col text-center">
+                  <button type="button" class="btn btn-secondary">
+                    Set city
+                  </button>
+                  <button type="button" class="btn btn-secondary">
+                    Set org
+                  </button>
+                  <button type="button" class="btn btn-primary">Next</button>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <div class="form-group">
+                    <label>Name</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      readonly
+                      id="name-raw-input"
+                    />
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" class="form-control" id="name-input" />
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <div class="form-group">
+                    <label>Email</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      readonly
+                      id="email-raw-input"
+                    />
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="form-group">
+                    <label>Email</label>
+                    <input type="text" class="form-control" id="email-input" />
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <div class="form-group">
+                    <label>Major</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      readonly
+                      id="major-raw-input"
+                    />
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="form-group">
+                    <label>Major</label>
+                    <input type="text" class="form-control" id="major-input" />
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <div class="form-group">
+                    <label>Path</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      readonly
+                      id="path-raw-input"
+                    />
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="form-group">
+                    <label>Path</label>
+                    <input type="text" class="form-control" id="path-input" />
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <div class="form-group">
+                    <label>Organization</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      readonly
+                      id="org-raw-input"
+                    />
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="form-group">
+                    <label>Organization</label>
+                    <input type="text" class="form-control" id="org-input" />
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <div class="form-group">
+                    <label>City and state</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      readonly
+                      id="city-state-raw-input"
+                    />
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="form-group">
+                    <label>City latitude</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="city-lat-input"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <div class="form-group">
+                    <label>City</label>
+                    <input type="text" class="form-control" id="city-input" />
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="form-group">
+                    <label>City longitude</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="city-long-input"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <div class="form-group">
+                    <label>State</label>
+                    <input type="text" class="form-control" id="state-input" />
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="form-group">
+                    <label>Organization latitude</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="org-lat-input"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <div class="form-group">
+                    <label>Country</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="country-input"
+                    />
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="form-group">
+                    <label>Organization longitude</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="org-long-input"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col"></div>
+                <div class="col"></div>
+              </div>
+              <div class="row">
+                <div class="col"></div>
+                <div class="col"></div>
+              </div>
+              <div class="row">
+                <div class="col"></div>
+                <div class="col"></div>
+              </div>
             </div>
           </div>
           <div class="col">
-            <div class="form-group">
-              <label>Name</label>
-              <input type="text" class="form-control" id="name-input" />
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col">
-            <div class="form-group">
-              <label>Email</label>
-              <input
-                type="text"
-                class="form-control"
-                readonly
-                id="email-raw-input"
-              />
-            </div>
-          </div>
-          <div class="col">
-            <div class="form-group">
-              <label>Email</label>
-              <input type="text" class="form-control" id="email-input" />
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col">
-            <div class="form-group">
-              <label>Major</label>
-              <input
-                type="text"
-                class="form-control"
-                readonly
-                id="major-raw-input"
-              />
-            </div>
-          </div>
-          <div class="col">
-            <div class="form-group">
-              <label>Major</label>
-              <input type="text" class="form-control" id="major-input" />
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col">
-            <div class="form-group">
-              <label>Path</label>
-              <input
-                type="text"
-                class="form-control"
-                readonly
-                id="path-raw-input"
-              />
-            </div>
-          </div>
-          <div class="col">
-            <div class="form-group">
-              <label>Path</label>
-              <input type="text" class="form-control" id="path-input" />
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col">
-            <div class="form-group">
-              <label>Organization</label>
-              <input
-                type="text"
-                class="form-control"
-                readonly
-                id="org-raw-input"
-              />
-            </div>
-          </div>
-          <div class="col">
-            <div class="form-group">
-              <label>Organization</label>
-              <input type="text" class="form-control" id="org-input" />
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col">
-            <div class="form-group">
-              <label>City and state</label>
-              <input
-                type="text"
-                class="form-control"
-                readonly
-                id="city-state-raw-input"
-              />
-            </div>
-          </div>
-          <div class="col">
-            <div class="form-group">
-              <label>City</label>
-              <input type="text" class="form-control" id="city-input" />
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col"></div>
-          <div class="col">
-            <div class="form-group">
-              <label>State</label>
-              <input type="text" class="form-control" id="state-input" />
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col"></div>
-          <div class="col">
-            <div class="form-group">
-              <label>Country</label>
-              <input type="text" class="form-control" id="country-input" />
-            </div>
+            <div
+              class="admin-map"
+              id="city-map"
+              style="width: 100%; height: 350px;"
+            ></div>
+            <div
+              class="admin-map"
+              id="org-map"
+              style="width: 100%; height: 350px;"
+            ></div>
           </div>
         </div>
       </div>
     </form>
-    <div id="city-map" style="width: 400px; height: 300px;"></div>
-    <div id="org-map" style="width: 400px; height: 300px;"></div>
     <script src="./js/admin.js"></script>
   </body>
 </html>

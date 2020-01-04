@@ -1,9 +1,11 @@
-import * as usaStates from "usa-states";
+import { initMapbox } from "./shared.js";
+
+import { UsaStates } from "usa-states";
 
 // https://github.com/parcel-bundler/parcel/issues/871#issuecomment-367899522
 import "babel-polyfill";
 
-const USA_STATES = new usaStates.UsaStates().states;
+const USA_STATES = new UsaStates().states;
 
 async function getData() {
   const resp = await fetch("/api/v1/admin/data");
@@ -31,28 +33,31 @@ function normalizeWhitespace(str) {
   return parts.join(" ");
 }
 
-// Taken from <>https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions>
+// Taken from <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions>
 function escapeRegExp(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
 }
 
-function containsCaseInsensitive(string, pattern) {
-  return string.toUpperCase().includes(pattern.toUpperCase());
+function containsWordCaseInsensitive(string, pattern) {
+  return !!string.match(new RegExp(`\b` + escapeRegExp(pattern) + `\b`, "i"));
 }
 
-function replaceCaseInsensitive(string, pattern, replacement) {
-  return string.replace(new RegExp(escapeRegExp(pattern), "ig"), replacement);
+function replaceWordCaseInsensitive(string, pattern, replacement) {
+  return string.replace(
+    new RegExp(`\b` + escapeRegExp(pattern) + `\b`, "ig"),
+    replacement
+  );
 }
 
 function parseCityStateCountry(cityState) {
-  cityState = normalizeWhitespace(cityState.replace(/,/g, ""));
+  cityState = normalizeWhitespace(cityState.replace(/,/g, " "));
   for (const state of USA_STATES) {
     if (
-      containsCaseInsensitive(cityState, state.name) ||
-      containsCaseInsensitive(cityState, state.abbreviation)
+      containsWordCaseInsensitive(cityState, state.name) ||
+      containsWordCaseInsensitive(cityState, state.abbreviation)
     ) {
-      cityState = replaceCaseInsensitive(cityState, state.name, "");
-      cityState = replaceCaseInsensitive(cityState, state.abbreviation, "");
+      cityState = replaceWordCaseInsensitive(cityState, state.name, "");
+      cityState = replaceWordCaseInsensitive(cityState, state.abbreviation, "");
       return {
         city: normalizeWhitespace(cityState),
         state: state.abbreviation,
@@ -111,6 +116,17 @@ function initPage(responses) {
       })
     );
   });
+  initMapbox();
+  return {
+    cityMap: new mapboxgl.Map({
+      container: "city-map",
+      style: "mapbox://styles/mapbox/streets-v9"
+    }),
+    orgMap: new mapboxgl.Map({
+      container: "org-map",
+      style: "mapbox://styles/mapbox/streets-v9"
+    })
+  };
 }
 
 function selectResponse(responses, idx) {
