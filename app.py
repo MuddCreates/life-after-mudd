@@ -38,6 +38,7 @@ def set_admin_data():
         with open("data-admin.json.tmp", "w") as f:
             json.dump(data, f)
         os.rename("data-admin.json.tmp", "data-admin.json")
+        return "Wrote data successfully", 200
     except OSError:
         return "Failed to write data", 500
 

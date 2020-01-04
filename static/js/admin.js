@@ -139,6 +139,33 @@ function setOrgCoords(coords) {
   $("#org-long-input").val(longitude);
 }
 
+function saveFormData() {
+  const responses = $("body").data("responses");
+  const idx = $("body").data("idx");
+  const r = responses[idx];
+  r.name = $("#name-input").val();
+  r.email = $("#email-input").val();
+  r.major = $("#major-input").val();
+  r.path = $("#path-input").val();
+  r.org = $("#org-input").val();
+  r.city = $("#city-input").val();
+  r.state = $("#state-input").val();
+  r.country = $("#country-input").val();
+  r.cityLat = $("#city-lat-input").val();
+  r.cityLong = $("#city-long-input").val();
+  r.orgLat = $("#org-lat-input").val();
+  r.orgLong = $("#org-long-input").val();
+  r.processed = "yes";
+}
+
+function submitForm() {
+  saveFormData();
+  const responses = $("body").data("responses");
+  setData(responses);
+  $("body").data("idx", getDefaultIndex(responses));
+  populateForm();
+}
+
 function initPage() {
   const responses = $("body").data("responses");
   $("#response-dropdown")
@@ -154,6 +181,8 @@ function initPage() {
   });
   $("#set-city-button").on("click", setCityCoords);
   $("#set-org-button").on("click", setOrgCoords);
+  $("#next-button").on("click", submitForm);
+  $("#response-form").on("submit", submitForm);
   initMapbox();
   initMap("city-map");
   initMap("org-map");
