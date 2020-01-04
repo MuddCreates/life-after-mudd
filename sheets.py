@@ -11,7 +11,7 @@ import oauth2client.service_account
 COLUMNS = (
     ("Timestamp", "timestamp"),
     ("Email Address", "emailRaw"),
-    ("Your name", "nameRaw"),
+    ("Your first and last name", "nameRaw"),
     ("Your major", "majorRaw"),
     ("What are you doing?", "pathRaw"),
     ("At what company, school, or organization?", "orgRaw"),
