@@ -104,7 +104,43 @@ function getDefaultIndex(responses) {
   return responses.length - 1;
 }
 
-function initPage(responses) {
+function initMap(id) {
+  const map = new mapboxgl.Map({
+    container: id,
+    style: "mapbox://styles/mapbox/streets-v9"
+  });
+  const search = new MapboxGeocoder({
+    accessToken: mapboxgl.accessToken,
+    mapboxgl: mapboxgl
+  });
+  map.addControl(search);
+  $("#" + id)
+    .data("map", map)
+    .data("search", search);
+}
+
+function setCityCoords(coords) {
+  const [longitude, latitude] =
+    coords ||
+    $("#city-map")
+      .data("search")
+      .getProximity();
+  $("#city-lat-input").val(latitude);
+  $("#city-long-input").val(longitude);
+}
+
+function setOrgCoords(coords) {
+  const [longitude, latitude] =
+    coords ||
+    $("#org-map")
+      .data("search")
+      .getProximity();
+  $("#org-lat-input").val(latitude);
+  $("#org-long-input").val(longitude);
+}
+
+function initPage() {
+  const responses = $("body").data("responses");
   $("#response-dropdown")
     .find("option")
     .remove();
@@ -116,20 +152,40 @@ function initPage(responses) {
       })
     );
   });
+  $("#set-city-button").on("click", setCityCoords);
+  $("#set-org-button").on("click", setOrgCoords);
   initMapbox();
-  return {
-    cityMap: new mapboxgl.Map({
-      container: "city-map",
-      style: "mapbox://styles/mapbox/streets-v9"
-    }),
-    orgMap: new mapboxgl.Map({
-      container: "org-map",
-      style: "mapbox://styles/mapbox/streets-v9"
-    })
-  };
+  initMap("city-map");
+  initMap("org-map");
+  $("#city-map")
+    .data("search")
+    .on("result", response => {
+      const idx = $("body").data("idx");
+      if (
+        !$("#city-lat-input").val() &&
+        !$("#city-long-input").val() &&
+        !responses[idx].processed
+      ) {
+        setCityCoords(response.result.center);
+      }
+    });
+  $("#org-map")
+    .data("search")
+    .on("result", response => {
+      const idx = $("body").data("idx");
+      if (
+        !$("#org-lat-input").val() &&
+        !$("#org-long-input").val() &&
+        !responses[idx].processed
+      ) {
+        setOrgCoords(response.result.center);
+      }
+    });
 }
 
-function selectResponse(responses, idx) {
+function populateForm() {
+  const responses = $("body").data("responses");
+  const idx = $("body").data("idx");
   const r = responses[idx];
   $("#name-raw-input").val(r.nameRaw);
   $("#email-raw-input").val(r.emailRaw);
@@ -145,13 +201,41 @@ function selectResponse(responses, idx) {
   $("#city-input").val(r.city);
   $("#state-input").val(r.state);
   $("#country-input").val(r.country);
+  const cityQuery = r.processed
+    ? [r.city, r.state, r.country].join(", ")
+    : r.cityStateRaw;
+  $("#city-map")
+    .data("search")
+    .query(cityQuery);
+  const onResults = response => {
+    if (response.features) {
+      const [longitude, latitude] = response.features[0].center;
+      $("#org-map")
+        .data("search")
+        .setProximity({ latitude, longitude });
+    }
+    $("#org-map")
+      .data("search")
+      .query(r.org || r.orgRaw);
+  };
+  const prevOnResults = $("#city-map").data("onResults");
+  if (prevOnResults) {
+    $("#city-map")
+      .data("search")
+      .off("results", prevOnResults);
+  }
+  $("#city-map")
+    .data("search")
+    .on("results", onResults);
 }
 
 async function main() {
   let responses = await getData();
   responses = fillDefaults(responses);
-  initPage(responses);
-  selectResponse(responses, getDefaultIndex(responses));
+  $("body").data("responses", responses);
+  $("body").data("idx", getDefaultIndex(responses));
+  initPage();
+  populateForm();
 }
 
 main().catch(console.error);
