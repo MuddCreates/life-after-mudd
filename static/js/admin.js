@@ -20,7 +20,7 @@ async function setData(data) {
   const resp = await fetch("/api/v1/admin/data", {
     method: "post",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   });
   if (!resp.ok) {
     throw new Error(`HTTP status ${resp.status}`);
@@ -45,7 +45,7 @@ function containsWordCaseInsensitive(string, pattern) {
 function replaceWordCaseInsensitive(string, pattern, replacement) {
   return string.replace(
     new RegExp(`\b` + escapeRegExp(pattern) + `\b`, "ig"),
-    replacement
+    replacement,
   );
 }
 
@@ -61,14 +61,14 @@ function parseCityStateCountry(cityState) {
       return {
         city: normalizeWhitespace(cityState),
         state: state.abbreviation,
-        country: "United States"
+        country: "United States",
       };
     }
   }
   return {
     city: cityState,
     state: "",
-    country: "United States"
+    country: "United States",
   };
 }
 
@@ -89,6 +89,18 @@ function fillDefaults(responses) {
       r.state = r.state || csc.state;
       r.country = r.country || csc.country;
     }
+    r.summerCityState = r.rawSummerCityState;
+    if (r.rawSummerPath === "Same as above") {
+      r.summerPath = r.path;
+      r.summerOrg = r.summerOrg || r.org;
+      r.summerCityState = r.summerCityState || r.rawCityState;
+      if (!(r.summerCity && r.summerState && r.summerCountry)) {
+        const csc = parseCityStateCountry(r.rawSummerCityState);
+        r.summerCity = r.summerCity || csc.summerCity;
+        r.summerState = r.summerState || csc.summerState;
+        r.summerCountry = r.summerCountry || csc.summerCountry;
+      }
+    }
     return r;
   });
 }
@@ -107,36 +119,16 @@ function getDefaultIndex(responses) {
 function initMap(id) {
   const map = new mapboxgl.Map({
     container: id,
-    style: "mapbox://styles/mapbox/streets-v9"
+    style: "mapbox://styles/mapbox/streets-v9",
   });
   const search = new MapboxGeocoder({
     accessToken: mapboxgl.accessToken,
-    mapboxgl: mapboxgl
+    mapboxgl: mapboxgl,
   });
   map.addControl(search);
   $("#" + id)
     .data("map", map)
     .data("search", search);
-}
-
-function setCityCoords(coords) {
-  const [longitude, latitude] =
-    coords ||
-    $("#city-map")
-      .data("search")
-      .getProximity();
-  $("#city-lat-input").val(latitude);
-  $("#city-long-input").val(longitude);
-}
-
-function setOrgCoords(coords) {
-  const [longitude, latitude] =
-    coords ||
-    $("#org-map")
-      .data("search")
-      .getProximity();
-  $("#org-lat-input").val(latitude);
-  $("#org-long-input").val(longitude);
 }
 
 function saveFormData() {
@@ -175,41 +167,54 @@ function initPage() {
     $("#response-dropdown").append(
       $("<option>", {
         value: idx,
-        text: response.name
-      })
+        text: response.name,
+      }),
     );
   });
-  $("#set-city-button").on("click", setCityCoords);
-  $("#set-org-button").on("click", setOrgCoords);
   $("#next-button").on("click", submitForm);
   $("#response-form").on("submit", submitForm);
   initMapbox();
-  initMap("city-map");
-  initMap("org-map");
-  $("#city-map")
-    .data("search")
-    .on("result", response => {
+  for (const { cityMap, latInput, longInput, setButton } of [
+    {
+      cityMap: $("#city-map"),
+      latInput: $("#city-lat-input"),
+      longInput: $("#city-long-input"),
+      setButton: $("#set-city-button"),
+    },
+    {
+      cityMap: $("#org-map"),
+      latInput: $("#org-lat-input"),
+      longInput: $("#org-long0input"),
+      setButton: $("#set-org-button"),
+    },
+    {
+      cityMap: $("#summer-city-map"),
+      latInput: $("#summer-city-lat-input"),
+      longInput: $("#summer-city-long-input"),
+      setButton: $("#set-summer-city-button"),
+    },
+    {
+      cityMap: $("#summer-org-map"),
+      latInput: $("#summer-org-lat-input"),
+      longInput: $("#summer-org-long0input"),
+      setButton: $("#set-summer-org-button"),
+    },
+  ]) {
+    initMap(cityMap.attr("id"));
+    const setCoords = coords => {
+      const [longitude, latitude] =
+        coords || cityMap.data("search").getProximity();
+      latInput.val(latitude);
+      longInput.val(longitude);
+    };
+    setButton.on("click", setCoords);
+    cityMap.data("search").on("result", response => {
       const idx = $("body").data("idx");
-      if (
-        !$("#city-lat-input").val() &&
-        !$("#city-long-input").val() &&
-        !responses[idx].processed
-      ) {
-        setCityCoords(response.result.center);
+      if (!latInput.val() && !longInput.val() && !responses[idx].processed) {
+        setCoords(response.result.center);
       }
     });
-  $("#org-map")
-    .data("search")
-    .on("result", response => {
-      const idx = $("body").data("idx");
-      if (
-        !$("#org-lat-input").val() &&
-        !$("#org-long-input").val() &&
-        !responses[idx].processed
-      ) {
-        setOrgCoords(response.result.center);
-      }
-    });
+  }
 }
 
 function populateForm() {
@@ -222,6 +227,9 @@ function populateForm() {
   $("#path-raw-input").val(r.rawPath);
   $("#org-raw-input").val(r.rawOrg);
   $("#city-state-raw-input").val(r.rawCityState);
+  $("#summer-path-raw-input").val(r.rawSummerPath);
+  $("#summer-org-raw-input").val(r.rawSummerOrg);
+  $("#summer-city-state-raw-input").val(r.rawSummerCityState);
   $("#name-input").val(r.name);
   $("#email-input").val(r.email);
   $("#major-input").val(r.major);
@@ -230,32 +238,60 @@ function populateForm() {
   $("#city-input").val(r.city);
   $("#state-input").val(r.state);
   $("#country-input").val(r.country);
-  const cityQuery = r.processed
-    ? [r.city, r.state, r.country].join(", ")
-    : r.rawCityState;
-  $("#city-map")
-    .data("search")
-    .query(cityQuery);
-  const onResults = response => {
-    if (response.features) {
-      const [longitude, latitude] = response.features[0].center;
-      $("#org-map")
+  $("#summer-path-input").val(r.path);
+  $("#summer-org-input").val(r.org);
+  $("#summer-city-input").val(r.city);
+  $("#summer-state-input").val(r.state);
+  $("#summer-country-input").val(r.country);
+  for (const cfg of [
+    {
+      rawCityState: "rawCityState",
+      city: "city",
+      state: "state",
+      country: "country",
+      cityMap: "#city-map",
+      orgMap: "#org-map",
+    },
+    {
+      rawCityState: "summerCityState",
+      city: "summerCity",
+      state: "summerState",
+      country: "summerCountry",
+      cityMap: "#summer-city-map",
+      orgMap: "#summer-org-map",
+    },
+  ]) {
+    // hack around race condition using timeout
+    setTimeout(() => {
+      let cityQuery = r[cfg.rawCityState];
+      if (r.processed) {
+        cityQuery = [r[cfg.city], r[cfg.state], r[cfg.country]].join(", ");
+      }
+      $(cfg.cityMap)
         .data("search")
-        .setProximity({ latitude, longitude });
-    }
-    $("#org-map")
-      .data("search")
-      .query(r.org || r.rawOrg);
-  };
-  const prevOnResults = $("#city-map").data("onResults");
-  if (prevOnResults) {
-    $("#city-map")
-      .data("search")
-      .off("results", prevOnResults);
+        .query(cityQuery);
+      const onResults = response => {
+        if (response.features) {
+          const [longitude, latitude] = response.features[0].center;
+          $(cfg.orgMap)
+            .data("search")
+            .setProximity({ latitude, longitude });
+        }
+        $(cfg.orgMap)
+          .data("search")
+          .query(r.org || r.rawOrg);
+      };
+      const prevOnResults = $(cfg.cityMap).data("onResults");
+      if (prevOnResults) {
+        $(cfg.cityMap)
+          .data("search")
+          .off("results", prevOnResults);
+      }
+      $(cfg.cityMap)
+        .data("search")
+        .on("results", onResults);
+    }, 100);
   }
-  $("#city-map")
-    .data("search")
-    .on("results", onResults);
 }
 
 async function main() {

@@ -4,6 +4,11 @@ body {
 
 .admin-map {
   margin-bottom: 35px;
+  height: 350px;
+}
+
+.form-column {
+  width: 70%;
 }
 
 .header-row {
