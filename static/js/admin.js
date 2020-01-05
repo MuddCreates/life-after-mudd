@@ -96,7 +96,7 @@ function fillDefaults(responses) {
     r.major = r.major || r.rawMajor;
     r.path = r.path || r.rawPath;
     r.org = r.org || r.rawOrg;
-    if (!(r.city && r.state && r.country)) {
+    if (!(r.city || r.state || r.country)) {
       const csc = parseCityStateCountry(r.rawCityState);
       r.city = r.city || csc.city;
       r.state = r.state || csc.state;
@@ -107,11 +107,11 @@ function fillDefaults(responses) {
       r.summerPath = r.path;
       r.summerOrg = r.summerOrg || r.org;
       r.summerCityState = r.summerCityState || r.rawCityState;
-      if (!(r.summerCity && r.summerState && r.summerCountry)) {
-        const csc = parseCityStateCountry(r.rawSummerCityState);
-        r.summerCity = r.summerCity || csc.summerCity;
-        r.summerState = r.summerState || csc.summerState;
-        r.summerCountry = r.summerCountry || csc.summerCountry;
+      if (!(r.summerCity || r.summerState || r.summerCountry)) {
+        const csc = parseCityStateCountry(r.summerCityState);
+        r.summerCity = r.summerCity || csc.city;
+        r.summerState = r.summerState || csc.state;
+        r.summerCountry = r.summerCountry || csc.country;
       }
     }
     r.comments = r.comments || r.rawComments;
@@ -139,6 +139,7 @@ function initMap(id) {
     accessToken: mapboxgl.accessToken,
     mapboxgl: mapboxgl,
   });
+  search.setFlyTo({ duration: 0 });
   map.addControl(search);
   $("#" + id)
     .data("map", map)
@@ -195,6 +196,18 @@ function initPage() {
   });
   $("#next-button").on("click", submitForm);
   $("#response-form").on("submit", submitForm);
+  $("#major-dropdown a").on("click", function() {
+    const value = $(this).text();
+    $("#major-input").val(value);
+  });
+  $("#path-dropdown a").on("click", function() {
+    const value = $(this).text();
+    $("#path-input").val(value);
+  });
+  $("#summer-path-dropdown a").on("click", function() {
+    const value = $(this).text();
+    $("#summer-path-input").val(value);
+  });
   initMapbox();
   for (const { cityMap, coordsInput, setButton } of [
     {
