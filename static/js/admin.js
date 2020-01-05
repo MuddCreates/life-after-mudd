@@ -39,27 +39,31 @@ function escapeRegExp(string) {
 }
 
 function containsWordCaseInsensitive(string, pattern) {
-  return !!string.match(new RegExp(`\b` + escapeRegExp(pattern) + `\b`, "i"));
+  return !!string.match(new RegExp("\\b" + escapeRegExp(pattern) + "\\b", "i"));
 }
 
 function replaceWordCaseInsensitive(string, pattern, replacement) {
   return string.replace(
-    new RegExp(`\b` + escapeRegExp(pattern) + `\b`, "ig"),
+    new RegExp("\\b" + escapeRegExp(pattern) + "\\b", "ig"),
     replacement,
   );
 }
 
 function parseCityStateCountry(cityState) {
-  cityState = normalizeWhitespace(cityState.replace(/,/g, " "));
+  let normCityState = normalizeWhitespace(cityState.replace(/,/g, " "));
   for (const state of USA_STATES) {
     if (
-      containsWordCaseInsensitive(cityState, state.name) ||
-      containsWordCaseInsensitive(cityState, state.abbreviation)
+      containsWordCaseInsensitive(normCityState, state.name) ||
+      containsWordCaseInsensitive(normCityState, state.abbreviation)
     ) {
-      cityState = replaceWordCaseInsensitive(cityState, state.name, "");
-      cityState = replaceWordCaseInsensitive(cityState, state.abbreviation, "");
+      normCityState = replaceWordCaseInsensitive(normCityState, state.name, "");
+      normCityState = replaceWordCaseInsensitive(
+        normCityState,
+        state.abbreviation,
+        "",
+      );
       return {
-        city: normalizeWhitespace(cityState),
+        city: normalizeWhitespace(normCityState),
         state: state.abbreviation,
         country: "United States",
       };
@@ -143,10 +147,13 @@ function saveFormData() {
   r.city = $("#city-input").val();
   r.state = $("#state-input").val();
   r.country = $("#country-input").val();
-  r.cityLat = $("#city-lat-input").val();
-  r.cityLong = $("#city-long-input").val();
-  r.orgLat = $("#org-lat-input").val();
-  r.orgLong = $("#org-long-input").val();
+  [r.cityLat, r.cityLong] = $("#city-lat-input")
+    .val()
+    .split(", ");
+  [r.orgLat, r.orgLong] = $("#org-coords-input")
+    .val()
+    .split(", ");
+  r.comments = $("#comments-input").val();
   r.processed = "yes";
 }
 
@@ -174,44 +181,40 @@ function initPage() {
   $("#next-button").on("click", submitForm);
   $("#response-form").on("submit", submitForm);
   initMapbox();
-  for (const { cityMap, latInput, longInput, setButton } of [
+  for (const { cityMap, coordsInput, setButton } of [
     {
       cityMap: $("#city-map"),
-      latInput: $("#city-lat-input"),
-      longInput: $("#city-long-input"),
+      coordsInput: $("#city-coords-input"),
       setButton: $("#set-city-button"),
     },
     {
       cityMap: $("#org-map"),
-      latInput: $("#org-lat-input"),
-      longInput: $("#org-long0input"),
+      coordsInput: $("#org-coords-input"),
       setButton: $("#set-org-button"),
     },
     {
       cityMap: $("#summer-city-map"),
-      latInput: $("#summer-city-lat-input"),
-      longInput: $("#summer-city-long-input"),
+      coordsInput: $("#summer-city-coords-input"),
       setButton: $("#set-summer-city-button"),
     },
     {
       cityMap: $("#summer-org-map"),
-      latInput: $("#summer-org-lat-input"),
-      longInput: $("#summer-org-long0input"),
+      coordsInput: $("#summer-org-coords-input"),
       setButton: $("#set-summer-org-button"),
     },
   ]) {
     initMap(cityMap.attr("id"));
     const setCoords = coords => {
-      const [longitude, latitude] =
+      const { latitude, longitude } =
         coords || cityMap.data("search").getProximity();
-      latInput.val(latitude);
-      longInput.val(longitude);
+      coordsInput.val(`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
     };
-    setButton.on("click", setCoords);
+    setButton.on("click", () => setCoords());
     cityMap.data("search").on("result", response => {
       const idx = $("body").data("idx");
-      if (!latInput.val() && !longInput.val() && !responses[idx].processed) {
-        setCoords(response.result.center);
+      if (!coordsInput.val() && !responses[idx].processed) {
+        const [longitude, latitude] = response.result.center;
+        setCoords({ latitude, longitude });
       }
     });
   }
@@ -243,6 +246,8 @@ function populateForm() {
   $("#summer-city-input").val(r.city);
   $("#summer-state-input").val(r.state);
   $("#summer-country-input").val(r.country);
+  $("#comments-raw-input").val(r.rawComments);
+  $("#comments-input").val(r.comments);
   for (const cfg of [
     {
       rawCityState: "rawCityState",
