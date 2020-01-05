@@ -114,6 +114,7 @@ function fillDefaults(responses) {
         r.summerCountry = r.summerCountry || csc.summerCountry;
       }
     }
+    r.comments = r.comments || r.rawComments;
     return r;
   });
 }
