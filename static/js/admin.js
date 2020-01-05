@@ -42,35 +42,44 @@ function containsWordCaseInsensitive(string, pattern) {
   return !!string.match(new RegExp("\\b" + escapeRegExp(pattern) + "\\b", "i"));
 }
 
-function replaceWordCaseInsensitive(string, pattern, replacement) {
-  return string.replace(
-    new RegExp("\\b" + escapeRegExp(pattern) + "\\b", "ig"),
-    replacement,
+function reverseString(string) {
+  return [...string].reverse().join("");
+}
+
+function deleteLastWordCaseInsensitive(string, pattern) {
+  return reverseString(
+    reverseString(string).replace(
+      new RegExp("\\b" + escapeRegExp(reverseString(pattern)) + "\\b", "i"),
+      "",
+    ),
   );
+}
+
+function capitalize(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 function parseCityStateCountry(cityState) {
   let normCityState = normalizeWhitespace(cityState.replace(/,/g, " "));
   for (const state of USA_STATES) {
-    if (
-      containsWordCaseInsensitive(normCityState, state.name) ||
-      containsWordCaseInsensitive(normCityState, state.abbreviation)
-    ) {
-      normCityState = replaceWordCaseInsensitive(normCityState, state.name, "");
-      normCityState = replaceWordCaseInsensitive(
+    if (containsWordCaseInsensitive(normCityState, state.abbreviation)) {
+      normCityState = deleteLastWordCaseInsensitive(
         normCityState,
         state.abbreviation,
-        "",
       );
-      return {
-        city: normalizeWhitespace(normCityState),
-        state: state.abbreviation,
-        country: "United States",
-      };
+    } else if (containsWordCaseInsensitive(normCityState, state.name)) {
+      normCityState = deleteLastWordCaseInsensitive(normCityState, state.name);
+    } else {
+      continue;
     }
+    return {
+      city: capitalize(normalizeWhitespace(normCityState)),
+      state: state.abbreviation,
+      country: "United States",
+    };
   }
   return {
-    city: cityState,
+    city: capitalize(cityState.trim()),
     state: "",
     country: "United States",
   };
@@ -178,6 +187,11 @@ function initPage() {
       }),
     );
   });
+  $("#response-dropdown").on("change", () => {
+    const idx = parseInt($("#response-dropdown").val());
+    $("body").data("idx", idx);
+    populateForm(idx);
+  });
   $("#next-button").on("click", submitForm);
   $("#response-form").on("submit", submitForm);
   initMapbox();
@@ -241,11 +255,11 @@ function populateForm() {
   $("#city-input").val(r.city);
   $("#state-input").val(r.state);
   $("#country-input").val(r.country);
-  $("#summer-path-input").val(r.path);
-  $("#summer-org-input").val(r.org);
-  $("#summer-city-input").val(r.city);
-  $("#summer-state-input").val(r.state);
-  $("#summer-country-input").val(r.country);
+  $("#summer-path-input").val(r.summerPath);
+  $("#summer-org-input").val(r.summerOrg);
+  $("#summer-city-input").val(r.summerCity);
+  $("#summer-state-input").val(r.summerState);
+  $("#summer-country-input").val(r.summerCountry);
   $("#comments-raw-input").val(r.rawComments);
   $("#comments-input").val(r.comments);
   for (const cfg of [

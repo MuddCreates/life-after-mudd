@@ -22,7 +22,7 @@ COLUMNS = (
         "rawSummerOrg",
     ),
     ("In what city and state (if different for the summer)?", "rawSummerCityState"),
-    ("Anything else you want to share?", "rawComment"),
+    ("Anything else you want to share?", "rawComments"),
     ("", "blank"),
     ("Processed", "processed"),
     ("Email", "email"),
@@ -46,6 +46,7 @@ COLUMNS = (
     ("Summer country", "summerCountry"),
     ("Summer city latitude", "summerCityLat"),
     ("Summer city longitude", "summerCityLong"),
+    ("Comments", "comments"),
 )
 
 
