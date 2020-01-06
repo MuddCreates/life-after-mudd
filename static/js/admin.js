@@ -102,17 +102,18 @@ function fillDefaults(responses) {
       r.state = r.state || csc.state;
       r.country = r.country || csc.country;
     }
-    r.summerCityState = r.rawSummerCityState;
-    if (r.rawSummerPath === "Same as above") {
-      r.summerPath = r.path;
-      r.summerOrg = r.summerOrg || r.org;
-      r.summerCityState = r.summerCityState || r.rawCityState;
-      if (!(r.summerCity || r.summerState || r.summerCountry)) {
-        const csc = parseCityStateCountry(r.summerCityState);
-        r.summerCity = r.summerCity || csc.city;
-        r.summerState = r.summerState || csc.state;
-        r.summerCountry = r.summerCountry || csc.country;
-      }
+    if (r.rawHasSummerPlans === "No") {
+      r.rawSummerPath = r.rawPath;
+      r.rawSummerOrg = r.rawOrg;
+      r.rawSummerCityState = r.rawCityState;
+    }
+    r.summerPath = r.summerPath || r.rawSummerPath;
+    r.summerOrg = r.summerOrg || r.rawSummerOrg;
+    if (!(r.summerCity || r.summerState || r.summerCountry)) {
+      const csc = parseCityStateCountry(r.rawSummerCityState);
+      r.summerCity = r.summerCity || csc.city;
+      r.summerState = r.summerState || csc.state;
+      r.summerCountry = r.summerCountry || csc.country;
     }
     r.comments = r.comments || r.rawComments;
     return r;
@@ -286,7 +287,7 @@ function populateForm() {
       orgMap: "#org-map",
     },
     {
-      rawCityState: "summerCityState",
+      rawCityState: "rawSummerCityState",
       city: "summerCity",
       state: "summerState",
       country: "summerCountry",
