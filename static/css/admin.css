@@ -14,3 +14,7 @@ body {
 .header-row {
   margin-bottom: 30px;
 }
+
+.mapboxgl-ctrl-geocoder {
+  width: 420px;
+}
