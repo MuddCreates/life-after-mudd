@@ -146,6 +146,13 @@ function initMap(id) {
     mapboxgl: mapboxgl,
     trackProximity: false,
   });
+  search.__onChange = search._onChange;
+  search._onChange = function() {
+    this._inputEl._focus = this._inputEl.focus;
+    this._inputEl.focus = () => {};
+    search.__onChange();
+    this._inputEl.focus = this._inputEl._focus;
+  };
   search.setFlyTo({ duration: 0 });
   map.addControl(search);
   $("#" + id)
@@ -190,7 +197,7 @@ function locateCity({ processed, summer }) {
     ? $("#summer-city-state-raw-input")
     : $("#city-state-raw-input");
   const cityMap = summer ? $("#summer-city-map") : $("#city-map");
-  cityMap.data("search").clear();
+  cityMap.data("search")._clear();
   // Don't use country input because for some reason including
   // "United States" at the end of a search query sometimes causes
   // the Mapbox geocoder to malfunction weirdly??
@@ -204,7 +211,7 @@ function locateOrg({ summer }) {
   const orgInput = summer ? $("#summer-org-input") : $("#org-input");
   const cityMap = summer ? $("#summer-city-map") : $("#city-map");
   const orgMap = summer ? $("#summer-org-map") : $("#org-map");
-  orgMap.data("search").clear();
+  orgMap.data("search")._clear();
   const proximity = cityMap.data("search").getProximity();
   if (proximity) {
     orgMap.data("search").setProximity(proximity);
