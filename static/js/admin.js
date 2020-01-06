@@ -86,10 +86,15 @@ function parseCityStateCountry(cityState) {
 }
 
 function fillDefaults(responses) {
+  let idx = 0;
   return responses.map(r => {
     r = { ...r };
-    if (r.processed) {
+    // Make it so form response updates are automatically queued for
+    // reprocessing.
+    if (r.processed === r.timestamp) {
       return r;
+    } else {
+      r.processed = "";
     }
     r.email = r.email || r.rawEmail.replace("g.hmc.edu", "hmc.edu");
     r.name = r.name || r.rawName;
@@ -166,7 +171,7 @@ function saveFormData() {
     .val()
     .split(", ");
   r.comments = $("#comments-input").val();
-  r.processed = "yes";
+  r.processed = idx;
 }
 
 function submitForm() {
