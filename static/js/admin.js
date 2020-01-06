@@ -157,6 +157,7 @@ function initMap(id) {
   map.addControl(search);
   $("#" + id)
     .data("map", map)
+    .data("origBounds", map.getBounds())
     .data("search", search);
 }
 
@@ -238,7 +239,7 @@ function locateOrg({ summer }) {
 
 function resetMap(map) {
   map.data("search")._clear();
-  console.log("reset map", map);
+  map.data("map").fitBounds(map.data("origBounds"), { duration: 0 });
 }
 
 function initPage() {
