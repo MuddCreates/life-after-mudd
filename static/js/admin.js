@@ -283,9 +283,9 @@ function initPage() {
     setButton.on("click", () => setCoords());
     map.data("search").on("result", response => {
       const idx = $("body").data("idx");
+      const [longitude, latitude] = response.result.center;
+      map.data("search").setProximity({ latitude, longitude });
       if (!coordsInput.val() && !responses[idx].processed) {
-        const [longitude, latitude] = response.result.center;
-        map.data("search").setProximity({ latitude, longitude });
         setCoords({ latitude, longitude });
       }
       if (map.data("onFirstResult")) {
