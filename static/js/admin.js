@@ -183,6 +183,29 @@ function submitForm() {
   populateForm();
 }
 
+function locateCity({ processed, summer }) {
+  const cityInput = summer ? $("#summer-city-input") : $("#city-input");
+  const stateInput = summer ? $("#summer-state-input") : $("#state-input");
+  const cityMap = summer ? $("#summer-city-map") : $("#city-map");
+  cityMap.data("search").clear();
+  // Don't use country input because for some reason including
+  // "United States" at the end of a search query sometimes causes
+  // the Mapbox geocoder to malfunction weirdly??
+  const query = processed
+    ? [cityInput.val(), stateInput.val()].join(", ")
+    : rawCityStateInput.val();
+  cityMap.data("search").query(query);
+}
+
+function locateOrg({ summer }) {
+  orgMap.data("search").clear();
+  const proximity = cityMap.data("search").getProximity();
+  if (proximity) {
+    orgMap.data("search").setProximity(proximity);
+  }
+  orgMap.data("search").query(orgInput.val());
+}
+
 function initPage() {
   const responses = $("body").data("responses");
   $("#response-dropdown")
@@ -254,10 +277,18 @@ function initPage() {
       }
       if (map.data("onFirstResult")) {
         map.data("onFirstResult")();
-        map.data("onFirstResult", undefined);
+        map.data("onFirstResult", null);
       }
     });
   }
+  $("#locate-city-button").on("click", () =>
+    locateCity({ processed: true, summer: false }),
+  );
+  $("#locate-summer-city-button").on("click", () =>
+    locateCity({ processed: true, summer: true }),
+  );
+  $("#locate-org-button").on("click", () => locateOrg({ summer: false }));
+  $("#locate-summer-org-button").on("click", () => locateOrg({ summer: true }));
 }
 
 function populateForm() {
@@ -288,58 +319,12 @@ function populateForm() {
   $("#summer-country-input").val(r.summerCountry);
   $("#comments-raw-input").val(r.rawComments);
   $("#comments-input").val(r.comments);
-  for (const {
-    rawCityStateInput,
-    cityInput,
-    stateInput,
-    countryInput,
-    orgInput,
-    cityMap,
-    orgMap,
-    locateCityButton,
-    locateOrgButton,
-  } of [
-    {
-      rawCityStateInput: $("#city-state-raw-input"),
-      cityInput: $("#city-input"),
-      stateInput: $("#state-input"),
-      countryInput: $("#country-input"),
-      orgInput: $("#org-input"),
-      cityMap: $("#city-map"),
-      orgMap: $("#org-map"),
-      locateCityButton: $("#locate-city-button"),
-      locateOrgButton: $("#locate-org-button"),
-    },
-    {
-      rawCityStateInput: $("#summer-city-state-raw-input"),
-      cityInput: $("#summer-city-input"),
-      stateInput: $("#summer-state-input"),
-      countryInput: $("#summer-country-input"),
-      orgInput: $("#summer-org-input"),
-      cityMap: $("#summer-city-map"),
-      orgMap: $("#summer-org-map"),
-      locateCityButton: $("#locate-summer-city-button"),
-      locateOrgButton: $("#locate-summer-org-button"),
-    },
-  ]) {
-    const locateCity = ({ useProcessed }) => {
-      const query = useProcessed
-        ? [cityInput.val(), stateInput.val(), countryInput.val()].join(", ")
-        : rawCityStateInput.val();
-      cityMap.data("search").query(query);
-    };
-    const locateOrg = () => {
-      const proximity = cityMap.data("search").getProximity();
-      if (proximity) {
-        orgMap.data("search").setProximity(proximity);
-      }
-      orgMap.data("search").query(orgInput.val());
-    };
-    locateCityButton.on("click", () => locateCity({ useProcessed: true }));
-    locateOrgButton.on("click", () => locateOrg());
-    locateCity({ useProcessed: false });
-    cityMap.data("onFirstResult", locateOrg);
-  }
+  $("#city-map").data("onFirstResult", () => locateOrg({ summer: false }));
+  $("#summer-city-map").data("onFirstResult", () =>
+    locateOrg({ summer: true }),
+  );
+  locateCity({ processed: r.processed, summer: false });
+  locateCity({ processed: r.processed, summer: true });
 }
 
 async function main() {
