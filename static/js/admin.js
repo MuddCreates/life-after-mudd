@@ -1,9 +1,11 @@
-import { initMapbox } from "./shared.js";
-
-import { UsaStates } from "usa-states";
-
 // https://github.com/parcel-bundler/parcel/issues/871#issuecomment-367899522
 import "babel-polyfill";
+
+import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
+import $ from "jquery";
+import { UsaStates } from "usa-states";
+
+import { initMapbox } from "./shared.js";
 
 const USA_STATES = new UsaStates().states;
 
