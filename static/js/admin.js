@@ -144,6 +144,7 @@ function initMap(id) {
   const search = new MapboxGeocoder({
     accessToken: mapboxgl.accessToken,
     mapboxgl: mapboxgl,
+    trackProximity: false,
   });
   search.setFlyTo({ duration: 0 });
   map.addControl(search);
@@ -215,40 +216,45 @@ function initPage() {
     $("#summer-path-input").val(value);
   });
   initMapbox();
-  for (const { cityMap, coordsInput, setButton } of [
+  for (const { map, coordsInput, setButton } of [
     {
-      cityMap: $("#city-map"),
+      map: $("#city-map"),
       coordsInput: $("#city-coords-input"),
       setButton: $("#set-city-button"),
     },
     {
-      cityMap: $("#org-map"),
+      map: $("#org-map"),
       coordsInput: $("#org-coords-input"),
       setButton: $("#set-org-button"),
     },
     {
-      cityMap: $("#summer-city-map"),
+      map: $("#summer-city-map"),
       coordsInput: $("#summer-city-coords-input"),
       setButton: $("#set-summer-city-button"),
     },
     {
-      cityMap: $("#summer-org-map"),
+      map: $("#summer-org-map"),
       coordsInput: $("#summer-org-coords-input"),
       setButton: $("#set-summer-org-button"),
     },
   ]) {
-    initMap(cityMap.attr("id"));
+    initMap(map.attr("id"));
     const setCoords = coords => {
       const { latitude, longitude } =
-        coords || cityMap.data("search").getProximity();
+        coords || map.data("search").getProximity();
       coordsInput.val(`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
     };
     setButton.on("click", () => setCoords());
-    cityMap.data("search").on("result", response => {
+    map.data("search").on("result", response => {
       const idx = $("body").data("idx");
       if (!coordsInput.val() && !responses[idx].processed) {
         const [longitude, latitude] = response.result.center;
+        map.data("search").setProximity({ latitude, longitude });
         setCoords({ latitude, longitude });
+      }
+      if (map.data("onFirstResult")) {
+        map.data("onFirstResult")();
+        map.data("onFirstResult", undefined);
       }
     });
   }
@@ -282,44 +288,57 @@ function populateForm() {
   $("#summer-country-input").val(r.summerCountry);
   $("#comments-raw-input").val(r.rawComments);
   $("#comments-input").val(r.comments);
-  for (const { rawCityState, city, state, country, cityMap, orgMap } of [
+  for (const {
+    rawCityStateInput,
+    cityInput,
+    stateInput,
+    countryInput,
+    orgInput,
+    cityMap,
+    orgMap,
+    locateCityButton,
+    locateOrgButton,
+  } of [
     {
-      rawCityState: "rawCityState",
-      city: "city",
-      state: "state",
-      country: "country",
+      rawCityStateInput: $("#city-state-raw-input"),
+      cityInput: $("#city-input"),
+      stateInput: $("#state-input"),
+      countryInput: $("#country-input"),
+      orgInput: $("#org-input"),
       cityMap: $("#city-map"),
       orgMap: $("#org-map"),
+      locateCityButton: $("#locate-city-button"),
+      locateOrgButton: $("#locate-org-button"),
     },
     {
-      rawCityState: "rawSummerCityState",
-      city: "summerCity",
-      state: "summerState",
-      country: "summerCountry",
+      rawCityStateInput: $("#summer-city-state-raw-input"),
+      cityInput: $("#summer-city-input"),
+      stateInput: $("#summer-state-input"),
+      countryInput: $("#summer-country-input"),
+      orgInput: $("#summer-org-input"),
       cityMap: $("#summer-city-map"),
       orgMap: $("#summer-org-map"),
+      locateCityButton: $("#locate-summer-city-button"),
+      locateOrgButton: $("#locate-summer-org-button"),
     },
   ]) {
-    // hack around race condition using timeout
-    setTimeout(() => {
-      let cityQuery = r[rawCityState];
-      if (r.processed) {
-        cityQuery = [r[city], r[state], r[country]].join(", ");
+    const locateCity = ({ useProcessed }) => {
+      const query = useProcessed
+        ? [cityInput.val(), stateInput.val(), countryInput.val()].join(", ")
+        : rawCityStateInput.val();
+      cityMap.data("search").query(query);
+    };
+    const locateOrg = () => {
+      const proximity = cityMap.data("search").getProximity();
+      if (proximity) {
+        orgMap.data("search").setProximity(proximity);
       }
-      cityMap.data("search").query(cityQuery);
-      const onResults = response => {
-        if (response.features) {
-          const [longitude, latitude] = response.features[0].center;
-          orgMap.data("search").setProximity({ latitude, longitude });
-        }
-        orgMap.data("search").query(r.org || r.rawOrg);
-      };
-      const prevOnResults = cityMap.data("onResults");
-      if (prevOnResults) {
-        cityMap.data("search").off("results", prevOnResults);
-      }
-      cityMap.data("search").on("results", onResults);
-    }, 100);
+      orgMap.data("search").query(orgInput.val());
+    };
+    locateCityButton.on("click", () => locateCity({ useProcessed: true }));
+    locateOrgButton.on("click", () => locateOrg());
+    locateCity({ useProcessed: false });
+    cityMap.data("onFirstResult", locateOrg);
   }
 }
 
