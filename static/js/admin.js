@@ -282,53 +282,43 @@ function populateForm() {
   $("#summer-country-input").val(r.summerCountry);
   $("#comments-raw-input").val(r.rawComments);
   $("#comments-input").val(r.comments);
-  for (const cfg of [
+  for (const { rawCityState, city, state, country, cityMap, orgMap } of [
     {
       rawCityState: "rawCityState",
       city: "city",
       state: "state",
       country: "country",
-      cityMap: "#city-map",
-      orgMap: "#org-map",
+      cityMap: $("#city-map"),
+      orgMap: $("#org-map"),
     },
     {
       rawCityState: "rawSummerCityState",
       city: "summerCity",
       state: "summerState",
       country: "summerCountry",
-      cityMap: "#summer-city-map",
-      orgMap: "#summer-org-map",
+      cityMap: $("#summer-city-map"),
+      orgMap: $("#summer-org-map"),
     },
   ]) {
     // hack around race condition using timeout
     setTimeout(() => {
-      let cityQuery = r[cfg.rawCityState];
+      let cityQuery = r[rawCityState];
       if (r.processed) {
-        cityQuery = [r[cfg.city], r[cfg.state], r[cfg.country]].join(", ");
+        cityQuery = [r[city], r[state], r[country]].join(", ");
       }
-      $(cfg.cityMap)
-        .data("search")
-        .query(cityQuery);
+      cityMap.data("search").query(cityQuery);
       const onResults = response => {
         if (response.features) {
           const [longitude, latitude] = response.features[0].center;
-          $(cfg.orgMap)
-            .data("search")
-            .setProximity({ latitude, longitude });
+          orgMap.data("search").setProximity({ latitude, longitude });
         }
-        $(cfg.orgMap)
-          .data("search")
-          .query(r.org || r.rawOrg);
+        orgMap.data("search").query(r.org || r.rawOrg);
       };
-      const prevOnResults = $(cfg.cityMap).data("onResults");
+      const prevOnResults = cityMap.data("onResults");
       if (prevOnResults) {
-        $(cfg.cityMap)
-          .data("search")
-          .off("results", prevOnResults);
+        cityMap.data("search").off("results", prevOnResults);
       }
-      $(cfg.cityMap)
-        .data("search")
-        .on("results", onResults);
+      cityMap.data("search").on("results", onResults);
     }, 100);
   }
 }
