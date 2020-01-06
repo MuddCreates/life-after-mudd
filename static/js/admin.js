@@ -204,7 +204,15 @@ function locateCity({ processed, summer }) {
   const query = processed
     ? [cityInput.val(), stateInput.val()].join(", ")
     : rawCityStateInput.val();
-  cityMap.data("search").query(query);
+  if (query) {
+    cityMap.data("search").query(query);
+  } else {
+    resetMap(cityMap);
+    if (cityMap.data("onFirstResult")) {
+      cityMap.data("onFirstResult")();
+      cityMap.data("onFirstResult", null);
+    }
+  }
 }
 
 function locateOrg({ summer }) {
@@ -216,7 +224,21 @@ function locateOrg({ summer }) {
   if (proximity) {
     orgMap.data("search").setProximity(proximity);
   }
-  orgMap.data("search").query(orgInput.val());
+  const query = orgInput.val();
+  if (query) {
+    orgMap.data("search").query(query);
+  } else {
+    resetMap(orgMap);
+    if (orgMap.data("onFirstResult")) {
+      orgMap.data("onFirstResult")();
+      orgMap.data("onFirstResult", null);
+    }
+  }
+}
+
+function resetMap(map) {
+  map.data("search")._clear();
+  console.log("reset map", map);
 }
 
 function initPage() {
@@ -291,6 +313,11 @@ function initPage() {
       if (map.data("onFirstResult")) {
         map.data("onFirstResult")();
         map.data("onFirstResult", null);
+      }
+    });
+    map.data("search").on("results", response => {
+      if (response.features.length === 0) {
+        resetMap(map);
       }
     });
   }
