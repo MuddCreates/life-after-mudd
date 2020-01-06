@@ -186,6 +186,9 @@ function submitForm() {
 function locateCity({ processed, summer }) {
   const cityInput = summer ? $("#summer-city-input") : $("#city-input");
   const stateInput = summer ? $("#summer-state-input") : $("#state-input");
+  const rawCityStateInput = summer
+    ? $("#summer-city-state-raw-input")
+    : $("#city-state-raw-input");
   const cityMap = summer ? $("#summer-city-map") : $("#city-map");
   cityMap.data("search").clear();
   // Don't use country input because for some reason including
@@ -198,6 +201,9 @@ function locateCity({ processed, summer }) {
 }
 
 function locateOrg({ summer }) {
+  const orgInput = summer ? $("#summer-org-input") : $("#org-input");
+  const cityMap = summer ? $("#summer-city-map") : $("#city-map");
+  const orgMap = summer ? $("#summer-org-map") : $("#org-map");
   orgMap.data("search").clear();
   const proximity = cityMap.data("search").getProximity();
   if (proximity) {
