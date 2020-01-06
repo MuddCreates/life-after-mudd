@@ -17,7 +17,7 @@ To run:
 * Install JavaScript dependencies with `yarn install`.
 * Obtain Google Drive API key from **@raxod502** and place it in
   `.oauth-private-key.json`.
-* Download form data with `./downloader.py`.
+* Download form data with `./sheets.py download`.
 * Build static site in development mode with `yarn parcel watch
-  static/index.html`.
+  static/*.html`.
 * Start the development server with `watchexec -r -e py "flask run"`.
