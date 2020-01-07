@@ -4,22 +4,90 @@ import "babel-polyfill";
 import React from "react";
 import { render } from "react-dom";
 import { hot } from "react-hot-loader";
-import { Provider } from "react-redux";
-import { combineReducers, createStore } from "redux";
+import { connect, Provider } from "react-redux";
+import {
+  applyMiddleware,
+  bindActionCreators,
+  combineReducers,
+  createStore,
+} from "redux";
+import thunk from "redux-thunk";
 
 import { initMapbox } from "./shared.js";
 
-const defaultState = {};
+function decapitalize(string) {
+  return string.charAt(0).toLowerCase() + string.slice(1);
+}
 
-const reducers = (state = defaultState, action) => state;
+const initialState = {
+  fetching: false,
+  fetchError: null,
+  responses: null,
+};
 
-const store = createStore(reducers);
+const reducer = (state = initialState, action) => {
+  switch (action.type) {
+    case "FETCH_PENDING":
+      return { ...state, fetching: true, fetchError: null, responses: null };
+    case "FETCH_SUCCESS":
+      return {
+        ...state,
+        fetching: false,
+        fetchError: null,
+        responses: action.responses,
+      };
+    case "FETCH_ERROR":
+      return {
+        ...state,
+        fetching: false,
+        fetchError: action.error,
+        responses: null,
+      };
+    default:
+      return state;
+  }
+};
+
+const store = createStore(reducer, initialState, applyMiddleware(thunk));
+
+function fetchResponsesAction() {
+  return async dispatch => {
+    dispatch({
+      type: "FETCH_PENDING",
+    });
+    try {
+      const response = await fetch("/api/v1/data");
+      if (!response.ok) {
+        throw new Error(`Got status ${response.status} from API`);
+      }
+      const responses = await response.json();
+      dispatch({
+        type: "FETCH_SUCCESS",
+        responses,
+      });
+    } catch (error) {
+      dispatch({
+        type: "FETCH_ERROR",
+        error: error.message,
+      });
+    }
+  };
+}
 
 class Map extends React.Component {
   render() {
     return (
       <div>
-        <div ref={el => (this.mapContainer = el)} className="map" />
+        <div
+          ref={el => (this.mapContainer = el)}
+          style={{
+            position: "absolute",
+            top: "0",
+            left: "0",
+            bottom: "0",
+            right: "0",
+          }}
+        />
       </div>
     );
   }
@@ -27,27 +95,84 @@ class Map extends React.Component {
     const map = new mapboxgl.Map({
       container: this.mapContainer,
       style: "mapbox://styles/mapbox/streets-v9",
+      center: [-97, 38],
+      zoom: 4.3,
     });
+    window.map = map;
   }
 }
+
+Map = connect(state => ({
+  responses: state.responses,
+}))(Map);
 
 class App extends React.Component {
   render() {
-    return <Map />;
+    if (this.props.fetching) {
+      return (
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+          }}
+        >
+          <center>
+            <div
+              style={{
+                marginBottom: "5px",
+              }}
+            >
+              <div className="spinner-border"></div>
+            </div>
+            <p>Loading, please wait.</p>
+          </center>
+        </div>
+      );
+    } else if (this.props.fetchError !== null) {
+      return (
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+          }}
+        >
+          <p>
+            Sorry, couldn't fetch the data (
+            {decapitalize(this.props.fetchError)}).
+          </p>
+          <p>
+            Try reloading the page, or contact{" "}
+            <a href="mailto:rrosborough@hmc.edu">Radon Rosborough</a>.
+          </p>
+        </div>
+      );
+    } else {
+      return <Map />;
+    }
   }
 }
 
-function main() {
+App = connect(state => ({
+  fetching: state.fetching,
+  fetchError: state.fetchError,
+}))(App);
+
+async function main() {
   initMapbox();
   render(
     <Provider store={store}>
       <App />
     </Provider>,
-    document.getElementById("mount"),
+    document.getElementById("app"),
   );
+  store.dispatch(fetchResponsesAction());
 }
 
-main();
+main().catch(console.error);
 
 // https://dev.to/cronokirby/react-typescript-parcel-setting-up-hot-module-reloading-4f3f#setting-up-hmr
 export default hot(module)(App);
