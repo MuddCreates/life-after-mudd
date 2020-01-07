@@ -15,9 +15,25 @@ const reducers = (state = defaultState, action) => state;
 
 const store = createStore(reducers);
 
+class Map extends React.Component {
+  render() {
+    return (
+      <div>
+        <div ref={el => (this.mapContainer = el)} className="map" />
+      </div>
+    );
+  }
+  componentDidMount() {
+    const map = new mapboxgl.Map({
+      container: this.mapContainer,
+      style: "mapbox://styles/mapbox/streets-v9",
+    });
+  }
+}
+
 class App extends React.Component {
   render() {
-    return "Hello";
+    return <Map />;
   }
 }
 
