@@ -19,6 +19,15 @@ function decapitalize(string) {
   return string.charAt(0).toLowerCase() + string.slice(1);
 }
 
+function mapCallWhenReady(map, cb) {
+  // https://github.com/mapbox/mapbox-gl-directions/issues/111
+  if (map._loaded) {
+    cb();
+  } else {
+    map.on("load", cb);
+  }
+}
+
 const initialState = {
   fetching: false,
   fetchError: null,
@@ -98,7 +107,45 @@ class Map extends React.Component {
       center: [-97, 38],
       zoom: 4.3,
     });
+    this.map = map;
     window.map = map;
+    this.renderLandmarks();
+  }
+  componentDidUpdate() {
+    this.renderLandmarks();
+  }
+  renderLandmarks() {
+    mapCallWhenReady(this.map, () => {
+      if (this.map.getLayer("people")) {
+        this.map.removeLayer("people");
+      }
+      if (this.map.getSource("people")) {
+        this.map.removeSource("people");
+      }
+      if (this.props.responses === null) {
+        return;
+      }
+      this.map.addLayer({
+        id: "people",
+        type: "symbol",
+        source: {
+          type: "geojson",
+          data: {
+            type: "FeatureCollection",
+            features: this.props.responses.map(response => ({
+              type: "Feature",
+              geometry: {
+                type: "Point",
+                coordinates: [response.cityLong, response.cityLat],
+              },
+            })),
+          },
+        },
+        layout: {
+          "icon-image": "circle-15",
+        },
+      });
+    });
   }
 }
 
@@ -150,8 +197,10 @@ class App extends React.Component {
           </p>
         </div>
       );
-    } else {
+    } else if (this.props.responses !== null) {
       return <Map />;
+    } else {
+      return <div></div>;
     }
   }
 }
@@ -159,6 +208,7 @@ class App extends React.Component {
 App = connect(state => ({
   fetching: state.fetching,
   fetchError: state.fetchError,
+  responses: state.responses,
 }))(App);
 
 async function main() {
