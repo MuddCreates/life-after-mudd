@@ -1,9 +1,13 @@
-mapboxgl.accessToken =
-  "pk.eyJ1IjoicmF4b2Q1MDIiLCJhIjoiY2s0cmZmYW5kMnNodjNrbnZ0Y3E4emJxbiJ9.ejylhHRJ_dhT3uF3nQSJOA";
+// https://github.com/parcel-bundler/parcel/issues/871#issuecomment-367899522
+import "babel-polyfill";
+
+import { initMapbox } from "./shared.js";
+
+initMapbox();
 
 const map = new mapboxgl.Map({
   container: "map",
-  style: "mapbox://styles/mapbox/streets-v9"
+  style: "mapbox://styles/mapbox/streets-v9",
 });
 
 map.on("load", function() {
@@ -19,14 +23,14 @@ map.on("load", function() {
             type: "Feature",
             geometry: {
               type: "Point",
-              coordinates: [0, 0]
-            }
-          }
-        ]
-      }
+              coordinates: [0, 0],
+            },
+          },
+        ],
+      },
     },
     layout: {
-      "icon-image": "circle-15"
-    }
+      "icon-image": "circle-15",
+    },
   });
 });

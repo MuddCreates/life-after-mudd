@@ -1,4 +1,4 @@
-# Life after Mudd
+# Life After Mudd
 
 Small webapp that visualizes where Harvey Mudd's Class of 2020 will be
 after graduation, using data from [this Google
