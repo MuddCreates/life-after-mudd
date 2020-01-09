@@ -35,7 +35,7 @@ COLUMNS = (
     ("Country", "country"),
     ("City latitude", "cityLat"),
     ("City longitude", "cityLong"),
-    ("Summer path", "summerPath"),
+    ("Summer plans", "summerPlans"),
     ("Summer organization", "summerOrg"),
     ("Summer organization latitude", "summerOrgLat"),
     ("Summer organization longitude", "summerOrgLong"),
@@ -88,13 +88,13 @@ def write_form_responses(worksheet, responses):
 def download_form_responses():
     worksheet = get_worksheet()
     responses = read_form_responses(worksheet)
-    with open("data-admin.json.tmp", "w") as f:
+    with open("data.json.tmp", "w") as f:
         json.dump(responses, f)
-    os.rename("data-admin.json.tmp", "data-admin.json")
+    os.rename("data.json.tmp", "data.json")
 
 
 def upload_form_responses():
-    with open("data-admin.json") as f:
+    with open("data.json") as f:
         responses = json.load(f)
     worksheet = get_worksheet()
     write_form_responses(worksheet, responses)
