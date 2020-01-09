@@ -187,24 +187,44 @@ function saveFormData() {
   r.city = $("#city-input").val();
   r.state = $("#state-input").val();
   r.country = $("#country-input").val();
-  [r.cityLat, r.cityLong] = $("#city-lat-input")
-    .val()
-    .split(", ");
+  if ($("#city-coords-input").val()) {
+    [r.cityLat, r.cityLong] = $("#city-coords-input")
+      .val()
+      .split(", ");
+  } else {
+    r.cityLat = "";
+    r.cityLong = "";
+  }
   r.org = $("#org-input").val();
-  [r.orgLat, r.orgLong] = $("#org-coords-input")
-    .val()
-    .split(", ");
+  if ($("#org-coords-input").val()) {
+    [r.orgLat, r.orgLong] = $("#org-coords-input")
+      .val()
+      .split(", ");
+  } else {
+    r.orgLat = "";
+    r.orgLong = "";
+  }
   r.summerPlans = $("#summer-plans-input").val();
   r.summerCity = $("#summer-city-input").val();
   r.summerState = $("#summer-state-input").val();
   r.summerCountry = $("#summer-country-input").val();
-  [r.summerCityLat, r.summerCityLong] = $("#summer-city-lat-input")
-    .val()
-    .split(", ");
-  r.summerOrg = $("#org-input").val();
-  [r.summerOrgLat, r.summerOrgLong] = $("#summer-org-coords-input")
-    .val()
-    .split(", ");
+  if ($("#summer-city-coords-input").val()) {
+    [r.summerCityLat, r.summerCityLong] = $("#summer-city-coords-input")
+      .val()
+      .split(", ");
+  } else {
+    r.summerCityLat = "";
+    r.summerCityLong = "";
+  }
+  r.summerOrg = $("#summer-org-input").val();
+  if ($("#summer-org-coords-input").val()) {
+    [r.summerOrgLat, r.summerOrgLong] = $("#summer-org-coords-input")
+      .val()
+      .split(", ");
+  } else {
+    r.summerOrgLat = "";
+    r.summerOrgLong = "";
+  }
   r.comments = $("#comments-input").val();
   r.processed = r.timestamp;
 }
@@ -228,9 +248,10 @@ function locateCity({ processed, summer }) {
   // Don't use country input because for some reason including
   // "United States" at the end of a search query sometimes causes
   // the Mapbox geocoder to malfunction weirdly??
-  const query = processed
-    ? [cityInput.val(), stateInput.val()].join(", ")
-    : rawCityStateInput.val();
+  const query =
+    processed && cityInput.val() && stateInput.val()
+      ? [cityInput.val(), stateInput.val()].join(", ")
+      : rawCityStateInput.val();
   if (query) {
     cityMap.data("search").query(query);
   } else {
@@ -366,6 +387,7 @@ function initPage() {
 function populateForm() {
   const responses = $("body").data("responses");
   const idx = $("body").data("idx");
+  $("#response-dropdown").val(idx);
   const r = responses[idx];
   $("#name-raw-input").val(r.rawName);
   $("#email-raw-input").val(r.rawEmail);
