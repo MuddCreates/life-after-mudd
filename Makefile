@@ -49,8 +49,9 @@ image-run: ## Build and run Docker image for deployment
 .PHONY: deploy
 deploy: image ## Deploy webapp to Heroku
 	scripts/docker.bash tag life-after-mudd registry.heroku.com/life-after-mudd/web
+	heroku auth:token | scripts/docker.bash login --username=_ --password-stdin registry.heroku.com
 	scripts/docker.bash push registry.heroku.com/life-after-mudd/web
-	heroku container:release web
+	heroku container:release web -a life-after-mudd
 
 .PHONY: sandwich
 sandwich: ## https://xkcd.com/149/

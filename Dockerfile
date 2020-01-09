@@ -10,4 +10,7 @@ COPY scripts/docker-build-project.bash /tmp/
 RUN /tmp/docker-build-project.bash
 
 EXPOSE 8080
-CMD poetry run make app-prod
+
+# Heroku sets HOME to our working directory, which makes no sense. Fix
+# it.
+CMD HOME=/root poetry run make app-prod
