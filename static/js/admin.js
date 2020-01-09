@@ -62,6 +62,9 @@ function capitalize(string) {
 }
 
 function parseCityStateCountry(cityState) {
+  if (!cityState.trim()) {
+    return { city: "", state: "", country: "" };
+  }
   let normCityState = normalizeWhitespace(cityState.replace(/,/g, " "));
   for (const state of USA_STATES) {
     if (containsWordCaseInsensitive(normCityState, state.abbreviation)) {
@@ -262,6 +265,7 @@ function locateOrg({ summer }) {
 
 function resetMap(map) {
   map.data("search")._clear();
+  map.data("search").setProximity(null);
   map.data("map").fitBounds(map.data("origBounds"), { duration: 0 });
 }
 
@@ -322,9 +326,13 @@ function initPage() {
   ]) {
     initMap(map.attr("id"));
     const setCoords = coords => {
-      const { latitude, longitude } =
-        coords || map.data("search").getProximity();
-      coordsInput.val(`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
+      coords = coords || map.data("search").getProximity();
+      if (coords) {
+        const { latitude, longitude } = coords;
+        coordsInput.val(`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
+      } else {
+        coordsInput.val("");
+      }
     };
     setButton.on("click", () => setCoords());
     map.data("search").on("result", response => {
@@ -383,6 +391,10 @@ function populateForm() {
   $("#summer-country-input").val(r.summerCountry);
   $("#comments-raw-input").val(r.rawComments);
   $("#comments-input").val(r.comments);
+  $("#city-coords-input").val("");
+  $("#org-coords-input").val("");
+  $("#summer-city-coords-input").val("");
+  $("#summer-org-coords-input").val("");
   $("#city-map").data("onFirstResult", () => locateOrg({ summer: false }));
   $("#summer-city-map").data("onFirstResult", () =>
     locateOrg({ summer: true }),
