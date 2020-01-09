@@ -1,8 +1,10 @@
+# -*- mode: gitignore -*-
+
 /.cache/
+/.docker-venv/
 /.oauth-private-key.json
 /__pycache__/
 /dist/
 /node_modules/
 /data.json
-/requirements.txt
 /yarn-error.log

@@ -1,7 +1,0 @@
-# -*- mode: gitignore -*-
-
-#!include:.gitignore
-!/.oauth-private-key.json
-!/dist/
-!/node_modules/
-!/requirements.txt

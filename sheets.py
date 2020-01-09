@@ -52,14 +52,20 @@ COLUMN_INDICES = {key: idx for idx, (_, key) in enumerate(COLUMNS)}
 
 
 def get_worksheet():
-    creds = oauth2client.service_account.ServiceAccountCredentials.from_json_keyfile_name(
-        ".oauth-private-key.json",
-        # https://gspread.readthedocs.io/en/latest/oauth2.html#using-signed-credentials
-        [
-            "https://spreadsheets.google.com/feeds",
-            "https://www.googleapis.com/auth/drive",
-        ],
-    )
+    # https://gspread.readthedocs.io/en/latest/oauth2.html#using-signed-credentials
+    scopes = [
+        "https://spreadsheets.google.com/feeds",
+        "https://www.googleapis.com/auth/drive",
+    ]
+    env_key = os.environ.get("LAM_OAUTH_PRIVATE_KEY")
+    if env_key:
+        creds = oauth2client.service_account.ServiceAccountCredentials.from_json_keyfile_dict(
+            json.loads(env_key), scopes
+        )
+    else:
+        creds = oauth2client.service_account.ServiceAccountCredentials.from_json_keyfile_name(
+            ".oauth-private-key.json", scopes,
+        )
     return gspread.authorize(creds).open("Life After Mudd").get_worksheet(0)
 
 

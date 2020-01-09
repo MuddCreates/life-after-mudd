@@ -18,7 +18,10 @@ def get_index():
 
 @app.route("/admin")
 def get_admin():
-    return flask.send_file("dist/admin.html")
+    if ADMIN_ENABLED:
+        return flask.send_file("dist/admin.html")
+    else:
+        return "Admin dashboard not enabled", 403
 
 
 @app.route("/<path>")
@@ -103,6 +106,8 @@ if AUTOFETCH_ENABLED:
         try:
             sheets.download_form_responses()
         finally:
-            threading.Timer(60, sheets.download_form_responses).start()
+            timer = threading.Timer(60, sheets.download_form_responses)
+            timer.daemon = True
+            timer.start()
 
-    threading.Thread(target=start_autofetch).start()
+    threading.Thread(target=start_autofetch, daemon=True).start()

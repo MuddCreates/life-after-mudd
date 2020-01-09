@@ -1,27 +1,62 @@
-.PHONY: deps
-deps:
-	poetry install
-	yarn install
+.PHONY: help
+help: ## Show this message
+	@echo "usage:" >&2
+	@grep -h "[#]# " $(MAKEFILE_LIST)	| \
+		sed 's/^/  make /'		| \
+		sed 's/:[^#]*[#]# /|/'		| \
+		column -t -s'|' >&2
+
+.PHONY: docker
+docker: ## Run shell with source code and deps inside Docker
+	@scripts/docker-build.bash "$(CMD)"
+
+.PHONY: tmux
+tmux: ## Start tmux so you can run commands in parallel
+	tmux new-session -s tmux
 
 .PHONY: down
-down:
-	poetry run ./sheets.py download
+down: ## Download responses from Google Sheets to local JSON
+	./sheets.py download
 
 .PHONY: up
-up:
-	poetry run ./sheets.py upload
+up: ## Upload responses from local JSON back to Google Sheets
+	./sheets.py upload
 
-.PHONY: dev
-dev:
+.PHONY: build-prod
+build-prod: ## Build static files for production
+	yarn parcel build --no-cache static/*.html
+
+.PHONY: build-dev
+build-dev: ## Build static files for development, and watch for changes
 	yarn parcel watch static/*.html
 
-.PHONY: app
-app:
-	LAM_ADMIN_ENABLED=1 poetry run watchexec -r -e py "flask run"
+.PHONY: app-prod
+app-prod: ## Start webserver for production
+	LAM_AUTOFETCH_ENABLED=1 gunicorn --workers 1 --threads 1 --bind $${HOST:-0.0.0.0}:$${PORT:-8080} app:app
+
+.PHONY: app-dev
+app-dev: ## Start webserver in admin mode, with live-reload
+	LAM_ADMIN_ENABLED=1 watchexec -r -e py "flask run --host $${HOST:-127.0.0.1} --port $${PORT:-8080}"
+
+.PHONY: image
+image: ## Build Docker image for deployment
+	@scripts/docker-build.bash --prod
+
+.PHONY: image-run
+image-run: ## Build and run Docker image for deployment
+	@scripts/docker-build.bash --prod-run
 
 .PHONY: deploy
-deploy:
-	poetry export -f requirements.txt > requirements.txt
-	yarn install
-	yarn parcel build --no-cache static/*.html
-	gcloud app deploy --project life-after-mudd
+deploy: image ## Deploy webapp to Heroku
+	scripts/docker.bash tag life-after-mudd registry.heroku.com/life-after-mudd/web
+	scripts/docker.bash push registry.heroku.com/life-after-mudd/web
+	heroku container:release web
+
+.PHONY: sandwich
+sandwich: ## https://xkcd.com/149/
+	@if bash -c '[ "$${EUID}" != 0 ]'; then		\
+		echo "What? Make it yourself." >&2;	\
+		exit 1;					\
+	else						\
+		echo "Okay." >&2;			\
+	fi

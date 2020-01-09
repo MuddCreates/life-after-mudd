@@ -1,0 +1,18 @@
+FROM ubuntu:bionic
+
+COPY scripts/docker-install-system.bash /tmp/
+RUN /tmp/docker-install-system.bash
+
+ARG UID
+
+COPY scripts/docker-install-system-dev.bash /tmp/
+RUN /tmp/docker-install-system-dev.bash "$UID"
+
+USER $UID
+WORKDIR /home/docker/src
+EXPOSE 8080
+
+ENTRYPOINT ["/usr/local/bin/pid1.bash"]
+CMD bash
+
+COPY scripts/pid1.bash /usr/local/bin/

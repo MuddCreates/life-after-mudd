@@ -1,2 +1,0 @@
-runtime: python37
-entrypoint: LAM_AUTOFETCH_ENABLED=1 gunicorn --workers 1 --threads 1 --bind 0.0.0.0:8080 app:app
