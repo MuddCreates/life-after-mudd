@@ -13,12 +13,9 @@ Dependencies:
 
 To run:
 
-* Install Python dependencies with `poetry install`.
-* Install JavaScript dependencies with `yarn install`.
+* Install dependencies, `make deps`.
 * Obtain Google Drive API key from **@raxod502** and place it in
   `.oauth-private-key.json`.
-* Download form data with `./sheets.py download`.
-* Build static site in development mode with `yarn parcel watch
-  static/*.html`.
-* Start the development server with `LAM_ADMIN_ENABLE=1 watchexec -r
-  -e py "flask run"`.
+* Download form data, `make down`.
+* Build static site in development mode, `make dev`.
+* Start the development server, `make app`.

@@ -1,8 +1,12 @@
 import flask
 import json
 import os
+import threading
+
+import sheets
 
 ADMIN_ENABLED = bool(os.environ.get("LAM_ADMIN_ENABLED"))
+AUTOFETCH_ENABLED = bool(os.environ.get("LAM_AUTOFETCH_ENABLED"))
 
 app = flask.Flask(__name__)
 
@@ -72,9 +76,8 @@ PUBLIC_KEYS = {
     "summerOrg",
     "summerOrgLat",
     "summerOrgLong",
-    "summerPath",
-    "summerState",
     "summerPlans",
+    "summerState",
 }
 
 
@@ -92,3 +95,14 @@ def get_data():
         )
     except (OSError, json.JSONDecodeError):
         return "Data not available", 500
+
+
+if AUTOFETCH_ENABLED:
+
+    def start_autofetch():
+        try:
+            sheets.download_form_responses()
+        finally:
+            threading.Timer(60, sheets.download_form_responses).start()
+
+    threading.Thread(target=start_autofetch).start()

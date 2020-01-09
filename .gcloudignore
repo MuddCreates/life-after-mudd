@@ -1,2 +1,3 @@
 #!include:.gitignore
+!/.oauth-private-key.json
 !/requirements.txt
