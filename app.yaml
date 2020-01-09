@@ -1,2 +1,2 @@
 runtime: python37
-entrypoint: flask run
+entrypoint: flask run --host=0.0.0.0
