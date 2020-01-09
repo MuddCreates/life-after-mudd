@@ -20,4 +20,5 @@ To run:
 * Download form data with `./sheets.py download`.
 * Build static site in development mode with `yarn parcel watch
   static/*.html`.
-* Start the development server with `watchexec -r -e py "flask run"`.
+* Start the development server with `LAM_ADMIN_ENABLE=1 watchexec -r
+  -e py "flask run"`.

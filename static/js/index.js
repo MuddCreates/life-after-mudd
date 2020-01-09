@@ -136,7 +136,10 @@ class Map extends React.Component {
               type: "Feature",
               geometry: {
                 type: "Point",
-                coordinates: [response.cityLong, response.cityLat],
+                coordinates: [
+                  parseFloat(response.cityLong),
+                  parseFloat(response.cityLat),
+                ],
               },
             })),
           },

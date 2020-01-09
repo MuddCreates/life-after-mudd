@@ -3,6 +3,5 @@
 /__pycache__/
 /dist
 /node_modules
-/data-admin.json
-/data-public.json
+/data.json
 /yarn-error.log
