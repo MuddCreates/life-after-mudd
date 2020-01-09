@@ -1,7 +1,7 @@
+import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 // https://github.com/parcel-bundler/parcel/issues/871#issuecomment-367899522
 import "babel-polyfill";
-
-import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
+import "bootstrap";
 import $ from "jquery";
 import { UsaStates } from "usa-states";
 
@@ -87,6 +87,14 @@ function parseCityStateCountry(cityState) {
   };
 }
 
+function clean(field) {
+  field = field.trim();
+  if (["N/A", "NA"].indexOf(field.toUpperCase()) != -1) {
+    field = "";
+  }
+  return field;
+}
+
 function fillDefaults(responses) {
   let idx = 0;
   return responses.map(r => {
@@ -98,31 +106,33 @@ function fillDefaults(responses) {
     } else {
       r.processed = "";
     }
+    // Do this 'cause we read these fields directly to populate the
+    // form.
+    r.rawCityState = clean(r.rawCityState);
+    r.rawSummerCityState = clean(r.rawSummerCityState);
     r.email = r.email || r.rawEmail.replace("g.hmc.edu", "hmc.edu");
-    r.name = r.name || r.rawName;
-    r.major = r.major || r.rawMajor;
-    r.path = r.path || r.rawPath;
-    r.org = r.org || r.rawOrg;
+    r.name = clean(r.name || r.rawName);
+    r.major = clean(r.major || r.rawMajor);
+    r.path = clean(r.path || r.rawPath);
+    r.org = capitalize(clean(r.org || r.rawOrg));
+    if (r.org.toUpperCase() == "FB") {
+      r.org = "Facebook";
+    }
     if (!(r.city || r.state || r.country)) {
       const csc = parseCityStateCountry(r.rawCityState);
       r.city = r.city || csc.city;
       r.state = r.state || csc.state;
       r.country = r.country || csc.country;
     }
-    if (r.rawHasSummerPlans === "No") {
-      r.rawSummerPath = r.rawPath;
-      r.rawSummerOrg = r.rawOrg;
-      r.rawSummerCityState = r.rawCityState;
-    }
-    r.summerPath = r.summerPath || r.rawSummerPath;
-    r.summerOrg = r.summerOrg || r.rawSummerOrg;
+    r.summerPlans = clean(r.summerPlans || r.rawSummerPlans);
+    r.summerOrg = clean(r.summerOrg || r.rawSummerOrg);
     if (!(r.summerCity || r.summerState || r.summerCountry)) {
       const csc = parseCityStateCountry(r.rawSummerCityState);
       r.summerCity = r.summerCity || csc.city;
       r.summerState = r.summerState || csc.state;
       r.summerCountry = r.summerCountry || csc.country;
     }
-    r.comments = r.comments || r.rawComments;
+    r.comments = clean(r.comments || r.rawComments);
     return r;
   });
 }
@@ -171,18 +181,29 @@ function saveFormData() {
   r.email = $("#email-input").val();
   r.major = $("#major-input").val();
   r.path = $("#path-input").val();
-  r.org = $("#org-input").val();
   r.city = $("#city-input").val();
   r.state = $("#state-input").val();
   r.country = $("#country-input").val();
   [r.cityLat, r.cityLong] = $("#city-lat-input")
     .val()
     .split(", ");
+  r.org = $("#org-input").val();
   [r.orgLat, r.orgLong] = $("#org-coords-input")
     .val()
     .split(", ");
+  r.summerPlans = $("#summer-plans-input").val();
+  r.summerCity = $("#summer-city-input").val();
+  r.summerState = $("#summer-state-input").val();
+  r.summerCountry = $("#summer-country-input").val();
+  [r.summerCityLat, r.summerCityLong] = $("#summer-city-lat-input")
+    .val()
+    .split(", ");
+  r.summerOrg = $("#org-input").val();
+  [r.summerOrgLat, r.summerOrgLong] = $("#summer-org-coords-input")
+    .val()
+    .split(", ");
   r.comments = $("#comments-input").val();
-  r.processed = idx;
+  r.processed = r.timestamp;
 }
 
 function submitForm() {
@@ -344,7 +365,7 @@ function populateForm() {
   $("#path-raw-input").val(r.rawPath);
   $("#org-raw-input").val(r.rawOrg);
   $("#city-state-raw-input").val(r.rawCityState);
-  $("#summer-path-raw-input").val(r.rawSummerPath);
+  $("#summer-plans-raw-input").val(r.rawSummerPlans);
   $("#summer-org-raw-input").val(r.rawSummerOrg);
   $("#summer-city-state-raw-input").val(r.rawSummerCityState);
   $("#name-input").val(r.name);
@@ -355,7 +376,7 @@ function populateForm() {
   $("#city-input").val(r.city);
   $("#state-input").val(r.state);
   $("#country-input").val(r.country);
-  $("#summer-path-input").val(r.summerPath);
+  $("#summer-plans-input").val(r.summerPlans);
   $("#summer-org-input").val(r.summerOrg);
   $("#summer-city-input").val(r.summerCity);
   $("#summer-state-input").val(r.summerState);

@@ -63,18 +63,34 @@
                       Set
                     </button>
                     <div class="dropdown-menu" id="major-dropdown">
-                      <a class="dropdown-item" href="#">Biology</a>
-                      <a class="dropdown-item" href="#">Chemistry</a>
-                      <a class="dropdown-item" href="#">CS</a>
-                      <a class="dropdown-item" href="#">Engineering</a>
-                      <a class="dropdown-item" href="#">Math</a>
-                      <a class="dropdown-item" href="#">Physics</a>
-                      <a class="dropdown-item" href="#"
+                      <a class="dropdown-item" href="javascript:void(0)"
+                        >Biology</a
+                      >
+                      <a class="dropdown-item" href="javascript:void(0)"
+                        >Chemistry</a
+                      >
+                      <a class="dropdown-item" href="javascript:void(0)">CS</a>
+                      <a class="dropdown-item" href="javascript:void(0)"
+                        >Engineering</a
+                      >
+                      <a class="dropdown-item" href="javascript:void(0)"
+                        >Math</a
+                      >
+                      <a class="dropdown-item" href="javascript:void(0)"
+                        >Physics</a
+                      >
+                      <a class="dropdown-item" href="javascript:void(0)"
                         >Joint Chemistry/Biology</a
                       >
-                      <a class="dropdown-item" href="#">Joint CS/Math</a>
-                      <a class="dropdown-item" href="#">Joint Math/Comp/Bio</a>
-                      <a class="dropdown-item" href="#">Joint Math/Physics</a>
+                      <a class="dropdown-item" href="javascript:void(0)"
+                        >Joint CS/Math</a
+                      >
+                      <a class="dropdown-item" href="javascript:void(0)"
+                        >Joint Math/Comp/Bio</a
+                      >
+                      <a class="dropdown-item" href="javascript:void(0)"
+                        >Joint Math/Physics</a
+                      >
                     </div>
                   </div>
                 </div>
@@ -82,17 +98,6 @@
             </div>
           </div>
           <div class="row">
-            <div class="col">
-              <div class="form-group">
-                <label>Name</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  readonly
-                  id="name-raw-input"
-                />
-              </div>
-            </div>
             <div class="col">
               <div class="form-group">
                 <label>Path</label>
@@ -112,41 +117,48 @@
                       Set
                     </button>
                     <div class="dropdown-menu" id="path-dropdown">
-                      <a class="dropdown-item" href="#">Job</a>
-                      <a class="dropdown-item" href="#">Graduate school</a>
-                      <a class="dropdown-item" href="#">Gap year</a>
-                      <a class="dropdown-item" href="#">Not sure</a>
+                      <a class="dropdown-item" href="javascript:void(0)">Job</a>
+                      <a class="dropdown-item" href="javascript:void(0)"
+                        >Graduate school</a
+                      >
+                      <a class="dropdown-item" href="javascript:void(0)"
+                        >Gap year</a
+                      >
+                      <a class="dropdown-item" href="javascript:void(0)"
+                        >Not sure</a
+                      >
                     </div>
                   </div>
                 </div>
+                <label>Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  readonly
+                  id="name-raw-input"
+                />
               </div>
             </div>
             <div class="col">
               <div class="form-group">
-                <label>Summer path</label>
-                <div class="input-group mb-3">
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="summer-path-input"
-                    tabindex="15"
-                  />
-                  <div class="input-group-append">
-                    <button
-                      type="button"
-                      class="btn btn-outline-secondary dropdown-toggle"
-                      data-toggle="dropdown"
-                    >
-                      Set
-                    </button>
-                    <div class="dropdown-menu" id="summer-path-dropdown">
-                      <a class="dropdown-item" href="#">Internship</a>
-                      <a class="dropdown-item" href="#">Traveling</a>
-                      <a class="dropdown-item" href="#">Relaxing at home</a>
-                      <a class="dropdown-item" href="#">Not sure</a>
-                    </div>
-                  </div>
-                </div>
+                <label>Summer plans</label>
+                <textarea
+                  class="form-control"
+                  id="summer-plans-raw-input"
+                  readonly
+                  style="height: 124px"
+                ></textarea>
+              </div>
+            </div>
+            <div class="col">
+              <div class="form-group">
+                <label>Summer plans</label>
+                <textarea
+                  class="form-control"
+                  id="summer-plans-input"
+                  style="height: 124px"
+                  tabindex="15"
+                ></textarea>
               </div>
             </div>
           </div>
@@ -180,7 +192,7 @@
                   type="text"
                   class="form-control"
                   id="summer-city-input"
-                  tabindex="16"
+                  tabindex="17"
                 />
               </div>
             </div>
@@ -228,14 +240,14 @@
                     type="text"
                     class="form-control"
                     id="summer-state-input"
-                    tabindex="17"
+                    tabindex="18"
                   />
                   <div class="input-group-append">
                     <button
                       type="button"
                       class="btn btn-info"
                       id="locate-summer-city-button"
-                      tabindex="18"
+                      tabindex="19"
                     >
                       Locate
                     </button>
@@ -274,7 +286,7 @@
                   type="text"
                   class="form-control"
                   id="summer-country-input"
-                  tabindex="19"
+                  tabindex="20"
                 />
               </div>
             </div>
@@ -322,14 +334,14 @@
                     type="text"
                     class="form-control"
                     id="summer-city-coords-input"
-                    tabindex="20"
+                    tabindex="21"
                   />
                   <div class="input-group-append">
                     <button
                       type="button"
                       class="btn btn-secondary"
                       id="set-summer-city-button"
-                      tabindex="21"
+                      tabindex="22"
                     >
                       Set
                     </button>
@@ -381,14 +393,14 @@
                     type="text"
                     class="form-control"
                     id="summer-org-input"
-                    tabindex="22"
+                    tabindex="23"
                   />
                   <div class="input-group-append">
                     <button
                       type="button"
                       class="btn btn-info"
                       id="locate-summer-org-button"
-                      tabindex="23"
+                      tabindex="24"
                     >
                       Locate
                     </button>
@@ -400,12 +412,12 @@
           <div class="row">
             <div class="col">
               <div class="form-group">
-                <label>Summer path</label>
+                <label>Summer organization</label>
                 <input
                   type="text"
                   class="form-control"
                   readonly
-                  id="summer-path-raw-input"
+                  id="summer-org-raw-input"
                 />
               </div>
             </div>
@@ -440,14 +452,14 @@
                     type="text"
                     class="form-control"
                     id="summer-org-coords-input"
-                    tabindex="24"
+                    tabindex="25"
                   />
                   <div class="input-group-append">
                     <button
                       type="button"
                       class="btn btn-secondary"
                       id="set-summer-org-button"
-                      tabindex="25"
+                      tabindex="26"
                     >
                       Set
                     </button>
@@ -458,19 +470,6 @@
           </div>
           <div class="row">
             <div class="col">
-              <div class="row">
-                <div class="col">
-                  <div class="form-group">
-                    <label>Summer organization</label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      readonly
-                      id="summer-org-raw-input"
-                    />
-                  </div>
-                </div>
-              </div>
               <div class="row">
                 <div class="col">
                   <div class="form-group">
@@ -493,7 +492,7 @@
                     <textarea
                       class="form-control"
                       id="comments-raw-input"
-                      rows="5"
+                      style="height: 86px"
                       readonly
                     ></textarea>
                   </div>
@@ -504,8 +503,8 @@
                     <textarea
                       class="form-control"
                       id="comments-input"
-                      rows="5"
-                      tabindex="26"
+                      style="height: 86px"
+                      tabindex="27"
                     ></textarea>
                   </div>
                 </div>
@@ -523,7 +522,7 @@
                 type="button"
                 class="btn btn-primary"
                 id="next-button"
-                tabindex="27"
+                tabindex="28"
               >
                 Next
               </button>
