@@ -1,8 +1,8 @@
 /.cache/
 /.oauth-private-key.json
 /__pycache__/
-/dist
-/node_modules
+/dist/
+/node_modules/
 /data.json
 /requirements.txt
 /yarn-error.log

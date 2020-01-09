@@ -1,7 +1,7 @@
 .PHONY: deps
 deps:
-	yarn install
 	poetry install
+	yarn install
 
 .PHONY: down
 down:
@@ -22,4 +22,6 @@ app:
 .PHONY: deploy
 deploy:
 	poetry export -f requirements.txt > requirements.txt
+	yarn install
+	yarn parcel build --no-cache static/*.html
 	gcloud app deploy --project life-after-mudd
