@@ -148,7 +148,7 @@ function getDefaultIndex(responses) {
     }
     idx += 1;
   }
-  return responses.length - 1;
+  return 0;
 }
 
 function initMap(id) {

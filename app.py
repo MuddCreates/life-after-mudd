@@ -28,7 +28,7 @@ def get_static_file(path):
 def get_admin_data():
     if ADMIN_ENABLED:
         try:
-            with open("data-admin.json") as f:
+            with open("data.json") as f:
                 return flask.jsonify(json.load(f))
         except (OSError, json.JSONDecodeError):
             return "Data not available", 500
