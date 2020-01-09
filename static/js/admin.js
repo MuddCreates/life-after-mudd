@@ -413,16 +413,34 @@ function populateForm() {
   $("#summer-country-input").val(r.summerCountry);
   $("#comments-raw-input").val(r.rawComments);
   $("#comments-input").val(r.comments);
-  $("#city-coords-input").val("");
-  $("#org-coords-input").val("");
-  $("#summer-city-coords-input").val("");
-  $("#summer-org-coords-input").val("");
+  if (r.cityLat && r.cityLong) {
+    $("#city-coords-input").val(`${r.cityLat}, ${r.cityLong}`);
+  } else {
+    $("#city-coords-input").val("");
+  }
+  if (r.orgLat && r.orgLong) {
+    $("#org-coords-input").val(`${r.orgLat}, ${r.orgLong}`);
+  } else {
+    $("#org-coords-input").val("");
+  }
+  if (r.summerCityLat && r.summerCityLong) {
+    $("#summer-city-coords-input").val(
+      `${r.summerCityLat}, ${r.summerCityLong}`,
+    );
+  } else {
+    $("#summer-city-coords-input").val("");
+  }
+  if (r.summerOrgLat && r.summerOrgLong) {
+    $("#summer-org-coords-input").val(`${r.summerOrgLat}, ${r.summerOrgLong}`);
+  } else {
+    $("#summer-org-coords-input").val("");
+  }
   $("#city-map").data("onFirstResult", () => locateOrg({ summer: false }));
   $("#summer-city-map").data("onFirstResult", () =>
     locateOrg({ summer: true }),
   );
-  locateCity({ processed: r.processed, summer: false });
-  locateCity({ processed: r.processed, summer: true });
+  locateCity({ processed: r.processed === r.timestamp, summer: false });
+  locateCity({ processed: r.processed === r.timestamp, summer: true });
 }
 
 async function main() {
