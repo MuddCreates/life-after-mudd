@@ -16,8 +16,8 @@ COLUMNS = (
     ("What will you be doing next year?", "rawPath"),
     ("At what company, school, or organization?", "rawOrg"),
     ("In what city and state?", "rawCityState"),
-    ("Are you doing something different this summer?", "rawHasSummerPlans"),
-    ("", "rawSummerPath"),
+    ("Do you have separate summer plans you'd like to share?", "rawHasSummerPlans"),
+    ("What will you be doing?", "rawSummerPlans"),
     ("At what company, school, or organization?", "rawSummerOrg",),
     ("In what city and state?", "rawSummerCityState"),
     ("Anything else you want to share?", "rawComments"),
@@ -60,7 +60,7 @@ def get_worksheet():
             "https://www.googleapis.com/auth/drive",
         ],
     )
-    return gspread.authorize(creds).open("Life after Mudd").get_worksheet(0)
+    return gspread.authorize(creds).open("Life After Mudd").get_worksheet(0)
 
 
 def read_form_responses(worksheet):
