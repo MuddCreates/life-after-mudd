@@ -19,4 +19,5 @@ First install [Docker](https://www.docker.com/). Then, to run:
 
 To deploy, install the [Heroku
 CLI](https://devcenter.heroku.com/articles/heroku-cli) and run `make
-deploy`.
+deploy`. (But this happens automatically when a commmit is merged to
+`master`, courtesy of CircleCI.)
