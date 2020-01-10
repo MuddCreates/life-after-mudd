@@ -121,7 +121,17 @@ const fetchResponsesAction = thunk(async dispatch => {
   dispatch({
     type: "RESPONSES_FETCH_IN_PROGRESS",
   });
-  const response = await fetch("/api/v1/data");
+  const GoogleAuth = gapi.auth2.getAuthInstance();
+  const oauthToken = GoogleAuth.currentUser.get().getAuthResponse().id_token;
+  const response = await fetch("/api/v1/data", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      oauthToken,
+    }),
+  });
   if (!response.ok) {
     throw new Error(`Got status ${response.status} from API`);
   }
