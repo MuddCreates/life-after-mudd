@@ -397,7 +397,6 @@ async function main() {
       // https://developers.google.com/identity/protocols/OAuth2UserAgent
       await new Promise(resolve => gapi.load("client:auth2", resolve));
       await gapi.client.init({
-        apiKey: "AIzaSyDx1JBuFtRctu-sYhP-B6AGPxm6d-d1Vjw",
         clientId:
           "548868103597-3th6ihbnejkscon1950m9mm31misvhk9.apps.googleusercontent.com",
         scope: "email",
