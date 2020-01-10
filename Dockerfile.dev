@@ -11,6 +11,7 @@ RUN /tmp/docker-install-system-dev.bash "$UID"
 USER $UID
 WORKDIR /home/docker/src
 EXPOSE 8080
+EXPOSE 8081
 
 ENTRYPOINT ["/usr/local/bin/pid1.bash"]
 CMD bash

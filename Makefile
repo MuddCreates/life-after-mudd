@@ -28,7 +28,7 @@ build-prod: ## Build static files for production
 
 .PHONY: build-dev
 build-dev: ## Build static files for development, and watch for changes
-	yarn parcel watch static/*.html
+	yarn parcel watch --hmr-port $${HMR_PORT:-8081} static/*.html
 
 .PHONY: app-prod
 app-prod: ## Start webserver for production
