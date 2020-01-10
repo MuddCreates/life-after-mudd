@@ -11,13 +11,9 @@ import {
   combineReducers,
   createStore,
 } from "redux";
-import thunk from "redux-thunk";
+import thunkMiddleware from "redux-thunk";
 
 import { initMapbox } from "./shared.js";
-
-function decapitalize(string) {
-  return string.charAt(0).toLowerCase() + string.slice(1);
-}
 
 function mapCallWhenReady(map, cb) {
   // https://github.com/mapbox/mapbox-gl-directions/issues/111
@@ -29,59 +25,112 @@ function mapCallWhenReady(map, cb) {
 }
 
 const initialState = {
-  fetching: false,
-  fetchError: null,
+  catastrophicError: null,
+  auth: {
+    setupInProgress: false,
+    loginInProgress: false,
+    loggedIn: null,
+  },
+  fetch: {
+    inProgress: false,
+    finished: false,
+  },
   responses: null,
 };
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case "FETCH_PENDING":
-      return { ...state, fetching: true, fetchError: null, responses: null };
-    case "FETCH_SUCCESS":
+    case "CATASTROPHIC_ERROR":
+      return { ...state, catastrophicError: action.error };
+    case "OAUTH_SETUP_IN_PROGRESS":
       return {
         ...state,
-        fetching: false,
-        fetchError: null,
-        responses: action.responses,
+        auth: { ...state.auth, setupInProgress: true, loggedIn: null },
       };
-    case "FETCH_ERROR":
+    case "OAUTH_LOGGED_IN":
       return {
         ...state,
-        fetching: false,
-        fetchError: action.error,
+        auth: {
+          ...state.auth,
+          setupInProgress: false,
+          loginInProgress: false,
+          loggedIn: true,
+        },
+      };
+    case "OAUTH_NOT_LOGGED_IN":
+      return {
+        ...state,
+        auth: {
+          ...state.auth,
+          setupInProgress: false,
+          loginInProgress: false,
+          loggedIn: false,
+        },
+      };
+    case "OAUTH_LOGIN_IN_PROGRESS":
+      return {
+        ...state,
+        auth: { ...state.auth, loginInProgress: true, loggedIn: null },
+      };
+    case "RESPONSES_FETCH_IN_PROGRESS":
+      return {
+        ...state,
+        fetch: { ...state.fetch, inProgress: true, finished: false },
         responses: null,
+      };
+    case "RESPONSES_FETCHED":
+      return {
+        ...state,
+        fetch: { ...state.fetch, inProgress: false, finished: true },
+        responses: action.responses,
       };
     default:
       return state;
   }
 };
 
-const store = createStore(reducer, initialState, applyMiddleware(thunk));
+function failHard(error) {
+  if (error.message) {
+    console.error(error);
+  }
+  store.dispatch({ type: "CATASTROPHIC_ERROR", error });
+}
 
-function fetchResponsesAction() {
-  return async dispatch => {
-    dispatch({
-      type: "FETCH_PENDING",
-    });
+const store = createStore(
+  reducer,
+  initialState,
+  applyMiddleware(thunkMiddleware),
+);
+
+function thunk(action) {
+  return dispatch => {
     try {
-      const response = await fetch("/api/v1/data");
-      if (!response.ok) {
-        throw new Error(`Got status ${response.status} from API`);
+      let result = action(dispatch);
+      // https://stackoverflow.com/a/38339199/3538165
+      if (Promise.resolve(result) === result) {
+        result = result.catch(failHard);
       }
-      const responses = await response.json();
-      dispatch({
-        type: "FETCH_SUCCESS",
-        responses,
-      });
+      return result;
     } catch (error) {
-      dispatch({
-        type: "FETCH_ERROR",
-        error: error.message,
-      });
+      failHard(error);
     }
   };
 }
+
+const fetchResponsesAction = thunk(async dispatch => {
+  dispatch({
+    type: "RESPONSES_FETCH_IN_PROGRESS",
+  });
+  const response = await fetch("/api/v1/data");
+  if (!response.ok) {
+    throw new Error(`Got status ${response.status} from API`);
+  }
+  const responses = await response.json();
+  dispatch({
+    type: "RESPONSES_FETCHED",
+    responses,
+  });
+});
 
 class Map extends React.Component {
   render() {
@@ -156,63 +205,173 @@ Map = connect(state => ({
   responses: state.responses,
 }))(Map);
 
+const loginAction = thunk(async dispatch => {
+  dispatch({ type: "OAUTH_LOGIN_IN_PROGRESS" });
+  const GoogleAuth = gapi.auth2.getAuthInstance();
+  try {
+    await GoogleAuth.signIn();
+  } catch (error) {
+    // e.g., user closed login popup
+  }
+});
+
 class App extends React.Component {
+  messageScreen(...items) {
+    return (
+      <div
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+        }}
+      >
+        <center>
+          {items.map((jsx, idx) => {
+            const Item = () => jsx;
+            return <Item key={idx} />;
+          })}
+        </center>
+      </div>
+    );
+  }
+  loadingScreen(message) {
+    return this.messageScreen(
+      <div
+        style={{
+          marginBottom: "5px",
+        }}
+      >
+        <div className="spinner-border"></div>
+      </div>,
+      <p>{message}</p>,
+    );
+  }
   render() {
-    if (this.props.fetching) {
-      return (
-        <div
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-          }}
-        >
-          <center>
-            <div
-              style={{
-                marginBottom: "5px",
+    switch (this.props.redux.screen) {
+      case "error":
+        return this.messageScreen(
+          <p>
+            Sorry, there was a totally unexpected error.{" "}
+            {this.props.redux.error.message ? (
+              <span>Here's all the information we have:</span>
+            ) : (
+              <span>
+                Unfortunately, we don't have any further information. There
+                might be some information in your browser's JavaScript console,
+                though.
+              </span>
+            )}
+          </p>,
+          this.props.redux.error.message && (
+            <p>
+              <b>{this.props.redux.error.message}</b>
+            </p>
+          ),
+          <div style={{ textAlign: "left" }}>
+            You can try:
+            <ul>
+              <li>
+                <a href={window.location.origin + window.location.pathname}>
+                  reloading the page
+                </a>
+              </li>
+              <li>
+                <a href="https://github.com/MuddCreates/life-after-mudd/issues">
+                  filing a bug report on GitHub
+                </a>
+              </li>
+              <li>
+                <a href="mailto:rrosborough@hmc.edu">emailing the author</a>
+              </li>
+            </ul>
+          </div>,
+        );
+      case "authSetupInProgress":
+        return this.loadingScreen("Authorizing your session...");
+      case "authLoginInProgress":
+        return this.messageScreen(
+          <p>
+            Waiting for you to log in with Google. If you close the login
+            window,{" "}
+            <a
+              href="#"
+              onClick={event => {
+                store.dispatch(loginAction);
+                event.preventDefault();
               }}
             >
-              <div className="spinner-border"></div>
-            </div>
-            <p>Loading, please wait.</p>
-          </center>
-        </div>
-      );
-    } else if (this.props.fetchError !== null) {
-      return (
-        <div
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-          }}
-        >
-          <p>
-            Sorry, couldn't fetch the data (
-            {decapitalize(this.props.fetchError)}).
-          </p>
-          <p>
-            Try reloading the page, or contact{" "}
-            <a href="mailto:rrosborough@hmc.edu">Radon Rosborough</a>.
-          </p>
-        </div>
-      );
-    } else if (this.props.responses !== null) {
-      return <Map />;
-    } else {
-      return <div></div>;
+              click here
+            </a>{" "}
+            to open another one.
+          </p>,
+        );
+      case "authLoginRequired":
+        return this.messageScreen(
+          <p>All data is private to the HMC Class of 2020.</p>,
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => store.dispatch(loginAction)}
+          >
+            Sign in with your HMC Google Account
+          </button>,
+        );
+      case "fetchInProgress":
+        return this.loadingScreen("Fetching geolocation data...");
+      case "map":
+        return <Map />;
+      case "blank":
+        return <div></div>;
     }
   }
 }
 
-App = connect(state => ({
-  fetching: state.fetching,
-  fetchError: state.fetchError,
-  responses: state.responses,
-}))(App);
+App = connect(state => {
+  let redux;
+  if (state.catastrophicError !== null) {
+    redux = {
+      screen: "error",
+      error: state.catastrophicError,
+    };
+  } else if (state.auth.setupInProgress) {
+    redux = {
+      screen: "authSetupInProgress",
+    };
+  } else if (state.auth.loginInProgress) {
+    redux = {
+      screen: "authLoginInProgress",
+    };
+  } else if (!state.auth.loggedIn) {
+    redux = {
+      screen: "authLoginRequired",
+    };
+  } else if (state.fetch.inProgress) {
+    redux = {
+      screen: "fetchInProgress",
+    };
+  } else if (state.fetch.finished) {
+    redux = {
+      screen: "map",
+      responses: state.responses,
+    };
+  } else {
+    redux = {
+      screen: "blank",
+    };
+  }
+  return { redux };
+})(App);
+
+const updateLoginStatusAction = thunk(dispatch => {
+  const GoogleAuth = gapi.auth2.getAuthInstance();
+  if (GoogleAuth.currentUser.get().hasGrantedScopes("email")) {
+    dispatch({ type: "OAUTH_LOGGED_IN" });
+    dispatch(fetchResponsesAction);
+  } else {
+    dispatch({ type: "OAUTH_NOT_LOGGED_IN" });
+  }
+});
 
 async function main() {
   initMapbox();
@@ -222,10 +381,28 @@ async function main() {
     </Provider>,
     document.getElementById("app"),
   );
-  store.dispatch(fetchResponsesAction());
+  await store.dispatch(
+    thunk(async dispatch => {
+      dispatch({ type: "OAUTH_SETUP_IN_PROGRESS" });
+      // https://developers.google.com/identity/protocols/OAuth2UserAgent
+      await new Promise(resolve => gapi.load("client:auth2", resolve));
+      await gapi.client.init({
+        apiKey: "AIzaSyDx1JBuFtRctu-sYhP-B6AGPxm6d-d1Vjw",
+        clientId:
+          "548868103597-3th6ihbnejkscon1950m9mm31misvhk9.apps.googleusercontent.com",
+        scope: "email",
+      });
+      const GoogleAuth = gapi.auth2.getAuthInstance();
+      GoogleAuth.isSignedIn.listen(() => dispatch(updateLoginStatusAction));
+      dispatch(updateLoginStatusAction);
+    }),
+  );
 }
 
-main().catch(console.error);
+window.addEventListener("error", event => {
+  failHard(event.error || new Error(""));
+});
+main().catch(error => store.dispatch({ type: "CATASTROPHIC_ERROR", error }));
 
 // https://dev.to/cronokirby/react-typescript-parcel-setting-up-hot-module-reloading-4f3f#setting-up-hmr
 export default hot(module)(App);
