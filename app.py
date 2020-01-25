@@ -15,7 +15,7 @@ AUTOFETCH_ENABLED = bool(os.environ.get("LAM_AUTOFETCH_ENABLED"))
 
 app = flask.Flask(__name__)
 if not ADMIN_ENABLED:
-    flask_talisman.Talisman(app)
+    flask_talisman.Talisman(app, content_security_policy=None)
 
 
 @app.route("/")
