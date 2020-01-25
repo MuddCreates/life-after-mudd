@@ -273,11 +273,11 @@ class App extends React.Component {
               </span>
             )}
           </p>,
-          this.props.redux.error.message && (
+          this.props.redux.error.message ? (
             <p>
               <b>{this.props.redux.error.message}</b>
             </p>
-          ),
+          ) : null,
           <div style={{ textAlign: "left" }}>
             You can try:
             <ul>
