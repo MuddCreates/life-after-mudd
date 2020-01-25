@@ -230,6 +230,23 @@ const loginAction = thunk(async dispatch => {
   }
 });
 
+function getErrorMessage(error) {
+  if (!error) {
+    return "";
+  } else if (typeof error === "string") {
+    return error;
+  } else if (error instanceof Error) {
+    return error.message;
+  } else if (
+    typeof error.error === "string" &&
+    typeof error.details === "string"
+  ) {
+    return `${error.error}: ${error.details}`;
+  } else {
+    return `Bizarre error: ${error}`;
+  }
+}
+
 class App extends React.Component {
   messageScreen(...items) {
     return (
@@ -265,10 +282,11 @@ class App extends React.Component {
   render() {
     switch (this.props.redux.screen) {
       case "error":
+        const msg = getErrorMessage(this.props.redux.error);
         return this.messageScreen(
           <p>
             Sorry, there was a totally unexpected error.{" "}
-            {this.props.redux.error.message ? (
+            {msg ? (
               <span>Here's all the information we have:</span>
             ) : (
               <span>
@@ -278,9 +296,9 @@ class App extends React.Component {
               </span>
             )}
           </p>,
-          this.props.redux.error.message ? (
+          msg ? (
             <p>
-              <b>{this.props.redux.error.message}</b>
+              <b>{msg}</b>
             </p>
           ) : null,
           <div style={{ textAlign: "left" }}>
@@ -420,7 +438,7 @@ async function main() {
 }
 
 window.addEventListener("error", event => {
-  failHard(event.error || new Error(""));
+  failHard(event.error);
 });
 main().catch(error => store.dispatch({ type: "CATASTROPHIC_ERROR", error }));
 
