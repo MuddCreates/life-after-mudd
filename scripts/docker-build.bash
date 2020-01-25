@@ -42,12 +42,13 @@ scripts/docker.bash                      \
 
 PORT="${PORT:-8080}"
 HMR_PORT="${HMR_PORT:-8081}"
+HOST="${HOST:-127.0.0.1}"
 if [[ -n "$run" ]]; then
-    scripts/docker.bash                                    \
-        run -it --rm                                       \
-        -e PORT -e HMR_PORT                                \
-        -p "${PORT}:${PORT}" -p "${HMR_PORT}:${HMR_PORT}"  \
-        -e LAM_OAUTH_PRIVATE_KEY                           \
-        "${docker_run_opts[@]}"                            \
+    scripts/docker.bash                                                    \
+        run -it --rm                                                       \
+        -e PORT -e HMR_PORT                                                \
+        -p "${HOST}:${PORT}:${PORT}" -p "${HOST}:${HMR_PORT}:${HMR_PORT}"  \
+        -e LAM_OAUTH_PRIVATE_KEY                                           \
+        "${docker_run_opts[@]}"                                            \
         "life-after-mudd:${tag}" "${docker_run_args[@]}"
 fi
