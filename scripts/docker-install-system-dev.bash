@@ -18,6 +18,9 @@ wget
 # make it easier to run multiple commands
 tmux
 
+# formatting JSON
+jq
+
 "
 
 export DEBIAN_FRONTEND=noninteractive
