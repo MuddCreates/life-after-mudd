@@ -4,6 +4,7 @@ import threading
 import urllib.parse
 
 import flask
+import flask_talisman
 import requests
 import requests.exceptions
 
@@ -13,6 +14,8 @@ ADMIN_ENABLED = bool(os.environ.get("LAM_ADMIN_ENABLED"))
 AUTOFETCH_ENABLED = bool(os.environ.get("LAM_AUTOFETCH_ENABLED"))
 
 app = flask.Flask(__name__)
+if not ADMIN_ENABLED:
+    flask_talisman.Talisman(app)
 
 
 @app.route("/")

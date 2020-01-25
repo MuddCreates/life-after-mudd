@@ -43,6 +43,17 @@ dotenv = ["python-dotenv"]
 
 [[package]]
 category = "main"
+description = "HTTP security headers for Flask."
+name = "flask-talisman"
+optional = false
+python-versions = "*"
+version = "0.7.0"
+
+[package.dependencies]
+six = ">=1.9.0"
+
+[[package]]
+category = "main"
 description = "Google Spreadsheets Python API"
 name = "gspread"
 optional = false
@@ -213,7 +224,7 @@ termcolor = ["termcolor"]
 watchdog = ["watchdog"]
 
 [metadata]
-content-hash = "1c0669a2c76008e574c9eecf920fd88699a1d08b12d6d5f4f72a1a7c5882d7c9"
+content-hash = "42d8ea20c90fa428f6af878b0d4be1a6ab98771d2f0f74200695cd135afa49c3"
 python-versions = "^3.6"
 
 [metadata.files]
@@ -232,6 +243,10 @@ click = [
 flask = [
     {file = "Flask-1.1.1-py2.py3-none-any.whl", hash = "sha256:45eb5a6fd193d6cf7e0cf5d8a5b31f83d5faae0293695626f539a823e93b13f6"},
     {file = "Flask-1.1.1.tar.gz", hash = "sha256:13f9f196f330c7c2c5d7a5cf91af894110ca0215ac051b5844701f2bfd934d52"},
+]
+flask-talisman = [
+    {file = "flask-talisman-0.7.0.tar.gz", hash = "sha256:468131464a249274ed226efc21b372518f442487e58918ccab8357eaa638fd1f"},
+    {file = "flask_talisman-0.7.0-py2.py3-none-any.whl", hash = "sha256:eaa754f4b771dfbe473843391d69643b79e3a38c865790011ac5e4179c68e3ec"},
 ]
 gspread = [
     {file = "gspread-3.1.0-py3-none-any.whl", hash = "sha256:dd945e3ae5d3d0325ad9982e0d5667f79ca121d0bb6f35274dc84371bbb79dd5"},
