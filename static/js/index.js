@@ -332,7 +332,13 @@ class App extends React.Component {
       case "map":
         return <Map />;
       case "blank":
-        return <div></div>;
+        return null;
+      default:
+        store.dispatch({
+          type: "CATASTROPHIC_ERROR",
+          error: new Error(`Unknown screen name: ${this.props.redux.screen}`),
+        });
+        return null;
     }
   }
 }
