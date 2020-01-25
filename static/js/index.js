@@ -9,6 +9,7 @@ import {
   applyMiddleware,
   bindActionCreators,
   combineReducers,
+  compose,
   createStore,
 } from "redux";
 import thunkMiddleware from "redux-thunk";
@@ -99,7 +100,11 @@ function failHard(error) {
 const store = createStore(
   reducer,
   initialState,
-  applyMiddleware(thunkMiddleware),
+  compose(
+    applyMiddleware(thunkMiddleware),
+    window.__REDUX_DEVTOOLS_EXTENSION__ &&
+      window.__REDUX_DEVTOOLS_EXTENSION__(),
+  ),
 );
 
 function thunk(action) {
