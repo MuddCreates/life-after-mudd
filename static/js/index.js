@@ -256,14 +256,22 @@ class App extends React.Component {
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
+          maxWidth: "90%",
+          wordWrap: "break-word",
         }}
       >
-        <center>
-          {items.map((jsx, idx) => {
-            const Item = () => jsx;
-            return <Item key={idx} />;
-          })}
-        </center>
+        <div
+          style={{
+            maxWidth: "6in",
+          }}
+        >
+          <center>
+            {items.map((jsx, idx) => {
+              const Item = () => jsx;
+              return <Item key={idx} />;
+            })}
+          </center>
+        </div>
       </div>
     );
   }
