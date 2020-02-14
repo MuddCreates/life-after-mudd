@@ -2,6 +2,7 @@
 
 /.cache/
 /.docker-venv/
+/.log
 /.oauth-private-key.json
 /__pycache__/
 /dist/
