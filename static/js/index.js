@@ -2,6 +2,7 @@
 // https://babeljs.io/docs/en/next/babel-polyfill.html
 import "regenerator-runtime/runtime";
 
+import $ from "jquery";
 import React from "react";
 import { render } from "react-dom";
 import { hot } from "react-hot-loader";
@@ -228,6 +229,21 @@ class Map extends React.Component {
   componentDidUpdate() {
     this.renderLandmarks();
   }
+  getActiveIds(point) {
+    // https://docs.mapbox.com/mapbox-gl-js/example/queryrenderedfeatures-around-point/
+    const radius = 10;
+    const bbox = [
+      [point.x - radius, point.y - radius],
+      [point.x + radius, point.y + radius],
+    ];
+    const activeIds = {};
+    for (const feature of this.map.queryRenderedFeatures(bbox, {
+      layers: ["people"],
+    })) {
+      activeIds[feature.id] = true;
+    }
+    return activeIds;
+  }
   renderLandmarks() {
     mapCallWhenReady(this.map, () => {
       if (this.map.getLayer("people")) {
@@ -269,28 +285,19 @@ class Map extends React.Component {
           "circle-radius": 10,
         },
       });
-      this.map.on("mousemove", "people", e => {
-        this.setHoverId(e.features ? e.features[0].id : null);
-      });
-      this.map.on("mouseleave", "people", () => {
-        this.setHoverId(null);
+      this.map.on("mousemove", e => {
+        const activeIds = this.getActiveIds(e.point);
+        this.map.getCanvas().style.cursor = $.isEmptyObject(activeIds)
+          ? "grab"
+          : "pointer";
+        this.props.responses.forEach((_response, idx) => {
+          this.map.setFeatureState(
+            { source: "people", id: idx },
+            { hover: activeIds[idx] || false },
+          );
+        });
       });
     });
-  }
-  setHoverId(id) {
-    if (this.currentHoverId !== null) {
-      this.map.setFeatureState(
-        { source: "people", id: this.currentHoverId },
-        { hover: false },
-      );
-    }
-    if (id !== null) {
-      this.map.setFeatureState({ source: "people", id }, { hover: true });
-      this.map.getCanvas().style.cursor = "pointer";
-    } else {
-      this.map.getCanvas().style.cursor = "grab";
-    }
-    this.currentHoverId = id;
   }
 }
 
