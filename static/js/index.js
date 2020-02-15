@@ -455,7 +455,7 @@ class App extends React.Component {
     }
   }
   componentDidCatch(error, _errorInfo) {
-    failHard(error);
+    store.dispatch({ type: "CATASTROPHIC_ERROR", error });
   }
 }
 
