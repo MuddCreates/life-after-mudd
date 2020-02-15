@@ -7,7 +7,7 @@
       <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
     <!-- It is absolutely impossible to use Mapbox with Parcel. Yes, really.
-         See <https://github.com/parcel-bundler/parcel/issues/509>.
+         See <https://github.com/parcel-bundler/parcel/issues/1128>.
          I hate computers.
     -->
     <link
@@ -15,6 +15,11 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./css/admin.css" />
+    <script
+      defer
+      src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js"
+    ></script>
+    <script defer src="./js/admin.js"></script>
   </head>
 
   <body>
@@ -541,7 +546,5 @@
         </div>
       </div>
     </form>
-    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js"></script>
-    <script src="./js/admin.js"></script>
   </body>
 </html>
