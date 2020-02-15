@@ -218,6 +218,7 @@ class Map extends React.Component {
             "#eaaa00", // HMC yellow
             "#000000",
           ],
+          "circle-radius": 10,
         },
       });
       this.map.on("mousemove", "people", e => {
