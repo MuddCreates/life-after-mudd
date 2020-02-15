@@ -1,6 +1,8 @@
-import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 // https://github.com/parcel-bundler/parcel/issues/871#issuecomment-367899522
-import "babel-polyfill";
+// https://babeljs.io/docs/en/next/babel-polyfill.html
+import "regenerator-runtime/runtime";
+
+import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import "bootstrap";
 import $ from "jquery";
 import { UsaStates } from "usa-states";

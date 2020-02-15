@@ -1,5 +1,6 @@
 // https://github.com/parcel-bundler/parcel/issues/871#issuecomment-367899522
-import "babel-polyfill";
+// https://babeljs.io/docs/en/next/babel-polyfill.html
+import "regenerator-runtime/runtime";
 
 import React from "react";
 import { render } from "react-dom";
