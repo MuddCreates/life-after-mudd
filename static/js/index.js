@@ -20,6 +20,10 @@ function mapCallWhenReady(map, cb) {
   }
 }
 
+const GeotagView = Object.freeze({
+  standard: "standard",
+});
+
 const initialState = {
   catastrophicError: null,
   auth: {
@@ -32,6 +36,7 @@ const initialState = {
     finished: false,
   },
   responses: null,
+  geotagView: GeotagView.standard,
 };
 
 const reducer = (state = initialState, action) => {
@@ -118,6 +123,16 @@ function thunk(action) {
   };
 }
 
+function parseLatLong(long, lat) {
+  const longF = parseFloat(long);
+  const latF = parseFloat(lat);
+  if (!Number.isNaN(longF) && !Number.isNaN(latF)) {
+    return { long: longF, lat: latF };
+  } else {
+    return null;
+  }
+}
+
 const fetchResponsesAction = thunk(async dispatch => {
   dispatch({
     type: "RESPONSES_FETCH_IN_PROGRESS",
@@ -137,11 +152,47 @@ const fetchResponsesAction = thunk(async dispatch => {
     throw new Error(`Got status ${response.status} from API`);
   }
   const responses = await response.json();
+  for (const response of responses) {
+    response.cityLatLong = parseLatLong(response.cityLong, response.cityLat);
+    response.orgLatLong = parseLatLong(response.orgLong, response.orgLat);
+    response.summerCityLatLong = parseLatLong(
+      response.summerCityLong,
+      response.summerCityLat,
+    );
+    response.summerOrgLatLong = parseLatLong(
+      response.summerOrgLong,
+      response.summerOrgLat,
+    );
+  }
   dispatch({
     type: "RESPONSES_FETCHED",
     responses,
   });
 });
+
+function filterResponses(responses, geotagView) {
+  const filtered = [];
+  for (const response of responses) {
+    let latLong;
+    switch (geotagView) {
+      case GeotagView.standard:
+        latLong =
+          response.orgLatLong ||
+          response.cityLatLong ||
+          response.summerOrgLatLong ||
+          response.summerCityLatLong;
+        break;
+      default:
+        failHard(new Error(`Unknown geotag view: ${geotagView}`));
+        return [];
+    }
+    if (latLong === null) {
+      continue;
+    }
+    filtered.push({ ...response, geotag: latLong });
+  }
+  return filtered;
+}
 
 class Map extends React.Component {
   constructor(props) {
@@ -200,10 +251,7 @@ class Map extends React.Component {
               id: idx,
               geometry: {
                 type: "Point",
-                coordinates: [
-                  parseFloat(response.cityLong),
-                  parseFloat(response.cityLat),
-                ],
+                coordinates: [response.geotag.long, response.geotag.lat],
               },
             })),
           },
@@ -247,7 +295,7 @@ class Map extends React.Component {
 }
 
 Map = connect(state => ({
-  responses: state.responses,
+  responses: filterResponses(state.responses, state.geotagView),
 }))(Map);
 
 const loginAction = thunk(async dispatch => {
