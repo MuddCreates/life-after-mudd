@@ -6,13 +6,7 @@ import React from "react";
 import { render } from "react-dom";
 import { hot } from "react-hot-loader";
 import { connect, Provider } from "react-redux";
-import {
-  applyMiddleware,
-  bindActionCreators,
-  combineReducers,
-  compose,
-  createStore,
-} from "redux";
+import { applyMiddleware, compose, createStore } from "redux";
 import thunkMiddleware from "redux-thunk";
 
 import { initMapbox } from "./shared.js";
@@ -150,6 +144,10 @@ const fetchResponsesAction = thunk(async dispatch => {
 });
 
 class Map extends React.Component {
+  constructor(props) {
+    super(props);
+    this.currentHoverId = null;
+  }
   render() {
     return (
       <div>
@@ -174,7 +172,6 @@ class Map extends React.Component {
       zoom: 4.3,
     });
     this.map = map;
-    window.map = map;
     this.renderLandmarks();
   }
   componentDidUpdate() {
@@ -193,13 +190,14 @@ class Map extends React.Component {
       }
       this.map.addLayer({
         id: "people",
-        type: "symbol",
+        type: "circle",
         source: {
           type: "geojson",
           data: {
             type: "FeatureCollection",
-            features: this.props.responses.map(response => ({
+            features: this.props.responses.map((response, idx) => ({
               type: "Feature",
+              id: idx,
               geometry: {
                 type: "Point",
                 coordinates: [
@@ -210,11 +208,40 @@ class Map extends React.Component {
             })),
           },
         },
-        layout: {
-          "icon-image": "circle-15",
+        paint: {
+          "circle-color": [
+            "case",
+            // nb this case statement makes no sense to me, I tried
+            // every logic combination until I got the one I wanted.
+            // See: https://blog.mapbox.com/going-live-with-electoral-maps-a-guide-to-feature-state-b520e91a22d
+            ["boolean", ["feature-state", "hover"], false],
+            "#eaaa00", // HMC yellow
+            "#000000",
+          ],
         },
       });
+      this.map.on("mousemove", "people", e => {
+        this.setHoverId(e.features ? e.features[0].id : null);
+      });
+      this.map.on("mouseleave", "people", () => {
+        this.setHoverId(null);
+      });
     });
+  }
+  setHoverId(id) {
+    if (this.currentHoverId !== null) {
+      this.map.setFeatureState(
+        { source: "people", id: this.currentHoverId },
+        { hover: false },
+      );
+    }
+    if (id !== null) {
+      this.map.setFeatureState({ source: "people", id }, { hover: true });
+      this.map.getCanvas().style.cursor = "pointer";
+    } else {
+      this.map.getCanvas().style.cursor = "grab";
+    }
+    this.currentHoverId = id;
   }
 }
 

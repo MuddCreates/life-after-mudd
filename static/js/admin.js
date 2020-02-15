@@ -101,7 +101,6 @@ function clean(field) {
 }
 
 function fillDefaults(responses) {
-  let idx = 0;
   return responses.map(r => {
     r = { ...r };
     // Make it so form response updates are automatically queued for
