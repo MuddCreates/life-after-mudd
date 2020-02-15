@@ -395,12 +395,12 @@ class App extends React.Component {
       case "blank":
         return null;
       default:
-        store.dispatch({
-          type: "CATASTROPHIC_ERROR",
-          error: new Error(`Unknown screen name: ${this.props.redux.screen}`),
-        });
+        failHard(new Error(`Unknown screen name: ${this.props.redux.screen}`));
         return null;
     }
+  }
+  componentDidCatch(error, _errorInfo) {
+    failHard(error);
   }
 }
 
