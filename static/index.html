@@ -16,12 +16,19 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./css/index.css" />
+    <script>
+      // Parcel accidentally clears the app's output, thus meaning you have
+      // to reload the page *again* just to see error messages. According to
+      // <https://github.com/parcel-bundler/parcel/issues/1365> the issue
+      // has been fixed, but clearly not.
+      console.clear = () => {};
+    </script>
     <script defer src="https://apis.google.com/js/api.js"></script>
     <script
       defer
       src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js"
     ></script>
-    <script defer src="./js/index.js"></script>
+    <script defer src="./js/index/main.js"></script>
   </head>
 
   <body>

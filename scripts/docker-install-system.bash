@@ -40,6 +40,9 @@ python3-venv
 # to install JS dependencies
 yarn
 
+# to install deps for react-mapbox-gl fork
+npm
+
 "
 
 export DEBIAN_FRONTEND=noninteractive

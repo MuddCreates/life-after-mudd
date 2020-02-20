@@ -7,7 +7,7 @@ import "bootstrap";
 import $ from "jquery";
 import { UsaStates } from "usa-states";
 
-import { initMapbox } from "./shared.js";
+import { mapboxAccessToken } from "./shared.js";
 
 const USA_STATES = new UsaStates().states;
 
@@ -323,7 +323,7 @@ function initPage() {
     const value = $(this).text();
     $("#summer-path-input").val(value);
   });
-  initMapbox();
+  mapboxgl.accessToken = mapboxAccessToken;
   for (const { map, coordsInput, setButton } of [
     {
       map: $("#city-map"),
