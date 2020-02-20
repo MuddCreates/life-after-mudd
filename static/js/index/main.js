@@ -27,3 +27,10 @@ window.addEventListener("error", event => {
   failHard(event.error);
 });
 main().catch(failHard);
+
+// Fix Parcel's broken HMR, see
+// <https://github.com/parcel-bundler/parcel/issues/3299#issuecomment-518919533>.
+if (module.hot) {
+  module.hot.dispose(() => {});
+  module.hot.accept(() => {});
+}
