@@ -9,8 +9,6 @@ import { connect } from "react-redux";
 import { mapboxAccessToken } from "../../shared";
 import { GeotagView } from "../state";
 
-window.ReactMapboxGl = ReactMapboxGl;
-
 const CIRCLE_RADIUS = 10;
 const HIGHLIGHT_BBOX_RADIUS = 10;
 

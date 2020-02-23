@@ -5,14 +5,10 @@ import React from "react";
 import { connect } from "react-redux";
 
 import { failHard } from "../error";
-import { Screen, store } from "../state";
+import { store } from "../redux";
+import { Screen } from "../state";
 import MapView from "./MapView";
 import MessageScreen from "./MessageScreen";
-
-import { mapboxAccessToken } from "../../shared";
-const Map = ReactMapboxGl({
-  accessToken: mapboxAccessToken,
-});
 
 // Higher-order component that displays a loading spinner and a
 // message.
