@@ -10,7 +10,7 @@ function parseLatLong(long, lat) {
   const longF = parseFloat(long);
   const latF = parseFloat(lat);
   if (!Number.isNaN(longF) && !Number.isNaN(latF)) {
-    return { long: longF, lat: latF };
+    return { lng: longF, lat: latF };
   } else {
     return null;
   }

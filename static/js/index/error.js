@@ -36,7 +36,7 @@ export function failHard(error) {
         <p>
           Sorry, there was a totally unexpected error.{" "}
           {msg ? (
-            <span>Here's all the information we have:</span>
+            <span>Here's what we got:</span>
           ) : (
             <span>
               Unfortunately, we don't have any further information. There might
@@ -47,6 +47,14 @@ export function failHard(error) {
         msg ? (
           <p>
             <b>{msg}</b>
+          </p>
+        ) : null,
+        msg ? (
+          <p>
+            <span>
+              There might be more information in your browser's JavaScript
+              console, as well.
+            </span>
           </p>
         ) : null,
         <div style={{ textAlign: "left" }}>

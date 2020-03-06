@@ -31,6 +31,8 @@ export const initialState = {
   screen: Screen.initial,
   responses: null,
   geotagView: GeotagView.standard,
+  displayedResponses: null,
+  popupCoords: null,
 };
 
 // Global reducer for the app's Redux store.
@@ -46,6 +48,18 @@ export const reducer = (state = initialState, action) => {
       return { ...state, screen: Screen.fetching };
     case "SHOW_DATA":
       return { ...state, screen: Screen.map, responses: action.responses };
+    case "SHOW_DETAILS":
+      return {
+        ...state,
+        displayedResponses: action.responses,
+        popupCoords: action.coords,
+      };
+    case "HIDE_DETAILS":
+      return {
+        ...state,
+        displayedResponses: null,
+        popupCoords: null,
+      };
     default:
       return state;
   }

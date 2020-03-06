@@ -3,11 +3,13 @@
 import $ from "jquery";
 import React from "react";
 import ReactMapboxGl from "react-mapbox-gl";
-import { Feature, Layer } from "react-mapbox-gl";
+import { Feature, Layer, Popup } from "react-mapbox-gl";
 import { connect } from "react-redux";
 
 import { mapboxAccessToken } from "../../shared";
+import { store } from "../redux";
 import { GeotagView } from "../state";
+import Details from "./Details";
 
 const CIRCLE_RADIUS = 10;
 const HIGHLIGHT_BBOX_RADIUS = 10;
@@ -43,52 +45,67 @@ function geotagResponses(responses, geotagView) {
 class MapView extends React.Component {
   constructor(props) {
     super(props);
-    this.mouseDown = false;
+    // Keep track of this behind React's back, as it's used to mess
+    // with state that React doesn't know how to deal with.
+    this.mouseState = "up";
   }
   render() {
     return (
-      <Map
-        style="mapbox://styles/raxod502/ck6nxepcj03jv1jqe6a7p8om4"
-        center={[-97, 38]}
-        zoom={[4.3]}
-        onMouseDown={this.onMouseEvent}
-        onMouseMove={this.onMouseEvent}
-        onMouseUp={this.onMouseEvent}
-        containerStyle={{
-          position: "absolute",
-          top: "0",
-          left: "0",
-          bottom: "0",
-          right: "0",
-        }}
-      >
-        <Layer
-          id="people"
-          type="circle"
-          geoJSONSourceOptions={{ generateId: true }}
-          paint={{
-            "circle-color": [
-              "case",
-              // nb this case statement makes no sense to me, I tried
-              // every logic combination until I got the one I
-              // wanted. See:
-              //
-              // https://blog.mapbox.com/going-live-with-electoral-maps-a-guide-to-feature-state-b520e91a22d
-              ["boolean", ["feature-state", "hover"], false],
-              "#eaaa00", // HMC yellow
-              "#000000",
-            ],
-            "circle-radius": CIRCLE_RADIUS,
+      <div>
+        <Map
+          style="mapbox://styles/raxod502/ck6nxepcj03jv1jqe6a7p8om4"
+          center={[-97, 38]}
+          zoom={[4.3]}
+          onClick={this.onMouseEvent}
+          onMouseDown={this.onMouseEvent}
+          onMouseMove={this.onMouseEvent}
+          onMouseUp={this.onMouseEvent}
+          containerStyle={{
+            position: "absolute",
+            top: "0",
+            left: "0",
+            bottom: "0",
+            right: "0",
           }}
         >
-          {this.props.responses.map((resp, idx) => (
-            <Feature
-              coordinates={[resp.geotag.long, resp.geotag.lat]}
-              key={idx}
-            />
-          ))}
-        </Layer>
-      </Map>
+          <Layer
+            id="people"
+            type="circle"
+            geoJSONSourceOptions={{ generateId: true }}
+            paint={{
+              "circle-color": [
+                "case",
+                // nb this case statement makes no sense to me, I tried
+                // every logic combination until I got the one I
+                // wanted. See:
+                //
+                // https://blog.mapbox.com/going-live-with-electoral-maps-a-guide-to-feature-state-b520e91a22d
+                ["boolean", ["feature-state", "hover"], false],
+                "#eaaa00", // HMC yellow
+                "#000000",
+              ],
+              "circle-radius": CIRCLE_RADIUS,
+            }}
+          >
+            {this.props.responses.map((resp, idx) => (
+              <Feature
+                coordinates={[resp.geotag.lng, resp.geotag.lat]}
+                key={idx}
+              />
+            ))}
+          </Layer>
+          {this.props.popupCoords ? (
+            <Popup
+              coordinates={[
+                this.props.popupCoords.lng,
+                this.props.popupCoords.lat,
+              ]}
+            >
+              <Details />
+            </Popup>
+          ) : null}
+        </Map>
+      </div>
     );
   }
   getActiveIds = (map, point) => {
@@ -106,18 +123,26 @@ class MapView extends React.Component {
     return activeIds;
   };
   onMouseEvent = (map, e) => {
+    if (!map.getLayer("people")) {
+      // Map not fully loaded yet, refrain from messing with it to
+      // avoid errors.
+      return;
+    }
     if (e.type === "mousedown") {
-      this.mouseDown = true;
+      this.mouseState = "down";
     } else if (e.type === "mouseup") {
-      this.mouseDown = false;
+      this.mouseState = "up";
+    } else if (e.type === "mousemove" && this.mouseState !== "up") {
+      this.mouseState = "drag";
     }
     const activeIds = this.getActiveIds(map, e.point);
-    if (this.mouseDown) {
-      map.getCanvas().style.cursor = "grabbing";
-    } else if ($.isEmptyObject(activeIds)) {
-      map.getCanvas().style.cursor = "grab";
-    } else {
+    // This follows the conventions set by Google Maps.
+    if (!$.isEmptyObject(activeIds)) {
       map.getCanvas().style.cursor = "pointer";
+    } else if (this.mouseState === "drag") {
+      map.getCanvas().style.cursor = "move";
+    } else {
+      map.getCanvas().style.cursor = "default";
     }
     this.props.responses.forEach((_response, idx) => {
       map.setFeatureState(
@@ -125,9 +150,40 @@ class MapView extends React.Component {
         { hover: activeIds[idx] || false },
       );
     });
+    if (e.type === "click") {
+      let selected = this.props.responses.filter(
+        (_response, idx) => activeIds[idx],
+      );
+      // Compute center of all the selected points.
+      if (selected.length !== 0) {
+        let left = Infinity;
+        let right = -Infinity;
+        let top = Infinity;
+        let bottom = -Infinity;
+        for (const resp of selected) {
+          left = Math.min(left, resp.geotag.lng);
+          right = Math.max(right, resp.geotag.lng);
+          top = Math.min(top, resp.geotag.lat);
+          bottom = Math.max(bottom, resp.geotag.lat);
+        }
+        store.dispatch({
+          type: "SHOW_DETAILS",
+          responses: selected,
+          coords: {
+            lat: (top + bottom) / 2,
+            lng: (left + right) / 2,
+          },
+        });
+      } else {
+        store.dispatch({
+          type: "HIDE_DETAILS",
+        });
+      }
+    }
   };
 }
 
 export default connect(state => ({
   responses: geotagResponses(state.responses, state.geotagView),
+  popupCoords: state.popupCoords,
 }))(MapView);
