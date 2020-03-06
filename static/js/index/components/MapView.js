@@ -46,8 +46,10 @@ class MapView extends React.Component {
   constructor(props) {
     super(props);
     // https://github.com/alex3165/react-mapbox-gl/issues/557
-    this.initialCenter = [-97, 38];
-    this.initialZoom = [4.3];
+    this.initialBounds = [
+      [-126, 24],
+      [-66, 50],
+    ];
     // Keep track of this behind React's back, as it's used to mess
     // with state that React doesn't know how to deal with.
     this.mouseState = "up";
@@ -57,8 +59,8 @@ class MapView extends React.Component {
       <div>
         <Map
           style="mapbox://styles/raxod502/ck6nxepcj03jv1jqe6a7p8om4"
-          center={this.initialCenter}
-          zoom={this.initialZoom}
+          fitBounds={this.initialBounds}
+          fitBoundsOptions={{ duration: 0 }}
           onClick={this.onMouseEvent}
           onMouseDown={this.onMouseEvent}
           onMouseMove={this.onMouseEvent}
