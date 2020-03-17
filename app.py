@@ -5,8 +5,8 @@ import urllib.parse
 
 import flask
 import flask_talisman
-import requests
-import requests.exceptions
+import google.auth.transport.requests
+import google.oauth2.id_token
 
 import sheets
 
@@ -100,29 +100,18 @@ def get_data():
     except (KeyError, TypeError, json.JSONDecodeError):
         return "Request did not include token", 400
     try:
-        r = requests.get(
-            "https://oauth2.googleapis.com/tokeninfo?id_token={}".format(
-                urllib.parse.quote(token)
-            ),
-            timeout=5,
+        # https://developers.google.com/identity/sign-in/web/backend-auth
+        idinfo = google.oauth2.id_token.verify_oauth2_token(
+            token,
+            google.auth.transport.requests.Request(),
+            "548868103597-3th6ihbnejkscon1950m9mm31misvhk9.apps.googleusercontent.com",
         )
-        r.raise_for_status()
-        auth = r.json()
-        if (
-            auth["aud"]
-            != "548868103597-3th6ihbnejkscon1950m9mm31misvhk9.apps.googleusercontent.com"
-        ):
-            raise ValueError
-        if auth["hd"] != "g.hmc.edu":
-            raise ValueError
-    except (
-        KeyError,
-        TypeError,
-        ValueError,
-        json.JSONDecodeError,
-        requests.exceptions.RequestException,
-    ):
-        return "Bad token", 401
+        if idinfo["iss"] not in ("accounts.google.com", "https://accounts.google.com"):
+            raise ValueError("Wrong issuer: {}".format(idinfo["iss"]))
+        if idinfo["hd"] != "g.hmc.edu":
+            raise ValueError("Wrong domain: {}".format(idinfo["hd"]))
+    except ValueError as e:
+        return "Bad token: {}".format(e), 401
     try:
         with open("data.json") as f:
             responses = json.load(f)
