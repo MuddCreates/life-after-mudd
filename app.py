@@ -100,6 +100,10 @@ def get_data():
     except (KeyError, TypeError, json.JSONDecodeError):
         return "Request did not include token", 400
     try:
+        # This API call takes about 125ms in my testing. Could be
+        # optimized by doing our own JWT validation, probably. But
+        # that would really suck so let's hold off on that for now.
+        #
         # https://developers.google.com/identity/sign-in/web/backend-auth
         idinfo = google.oauth2.id_token.verify_oauth2_token(
             token,
