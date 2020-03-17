@@ -9,6 +9,7 @@ import { failHard } from "../error";
 import { LoadingStatus } from "../state";
 import LoginModal from "./LoginModal";
 import MapView from "./MapView";
+import Sidebar from "./Sidebar";
 
 // Wrapper component that is rendered at the root. Displays loading
 // messages, handles OAuth, wraps the main map app.
@@ -43,6 +44,7 @@ class App extends React.Component {
           }}
         >
           <MapView />
+          {this.props.showingSidebar && <Sidebar />}
         </LoadingOverlay>
         <LoginModal />
       </>
@@ -52,4 +54,5 @@ class App extends React.Component {
 
 export default connect(state => ({
   loadingStatus: state.loadingStatus,
+  showingSidebar: state.displayedResponses !== null,
 }))(App);

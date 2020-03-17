@@ -95,13 +95,7 @@ class MapView extends React.Component {
           onMouseDown={this.onMouseEvent}
           onMouseMove={this.onMouseEvent}
           onMouseUp={this.onMouseEvent}
-          containerStyle={{
-            position: "fixed",
-            top: "0",
-            left: "0",
-            width: "100%",
-            height: "100%",
-          }}
+          containerStyle={{ height: "100vh" }}
         >
           {layer}
         </Map>
