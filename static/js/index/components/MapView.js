@@ -3,13 +3,12 @@
 import $ from "jquery";
 import React from "react";
 import ReactMapboxGl from "react-mapbox-gl";
-import { Feature, Layer, Popup } from "react-mapbox-gl";
+import { Feature, Layer } from "react-mapbox-gl";
 import { connect } from "react-redux";
 
 import { mapboxAccessToken } from "../../shared";
 import { store } from "../redux";
 import { GeotagView } from "../state";
-import Details from "./Details";
 
 const CIRCLE_RADIUS = 10;
 const HIGHLIGHT_BBOX_RADIUS = 10;
@@ -55,6 +54,37 @@ class MapView extends React.Component {
     this.mouseState = "up";
   }
   render() {
+    let layer = null;
+    if (this.props.responses !== null) {
+      layer = (
+        <Layer
+          id="people"
+          type="circle"
+          geoJSONSourceOptions={{ generateId: true }}
+          paint={{
+            "circle-color": [
+              "case",
+              // nb this case statement makes no sense to me, I tried
+              // every logic combination until I got the one I
+              // wanted. See:
+              //
+              // https://blog.mapbox.com/going-live-with-electoral-maps-a-guide-to-feature-state-b520e91a22d
+              ["boolean", ["feature-state", "hover"], false],
+              "#eaaa00", // HMC yellow
+              "#000000",
+            ],
+            "circle-radius": CIRCLE_RADIUS,
+          }}
+        >
+          {this.props.responses.map((resp, idx) => (
+            <Feature
+              coordinates={[resp.geotag.lng, resp.geotag.lat]}
+              key={idx}
+            />
+          ))}
+        </Layer>
+      );
+    }
     return (
       <div>
         <Map
@@ -66,49 +96,14 @@ class MapView extends React.Component {
           onMouseMove={this.onMouseEvent}
           onMouseUp={this.onMouseEvent}
           containerStyle={{
-            position: "absolute",
+            position: "fixed",
             top: "0",
             left: "0",
-            bottom: "0",
-            right: "0",
+            width: "100%",
+            height: "100%",
           }}
         >
-          <Layer
-            id="people"
-            type="circle"
-            geoJSONSourceOptions={{ generateId: true }}
-            paint={{
-              "circle-color": [
-                "case",
-                // nb this case statement makes no sense to me, I tried
-                // every logic combination until I got the one I
-                // wanted. See:
-                //
-                // https://blog.mapbox.com/going-live-with-electoral-maps-a-guide-to-feature-state-b520e91a22d
-                ["boolean", ["feature-state", "hover"], false],
-                "#eaaa00", // HMC yellow
-                "#000000",
-              ],
-              "circle-radius": CIRCLE_RADIUS,
-            }}
-          >
-            {this.props.responses.map((resp, idx) => (
-              <Feature
-                coordinates={[resp.geotag.lng, resp.geotag.lat]}
-                key={idx}
-              />
-            ))}
-          </Layer>
-          {this.props.popupCoords ? (
-            <Popup
-              coordinates={[
-                this.props.popupCoords.lng,
-                this.props.popupCoords.lat,
-              ]}
-            >
-              <Details />
-            </Popup>
-          ) : null}
+          {layer}
         </Map>
       </div>
     );
@@ -189,6 +184,6 @@ class MapView extends React.Component {
 }
 
 export default connect(state => ({
-  responses: geotagResponses(state.responses, state.geotagView),
-  popupCoords: state.popupCoords,
+  responses:
+    state.responses && geotagResponses(state.responses, state.geotagView),
 }))(MapView);

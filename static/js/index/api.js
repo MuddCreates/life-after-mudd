@@ -39,7 +39,7 @@ function cleanResponses(responses) {
 // Once it returns, clean it up and show the data on the map in the
 // UI.
 export const fetchAction = thunk(async dispatch => {
-  dispatch({ type: "FETCHING" });
+  dispatch({ type: "FETCHING_DATA" });
   const GoogleAuth = gapi.auth2.getAuthInstance();
   const oauthToken = GoogleAuth.currentUser.get().getAuthResponse().id_token;
   const response = await fetch("/api/v1/data", {

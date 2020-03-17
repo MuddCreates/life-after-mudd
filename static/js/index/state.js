@@ -1,23 +1,14 @@
 "use strict";
 
-// Enum for the finite-state machine that represents different states
-// the UI can be in.
-export const Screen = Object.freeze({
-  // Nothing displayed. Used until the first Redux action is
-  // processed.
-  initial: "initial",
-  // Checking to see if the user is successfully authenticated.
-  oauthVerifying: "oauthVerifying",
-  // Displaying a login button because the user needs to sign in with
-  // OAuth.
-  oauthNeedsLogin: "oauthNeedsLogin",
-  // Waiting for the user to complete the OAuth flow in another
-  // window. Displaying a link to re-open the flow if they close it.
-  oauthWaitingForLogin: "oauthWaitingForLogin",
-  // Fetching API data.
-  fetching: "fetching",
-  // Displaying the main app.
-  map: "map",
+// Enum that indicates whether a loading spinner is displayed
+// overlaying the map, and if so what message is shown.
+export const LoadingStatus = Object.freeze({
+  // Nothing is loading.
+  none: "none",
+  // We are initializing OAuth or verifying the user's access scopes.
+  verifyingOAuth: "verifyingOAuth",
+  // We are fetching geolocation data from the server.
+  fetchingData: "fetchingData",
 });
 
 // Enum for what geotags are displayed on the map.
@@ -28,37 +19,51 @@ export const GeotagView = Object.freeze({
 
 // Initial state for the Redux store. Covers the whole app.
 export const initialState = {
-  screen: Screen.initial,
+  loadingStatus: LoadingStatus.none,
+  showingModal: false,
+  modalWaiting: null,
   responses: null,
   geotagView: GeotagView.standard,
   displayedResponses: null,
-  popupCoords: null,
 };
 
 // Global reducer for the app's Redux store.
 export const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case "OAUTH_VERIFYING":
-      return { ...state, screen: Screen.oauthVerifying };
-    case "OAUTH_PROMPT_FOR_LOGIN":
-      return { ...state, screen: Screen.oauthNeedsLogin };
-    case "OAUTH_WAITING_FOR_LOGIN":
-      return { ...state, screen: Screen.oauthWaitingForLogin };
-    case "FETCHING":
-      return { ...state, screen: Screen.fetching };
+    case "VERIFYING_OAUTH":
+      return { ...state, loadingStatus: LoadingStatus.verifyingOAuth };
+    case "PROMPT_FOR_LOGIN":
+      return {
+        ...state,
+        loadingStatus: LoadingStatus.none,
+        showingModal: true,
+        modalWaiting: false,
+      };
+    case "WAIT_FOR_LOGIN":
+      return { ...state, modalWaiting: true };
+    case "FETCHING_DATA":
+      return {
+        ...state,
+        loadingStatus: LoadingStatus.fetchingData,
+        showingModal: false,
+        modalWaiting: null,
+      };
     case "SHOW_DATA":
-      return { ...state, screen: Screen.map, responses: action.responses };
+      return {
+        ...state,
+        loadingStatus: LoadingStatus.none,
+        responses: action.responses,
+        displayedResponses: null,
+      };
     case "SHOW_DETAILS":
       return {
         ...state,
         displayedResponses: action.responses,
-        popupCoords: action.coords,
       };
     case "HIDE_DETAILS":
       return {
         ...state,
         displayedResponses: null,
-        popupCoords: null,
       };
     default:
       return state;
