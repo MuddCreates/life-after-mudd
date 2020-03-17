@@ -52,7 +52,15 @@ export const fetchAction = thunk(async dispatch => {
     }),
   });
   if (!response.ok) {
-    throw new Error(`Got status ${response.status} from API`);
+    let explanation = "";
+    try {
+      explanation = ": " + (await response.text());
+    } catch (e) {
+      // If stream is interrupted, forget about getting an
+      // explanation. Who does that server think it is, anyway? We
+      // don't need it anyway.
+    }
+    throw new Error(`Got status ${response.status} from API` + explanation);
   }
   const responses = cleanResponses(await response.json());
   dispatch({
