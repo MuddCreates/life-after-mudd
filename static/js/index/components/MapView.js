@@ -150,23 +150,9 @@ class MapView extends React.Component {
       );
       // Compute center of all the selected points.
       if (selected.length !== 0) {
-        let left = Infinity;
-        let right = -Infinity;
-        let top = Infinity;
-        let bottom = -Infinity;
-        for (const resp of selected) {
-          left = Math.min(left, resp.geotag.lng);
-          right = Math.max(right, resp.geotag.lng);
-          top = Math.min(top, resp.geotag.lat);
-          bottom = Math.max(bottom, resp.geotag.lat);
-        }
         store.dispatch({
           type: "SHOW_DETAILS",
           responses: selected,
-          coords: {
-            lat: (top + bottom) / 2,
-            lng: (left + right) / 2,
-          },
         });
       } else {
         store.dispatch({
