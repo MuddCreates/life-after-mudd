@@ -15,6 +15,8 @@ export const LoadingStatus = Object.freeze({
 export const GeotagView = Object.freeze({
   // org || city || summerOrg || summerCity
   standard: "standard",
+  // summerOrg || summerCity || org || city
+  summer: "summer",
 });
 
 // Initial state for the Redux store. Covers the whole app.
