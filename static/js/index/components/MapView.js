@@ -64,16 +64,20 @@ class MapView extends React.Component {
           paint={{
             "circle-color": [
               "case",
-              // nb this case statement makes no sense to me, I tried
-              // every logic combination until I got the one I
-              // wanted. See:
-              //
+              // https://blog.mapbox.com/visualizing-election-data-a-guide-to-mapbox-gl-expressions-92cc469b8dfd
               // https://blog.mapbox.com/going-live-with-electoral-maps-a-guide-to-feature-state-b520e91a22d
               ["boolean", ["feature-state", "hover"], false],
-              "#eaaa00", // HMC yellow
               "#000000",
+              "#eaaa00", // HMC yellow
             ],
             "circle-radius": CIRCLE_RADIUS,
+            "circle-stroke-color": "black",
+            "circle-stroke-width": [
+              "case",
+              ["boolean", ["feature-state", "clicked"], false],
+              3,
+              1,
+            ],
           }}
         >
           {this.props.responses.map((resp, idx) => (
@@ -143,6 +147,12 @@ class MapView extends React.Component {
         { source: "people", id: idx },
         { hover: activeIds[idx] || false },
       );
+      if (e.type === "click") {
+        map.setFeatureState(
+          { source: "people", id: idx },
+          { clicked: activeIds[idx] || false },
+        );
+      }
     });
     if (e.type === "click") {
       let selected = this.props.responses.filter(
