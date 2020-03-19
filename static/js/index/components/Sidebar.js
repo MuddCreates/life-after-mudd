@@ -114,6 +114,7 @@ class Sidebar extends React.Component {
           height: "100%",
           padding: "10px",
           background: "white",
+          zIndex: "3",
         }}
       >
         {grouped.map(({ loc, descs }) => (
