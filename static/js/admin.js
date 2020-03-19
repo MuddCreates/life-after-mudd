@@ -390,6 +390,16 @@ function populateForm() {
   const idx = $("body").data("idx");
   $("#response-dropdown").val(idx);
   const r = responses[idx];
+  {
+    const btn = $("#next-button")[0];
+    btn.classList.remove("btn-primary");
+    btn.classList.remove("btn-warning");
+    if (r.processed) {
+      btn.classList.add("btn-warning");
+    } else {
+      btn.classList.add("btn-primary");
+    }
+  }
   $("#name-raw-input").val(r.rawName);
   $("#email-raw-input").val(r.rawEmail);
   $("#major-raw-input").val(r.rawMajor);
