@@ -10,6 +10,7 @@ import { store } from "../redux";
 import { LoadingStatus } from "../state";
 import LoginModal from "./LoginModal";
 import MapView from "./MapView";
+import SearchBar from "./SearchBar";
 import Sidebar from "./Sidebar";
 
 // Wrapper component that is rendered at the root. Displays loading
@@ -45,6 +46,7 @@ class App extends React.Component {
           }}
         >
           <MapView />
+          <SearchBar />
           {this.props.showingSidebar && <Sidebar />}
         </LoadingOverlay>
         <LoginModal />

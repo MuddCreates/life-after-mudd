@@ -1,1 +1,7 @@
 @import "bootstrap/dist/css/bootstrap.min.css";
+
+/**
+ * We don't actually use the geocoder but we do steal its CSS styling
+ * for our own search bar.
+ */
+@import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
