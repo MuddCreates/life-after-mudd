@@ -6,6 +6,7 @@ import { connect } from "react-redux";
 import ScaleLoader from "react-spinners/ScaleLoader";
 
 import { failHard } from "../error";
+import { store } from "../redux";
 import { LoadingStatus } from "../state";
 import LoginModal from "./LoginModal";
 import MapView from "./MapView";
@@ -49,6 +50,19 @@ class App extends React.Component {
         <LoginModal />
       </>
     );
+  }
+  keyListener(e) {
+    if (e.key === "Escape") {
+      store.dispatch({
+        type: "HIDE_DETAILS",
+      });
+    }
+  }
+  componentDidMount() {
+    document.addEventListener("keydown", this.keyListener, false);
+  }
+  componentWillUnmount() {
+    document.removeEventListener("keydown", this.keyListener, false);
   }
 }
 
