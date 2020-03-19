@@ -11,7 +11,9 @@ function formatCity(city, state, country) {
   if (country === "United States") {
     country = "";
   }
-  return [city, state, country].filter(Boolean).join(", ");
+  return (
+    [city, state, country].filter(Boolean).join(", ") || "No location given"
+  );
 }
 
 function extractPlan(response, view) {
@@ -61,6 +63,9 @@ function extractPlan(response, view) {
       break;
     case "Not sure":
       info.plan = "Not sure what";
+      break;
+    case "":
+      info.plan = "No plans shared";
       break;
   }
   info.desc = info.plan;
@@ -120,7 +125,7 @@ class Sidebar extends React.Component {
               <>
                 <b>{desc}</b>
                 {responses.map(resp => (
-                  <div>{resp.name}</div>
+                  <div>{resp.name || "Anonymous"}</div>
                 ))}
               </>
             ))}
