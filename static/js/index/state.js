@@ -21,11 +21,21 @@ export const GeotagView = Object.freeze({
 
 // Initial state for the Redux store. Covers the whole app.
 export const initialState = {
+  // Whether a loading indicator should be shown, and if so what the
+  // message should be.
   loadingStatus: LoadingStatus.none,
+  // Whether we're currently showing the login modal.
   showingModal: false,
+  // Whether the login modal is waiting for the user to finish the
+  // OAuth flow. If false, the user hasn't started the flow yet.
   modalWaiting: null,
+  // List of objects. As retrieved from the API, with some minor
+  // touch-ups. Each object has an idx key which can be used as a uid.
   responses: null,
+  // Whether to give precedence to summer plans or next-year plans in
+  // map and detail views.
   geotagView: GeotagView.standard,
+  // Set of idx keys for the responses that are displayed.
   displayedResponses: null,
 };
 

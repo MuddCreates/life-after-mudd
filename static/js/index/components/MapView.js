@@ -74,16 +74,21 @@ class MapView extends React.Component {
             "circle-stroke-color": "black",
             "circle-stroke-width": [
               "case",
-              ["boolean", ["feature-state", "clicked"], false],
+              ["boolean", ["get", "displayed"], false],
               3,
               1,
             ],
           }}
         >
-          {this.props.responses.map((resp, idx) => (
+          {this.props.responses.map(resp => (
             <Feature
               coordinates={[resp.geotag.lng, resp.geotag.lat]}
-              key={idx}
+              key={resp.idx}
+              properties={{
+                displayed:
+                  this.props.displayedResponses &&
+                  this.props.displayedResponses.has(resp.idx),
+              }}
             />
           ))}
         </Layer>
@@ -106,19 +111,19 @@ class MapView extends React.Component {
       </div>
     );
   }
-  getActiveIds = (map, point) => {
+  getNearbyPoints = (map, point) => {
     // https://docs.mapbox.com/mapbox-gl-js/example/queryrenderedfeatures-around-point/
     const bbox = [
       [point.x - HIGHLIGHT_BBOX_RADIUS, point.y - HIGHLIGHT_BBOX_RADIUS],
       [point.x + HIGHLIGHT_BBOX_RADIUS, point.y + HIGHLIGHT_BBOX_RADIUS],
     ];
-    const activeIds = {};
+    const nearbyPoints = new Set();
     for (const feature of map.queryRenderedFeatures(bbox, {
       layers: ["people"],
     })) {
-      activeIds[feature.id] = true;
+      nearbyPoints.add(feature.id);
     }
-    return activeIds;
+    return nearbyPoints;
   };
   onMouseEvent = (map, e) => {
     if (!map.getLayer("people")) {
@@ -133,36 +138,26 @@ class MapView extends React.Component {
     } else if (e.type === "mousemove" && this.mouseState !== "up") {
       this.mouseState = "drag";
     }
-    const activeIds = this.getActiveIds(map, e.point);
+    const nearbyPoints = this.getNearbyPoints(map, e.point);
     // This follows the conventions set by Google Maps.
-    if (!$.isEmptyObject(activeIds)) {
+    if (nearbyPoints.size > 0) {
       map.getCanvas().style.cursor = "pointer";
     } else if (this.mouseState === "drag") {
       map.getCanvas().style.cursor = "move";
     } else {
       map.getCanvas().style.cursor = "default";
     }
-    this.props.responses.forEach((_response, idx) => {
+    this.props.responses.forEach(resp => {
       map.setFeatureState(
-        { source: "people", id: idx },
-        { hover: activeIds[idx] || false },
+        { source: "people", id: resp.idx },
+        { hover: nearbyPoints.has(resp.idx) },
       );
-      if (e.type === "click") {
-        map.setFeatureState(
-          { source: "people", id: idx },
-          { clicked: activeIds[idx] || false },
-        );
-      }
     });
     if (e.type === "click") {
-      let selected = this.props.responses.filter(
-        (_response, idx) => activeIds[idx],
-      );
-      // Compute center of all the selected points.
-      if (selected.length !== 0) {
+      if (nearbyPoints.size > 0) {
         store.dispatch({
           type: "SHOW_DETAILS",
-          responses: selected,
+          responses: nearbyPoints,
         });
       } else {
         store.dispatch({
@@ -176,4 +171,5 @@ class MapView extends React.Component {
 export default connect(state => ({
   responses:
     state.responses && geotagResponses(state.responses, state.geotagView),
+  displayedResponses: state.displayedResponses,
 }))(MapView);

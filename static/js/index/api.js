@@ -20,7 +20,7 @@ function parseLatLong(long, lat) {
 // version suitable for use on the frontend. May reuse storage of the
 // original objects and array.
 function cleanResponses(responses) {
-  for (const response of responses) {
+  responses.map((response, idx) => {
     response.cityLatLong = parseLatLong(response.cityLong, response.cityLat);
     response.orgLatLong = parseLatLong(response.orgLong, response.orgLat);
     response.summerCityLatLong = parseLatLong(
@@ -31,7 +31,8 @@ function cleanResponses(responses) {
       response.summerOrgLong,
       response.summerOrgLat,
     );
-  }
+    response.idx = idx;
+  });
   return responses;
 }
 

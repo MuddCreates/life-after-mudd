@@ -1,6 +1,7 @@
 "use strict";
 
 import React from "react";
+import { Fragment } from "react";
 import { connect } from "react-redux";
 
 import { failHard } from "../error";
@@ -117,20 +118,20 @@ class Sidebar extends React.Component {
           zIndex: "3",
         }}
       >
-        {grouped.map(({ loc, descs }) => (
-          <>
+        {grouped.map(({ loc, descs }, idx) => (
+          <Fragment key={idx}>
             <h5>
               <b>{loc}</b>
             </h5>
-            {descs.map(({ desc, responses }) => (
-              <>
+            {descs.map(({ desc, responses }, idx) => (
+              <Fragment key={idx}>
                 <b>{desc}</b>
-                {responses.map(resp => (
-                  <div>{resp.name || "Anonymous"}</div>
+                {responses.map((resp, idx) => (
+                  <div key={idx}>{resp.name || "Anonymous"}</div>
                 ))}
-              </>
+              </Fragment>
             ))}
-          </>
+          </Fragment>
         ))}
       </div>
     );
@@ -138,6 +139,8 @@ class Sidebar extends React.Component {
 }
 
 export default connect(state => ({
-  responses: state.displayedResponses,
+  responses: state.responses.filter(resp =>
+    state.displayedResponses.has(resp.idx),
+  ),
   geotagView: state.geotagView,
 }))(Sidebar);
