@@ -1510,6 +1510,11 @@ boolbase@^1.0.0, boolbase@~1.0.0:
   resolved "https://registry.yarnpkg.com/boolbase/-/boolbase-1.0.0.tgz#68dff5fbe60c51eb37725ea9e3ed310dcc1e776e"
   integrity sha1-aN/1++YMUes3cl6p4+0xDcwed24=
 
+bootstrap-autocomplete@^2.3.2:
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/bootstrap-autocomplete/-/bootstrap-autocomplete-2.3.2.tgz#18c17c5b54d5edcd1e440ce5ff5e4dbbbb2b74f1"
+  integrity sha512-oFKgkPUUKlglAD4ixrr36WVrPFXTXcz2kQTJEFkSGw2J15xzUIoFoRTNSZsiaNReqa11j0/69zY5pC3gaFdUoA==
+
 bootstrap@^4.4.1:
   version "4.4.1"
   resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-4.4.1.tgz#8582960eea0c5cd2bede84d8b0baf3789c3e8b01"
@@ -3708,6 +3713,11 @@ kind-of@^6.0.0, kind-of@^6.0.2:
   version "6.0.2"
   resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-6.0.2.tgz#01146b36a6218e64e58f3a8d66de5d7fc6f6d051"
   integrity sha512-s5kLOcnH0XqDO+FvuaLX8DDjZ18CGFk7VygH40QoKPUQhW4e2rvM0rwUq0t8IQDOwYSeLK01U90OjzBTme2QqA==
+
+latinize@^0.4.1:
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/latinize/-/latinize-0.4.1.tgz#1b82d6e0687f2722dfdf67a19302fc345a772738"
+  integrity sha512-A4miz97dNF+EbNgQdayPAEtud5eRpCGPwJy7JQFD1hBQcOzOgBS4m721zoREuPqpz1yKm8hYT2ANlh7pirapsA==
 
 levn@~0.3.0:
   version "0.3.0"
