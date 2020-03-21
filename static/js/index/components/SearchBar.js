@@ -25,6 +25,7 @@ for (const state of new UsaStates().states) {
 // IMPORTANT: when updating this function, also update the doSearch
 // function.
 function getSearchSuggestions(responses) {
+  const majors = responses.map(resp => resp.major).sort();
   const cities = [].concat
     .apply(
       [],
@@ -57,9 +58,11 @@ function getSearchSuggestions(responses) {
   const names = responses.map(resp => resp.name).sort();
   const queries = new Set(
     [].concat(
+      ["Job/Internship/Working", "Grad school", "Not sure"],
+      majors,
       countries,
       states,
-      ["Bay Area"],
+      ["Bay Area", "Seattle Area"],
       cities,
       orgs,
       countries,
@@ -85,6 +88,7 @@ function doSearch(query, responses) {
   for (const resp of responses) {
     if (
       [
+        resp.major,
         resp.city,
         resp.summerCity,
         statesByAbbr[resp.state] ? statesByAbbr[resp.state].name : "",
