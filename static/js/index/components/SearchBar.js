@@ -124,6 +124,12 @@ class SearchBar extends React.Component {
       },
       minLength: 1,
     });
+    const dd = $(this.input.current).data("autoComplete")._dd;
+    dd._refreshItemList = dd.refreshItemList;
+    dd.refreshItemList = () => {
+      dd._refreshItemList();
+      dd.focusNextItem();
+    };
   }
 }
 
