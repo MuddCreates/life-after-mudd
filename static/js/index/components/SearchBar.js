@@ -69,6 +69,10 @@ function normalize(query) {
     .replace(/[^a-z]/g, "");
 }
 
+function search(query) {
+  console.log("Did a search for:", query);
+}
+
 class SearchBar extends React.Component {
   constructor(props) {
     super(props);
@@ -107,6 +111,7 @@ class SearchBar extends React.Component {
     );
   }
   componentDidMount() {
+    // Set up autocompletions and provide the suggestions list.
     $(this.input.current).autoComplete({
       resolver: "custom",
       events: {
@@ -122,14 +127,47 @@ class SearchBar extends React.Component {
           callback(results);
         },
       },
-      minLength: 1,
+      minLength: 0,
+      autoSelect: false,
     });
-    const dd = $(this.input.current).data("autoComplete")._dd;
+    // Autoselect the first suggestion.
+    //
+    // https://github.com/xcash/bootstrap-autocomplete/issues/28#issuecomment-602104553
+    const ac = $(this.input.current).data("autoComplete");
+    const dd = ac._dd;
     dd._refreshItemList = dd.refreshItemList;
     dd.refreshItemList = () => {
       dd._refreshItemList();
       dd.focusNextItem();
     };
+    // Bring the suggestions list back when the user clicks back into
+    // the field.
+    $(this.input.current).on("focus", () => {
+      ac.handlerTyped($(this.input.current).val());
+    });
+    // Do a search when an item is selected. We don't allow any
+    // searches that aren't autosuggested.
+    $(this.input.current).on("autocomplete.select", (_event, item) => {
+      $(this.input.current).blur();
+      search(item.text);
+    });
+    // Unfocus the input on ESC.
+    $(this.input.current).on("keyup", event => {
+      if (event.key === "Escape") {
+        $(this.input.current).blur();
+      }
+    });
+    // Don't dismiss the suggestions on RET unless a
+    // suggestion was actually accepted.
+    for (const trigger of ["keyup", "keydown"]) {
+      $(this.input.current).on(trigger, event => {
+        if (event.key === "Enter") {
+          if (!dd.isItemFocused) {
+            dd.show();
+          }
+        }
+      });
+    }
   }
 }
 
