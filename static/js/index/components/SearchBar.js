@@ -13,11 +13,17 @@ window.$ = window.jQuery = require("jquery");
 require("bootstrap");
 require("bootstrap-autocomplete");
 
-const stateMap = {};
+import { store } from "../redux";
+
+const statesByName = {};
+const statesByAbbr = {};
 for (const state of new UsaStates().states) {
-  stateMap[state.abbreviation] = state;
+  statesByName[state.name] = state;
+  statesByAbbr[state.abbreviation] = state;
 }
 
+// IMPORTANT: when updating this function, also update the doSearch
+// function.
 function getSearchSuggestions(responses) {
   const cities = [].concat
     .apply(
@@ -29,8 +35,10 @@ function getSearchSuggestions(responses) {
     .apply(
       [],
       responses.map(resp => [
-        stateMap[resp.state] ? stateMap[resp.state].name : "",
-        stateMap[resp.summerState] ? stateMap[resp.summerState].name : "",
+        statesByAbbr[resp.state] ? statesByAbbr[resp.state].name : "",
+        statesByAbbr[resp.summerState]
+          ? statesByAbbr[resp.summerState].name
+          : "",
       ]),
     )
     .sort();
@@ -69,8 +77,33 @@ function normalize(query) {
     .replace(/[^a-z]/g, "");
 }
 
-function search(query) {
-  console.log("Did a search for:", query);
+// IMPORTANT: when updating this function, also update the
+// getSearchSuggestions function.
+function doSearch(query, responses) {
+  console.log("query:", query);
+  const results = [];
+  for (const resp of responses) {
+    if (
+      [
+        resp.city,
+        resp.summerCity,
+        statesByAbbr[resp.state] ? statesByAbbr[resp.state].name : "",
+        statesByAbbr[resp.summerState]
+          ? statesByAbbr[resp.summerState].name
+          : "",
+        resp.country,
+        resp.summerCountry,
+        resp.org,
+        resp.summerOrg,
+        resp.name,
+      ]
+        .filter(x => x)
+        .includes(query)
+    ) {
+      results.push(resp.idx);
+    }
+  }
+  store.dispatch({ type: "SHOW_DETAILS", responses: results });
 }
 
 class SearchBar extends React.Component {
@@ -149,7 +182,7 @@ class SearchBar extends React.Component {
     // searches that aren't autosuggested.
     $(this.input.current).on("autocomplete.select", (_event, item) => {
       $(this.input.current).blur();
-      search(item.text);
+      doSearch(item.text, this.props.responses);
     });
     // Unfocus the input on ESC.
     $(this.input.current).on("keyup", event => {
@@ -172,5 +205,6 @@ class SearchBar extends React.Component {
 }
 
 export default connect(state => ({
+  responses: state.responses,
   suggestions: state.responses && getSearchSuggestions(state.responses),
 }))(SearchBar);

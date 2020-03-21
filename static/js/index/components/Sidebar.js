@@ -138,9 +138,10 @@ class Sidebar extends React.Component {
   }
 }
 
-export default connect(state => ({
-  responses: state.responses.filter(resp =>
-    state.displayedResponses.has(resp.idx),
-  ),
-  geotagView: state.geotagView,
-}))(Sidebar);
+export default connect(state => {
+  const displayedResponses = new Set(state.displayedResponses);
+  return {
+    responses: state.responses.filter(resp => displayedResponses.has(resp.idx)),
+    geotagView: state.geotagView,
+  };
+})(Sidebar);

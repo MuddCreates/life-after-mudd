@@ -157,7 +157,7 @@ class MapView extends React.Component {
       if (nearbyPoints.size > 0) {
         store.dispatch({
           type: "SHOW_DETAILS",
-          responses: nearbyPoints,
+          responses: Array.from(nearbyPoints),
         });
       } else {
         store.dispatch({
@@ -171,5 +171,5 @@ class MapView extends React.Component {
 export default connect(state => ({
   responses:
     state.responses && geotagResponses(state.responses, state.geotagView),
-  displayedResponses: state.displayedResponses,
+  displayedResponses: new Set(state.displayedResponses),
 }))(MapView);
