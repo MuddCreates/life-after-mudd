@@ -12,8 +12,8 @@ First install [Docker](https://www.docker.com/). Then, to run:
 * Obtain Google Drive API key from **@raxod502** and place it in
   `.oauth-private-key.json`.
 * Download form data, `make down`.
-* Build static site in development mode, `make dev`.
-* Start the development server, `make app`.
+* Build static site in development mode, `make build-dev`.
+* Start the development server, `make app-dev`.
 * Head to <http://localhost:8080/admin> for the admin dashboard, and
   <http://localhost:8080> for the main webapp.
 
