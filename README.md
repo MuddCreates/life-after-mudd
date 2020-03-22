@@ -28,6 +28,6 @@ deploy`. (But this happens automatically when a commmit is merged to
 warning " > @mapbox/mapbox-gl-geocoder@4.5.1" has unmet peer dependency "mapbox-gl@>= 0.47.0 < 2.0.0".
 ```
 
-Because we Parcel is incompatible with mapbox-gl for dumb reasons, we
+Because Parcel is incompatible with mapbox-gl for dumb reasons, we
 need to include mapbox-gl via `<script>` tag. Hence it's not installed
 through Yarn; that would just be misleading.
