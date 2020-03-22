@@ -159,6 +159,10 @@ class SearchBar extends React.Component {
             const normItem = normalize(item);
             if (normItem.includes(normQuery)) {
               results.push({ text: item });
+              // Limit to 10 results, like Google.
+              if (results.length >= 10) {
+                break;
+              }
             }
           }
           callback(results);
