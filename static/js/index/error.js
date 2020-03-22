@@ -29,58 +29,57 @@ function getErrorMessage(error) {
 // literally anything that seems like an error.
 export function failHard(error) {
   console.error("Crashing app due to error:", error);
+  let elt;
   try {
     const msg = getErrorMessage(error);
-    render(
-      MessageScreen(
+    elt = MessageScreen(
+      <p>
+        Sorry, there was a totally unexpected error.{" "}
+        {msg ? (
+          <span>Here's what we got:</span>
+        ) : (
+          <span>
+            Unfortunately, we don't have any further information. There might be
+            some information in your browser's JavaScript console, though.
+          </span>
+        )}
+      </p>,
+      msg ? (
         <p>
-          Sorry, there was a totally unexpected error.{" "}
-          {msg ? (
-            <span>Here's what we got:</span>
-          ) : (
-            <span>
-              Unfortunately, we don't have any further information. There might
-              be some information in your browser's JavaScript console, though.
-            </span>
-          )}
-        </p>,
-        msg ? (
-          <p>
-            <b>{msg}</b>
-          </p>
-        ) : null,
-        msg ? (
-          <p>
-            <span>
-              There might be more information in your browser's JavaScript
-              console, as well.
-            </span>
-          </p>
-        ) : null,
-        <div style={{ textAlign: "left" }}>
-          You can try:
-          <ul>
-            <li>
-              <a href={window.location.origin + window.location.pathname}>
-                reloading the page
-              </a>
-            </li>
-            <li>
-              <a href="https://github.com/MuddCreates/life-after-mudd/issues">
-                filing a bug report on GitHub
-              </a>
-            </li>
-            <li>
-              <a href="mailto:rrosborough@hmc.edu">emailing the author</a>
-            </li>
-          </ul>
-        </div>,
-      ),
-      document.getElementById("app"),
+          <b>{msg}</b>
+        </p>
+      ) : null,
+      msg ? (
+        <p>
+          <span>
+            There might be more information in your browser's JavaScript
+            console, as well.
+          </span>
+        </p>
+      ) : null,
+      <div style={{ textAlign: "left" }}>
+        You can try:
+        <ul>
+          <li>
+            <a href={window.location.origin + window.location.pathname}>
+              reloading the page
+            </a>
+          </li>
+          <li>
+            <a href="https://github.com/MuddCreates/life-after-mudd/issues">
+              filing a bug report on GitHub
+            </a>
+          </li>
+          <li>
+            <a href="mailto:rrosborough@hmc.edu">emailing the author</a>
+          </li>
+        </ul>
+      </div>,
     );
   } catch (newError) {
     alert(
       `An error occurred (${newError}) while trying to display an error message (${error}). Sorry!`,
     );
   }
+  render(elt, document.getElementById("app"));
 }
