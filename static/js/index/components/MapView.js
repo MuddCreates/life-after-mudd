@@ -7,6 +7,7 @@ import { Feature, Layer } from "react-mapbox-gl";
 import { connect } from "react-redux";
 
 import { mapboxAccessToken } from "../../shared";
+import { geotagAll } from "../geotag";
 import { store } from "../redux";
 import { GeotagView } from "../state";
 
@@ -16,30 +17,6 @@ const HIGHLIGHT_BBOX_RADIUS = 10;
 const Map = ReactMapboxGl({
   accessToken: mapboxAccessToken,
 });
-
-function geotagResponses(responses, geotagView) {
-  const filtered = [];
-  for (const response of responses) {
-    let latLong;
-    switch (geotagView) {
-      case GeotagView.standard:
-        latLong =
-          response.orgLatLong ||
-          response.cityLatLong ||
-          response.summerOrgLatLong ||
-          response.summerCityLatLong;
-        break;
-      default:
-        failHard(new Error(`Unknown geotag view: ${geotagView}`));
-        return [];
-    }
-    if (latLong === null) {
-      continue;
-    }
-    filtered.push({ ...response, geotag: latLong });
-  }
-  return filtered;
-}
 
 class MapView extends React.Component {
   constructor(props) {
@@ -82,7 +59,7 @@ class MapView extends React.Component {
         >
           {this.props.responses.map(resp => (
             <Feature
-              coordinates={[resp.geotag.lng, resp.geotag.lat]}
+              coordinates={[resp.plan.latLong.lng, resp.plan.latLong.lat]}
               key={resp.idx}
               properties={{
                 displayed:
@@ -170,6 +147,9 @@ class MapView extends React.Component {
 
 export default connect(state => ({
   responses:
-    state.responses && geotagResponses(state.responses, state.geotagView),
+    state.responses &&
+    geotagAll(state.responses, state.geotagView).filter(
+      resp => resp.plan.latLong,
+    ),
   displayedResponses: new Set(state.displayedResponses),
 }))(MapView);
