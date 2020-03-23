@@ -4,18 +4,18 @@ import React from "react";
 import { Fragment } from "react";
 import { connect } from "react-redux";
 
-import { geotagAll } from "../geotag";
+import { tagAll } from "../tag";
 
 function groupPlans(responses) {
   const index = {};
   for (const resp of responses) {
-    if (!index[resp.plan.loc]) {
-      index[resp.plan.loc] = [];
+    if (!index[resp.tag.loc]) {
+      index[resp.tag.loc] = [];
     }
-    if (!index[resp.plan.loc][resp.plan.desc]) {
-      index[resp.plan.loc][resp.plan.desc] = [];
+    if (!index[resp.tag.loc][resp.tag.desc]) {
+      index[resp.tag.loc][resp.tag.desc] = [];
     }
-    index[resp.plan.loc][resp.plan.desc].push(resp);
+    index[resp.tag.loc][resp.tag.desc].push(resp);
   }
   return Object.keys(index)
     .sort()
@@ -30,7 +30,7 @@ function groupPlans(responses) {
 class Sidebar extends React.Component {
   render() {
     const grouped = groupPlans(
-      geotagAll(this.props.responses, this.props.geotagView),
+      tagAll(this.props.responses, this.props.geotagView),
     );
     return (
       <div

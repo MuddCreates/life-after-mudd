@@ -13,6 +13,8 @@ window.$ = window.jQuery = require("jquery");
 require("bootstrap");
 require("bootstrap-autocomplete");
 
+import { failHard } from "../error";
+import { tagAll } from "../tag";
 import { store } from "../redux";
 
 const statesByName = {};
@@ -22,92 +24,128 @@ for (const state of new UsaStates().states) {
   statesByAbbr[state.abbreviation] = state;
 }
 
-// IMPORTANT: when updating this function, also update the doSearch
-// function.
-function getSearchSuggestions(responses) {
-  const majors = responses.map(resp => resp.major).sort();
-  const cities = [].concat
-    .apply(
-      [],
-      responses.map(resp => [resp.city, resp.summerCity]),
-    )
-    .sort();
-  const states = [].concat
-    .apply(
-      [],
-      responses.map(resp => [
-        statesByAbbr[resp.state] ? statesByAbbr[resp.state].name : "",
-        statesByAbbr[resp.summerState]
-          ? statesByAbbr[resp.summerState].name
-          : "",
+const searchSources = [
+  {
+    field: resp => resp.path,
+    rename: {
+      Job: "Job/Internship/Working",
+    },
+  },
+  resp => resp.major,
+  {
+    field: resp => resp.tag.city,
+    alias: {
+      "New York City": "NYC",
+      "San Francisco": "SF",
+    },
+  },
+  {
+    field: resp => resp.tag.state,
+    alias: Object.fromEntries(
+      Object.entries(statesByName).map(([name, state]) => [
+        name,
+        state.abbreviation,
       ]),
-    )
-    .sort();
-  const countries = [].concat
-    .apply(
-      [],
-      responses.map(resp => [resp.country, resp.summerCountry]),
-    )
-    .sort();
-  const orgs = [].concat
-    .apply(
-      [],
-      responses.map(resp => [resp.org, resp.summerOrg]),
-    )
-    .sort();
-  const names = responses.map(resp => resp.name).sort();
-  const queries = new Set(
-    [].concat(
-      ["Job/Internship/Working", "Grad school", "Not sure"],
-      majors,
-      countries,
-      states,
-      ["Bay Area", "Seattle Area"],
-      cities,
-      orgs,
-      countries,
-      orgs,
-      names,
     ),
+  },
+  [
+    {
+      name: "San Francisco (SF) Bay Area",
+      filter: resp =>
+        resp.tag.latLong.lat > 36.878 &&
+        resp.tag.latLong.lat < 38.859 &&
+        resp.tag.latLong.lng > -123.569 &&
+        resp.tag.latLong.lng < -121.199,
+    },
+    {
+      name: "Seattle Area",
+      filter: resp =>
+        resp.tag.latLong.lat > 46.724 &&
+        resp.tag.latLong.lat < 48.309 &&
+        resp.tag.latLong.lng > -122.725 &&
+        resp.tag.latLong.lng < -120.877,
+    },
+  ],
+  {
+    field: resp => resp.tag.country,
+    alias: { "United States": "USA" },
+  },
+  {
+    field: resp => resp.tag.org,
+    alias: { Facebook: "FB" },
+  },
+  resp => resp.name,
+];
+
+function getSearchIndex(responses) {
+  const index = new Map();
+  searchSources
+    .map(source => {
+      if (typeof source === "function") {
+        source = { field: source };
+      }
+      if (!Array.isArray(source)) {
+        source = [source];
+      }
+      return source;
+    })
+    .forEach((sources, idx) =>
+      sources.forEach(source => {
+        let values;
+        if (source.field && !source.name) {
+          values = responses.map(resp => {
+            let val = source.field(resp);
+            if (source.rename && source.rename[val]) {
+              val = source.rename[val];
+            }
+            if (source.alias && source.alias[val]) {
+              val = `${val} (${source.alias[val]})`;
+            }
+            return { response: resp, val };
+          });
+        } else if (source.name && source.filter && !source.field) {
+          values = responses
+            .filter(resp => source.filter(resp))
+            .map(resp => ({ response: resp, val: source.name }));
+        } else {
+          failHard(`Malformed search source: ${JSON.stringify(source)}`);
+        }
+        values.forEach(({ response: resp, val }) => {
+          if (!index.has(val)) {
+            index.set(val, { priority: idx, responses: [] });
+          }
+          index.get(val).responses.push(resp);
+        });
+      }),
+    );
+  index.delete("");
+  return new Map(
+    Array.from(index)
+      .sort(
+        ([val1, { priority: priority1 }], [val2, { priority: priority2 }]) => {
+          if (priority1 < priority2) return -1;
+          if (priority1 > priority2) return +1;
+          if (val1 < val2) return -1;
+          if (val1 > val2) return +1;
+          return 0;
+        },
+      )
+      .map(([val, { responses }]) => [val, responses]),
   );
-  queries.delete("");
-  return queries;
 }
 
 function normalize(query) {
   return latinize(query)
     .toLowerCase()
-    .replace(/[^a-z]/g, "");
+    .replace(/[^a-z ]/g, "")
+    .replace(/ +/g, " ");
 }
 
-// IMPORTANT: when updating this function, also update the
-// getSearchSuggestions function.
-function doSearch(query, responses) {
-  console.log("query:", query);
-  const results = [];
-  for (const resp of responses) {
-    if (
-      [
-        resp.major,
-        resp.city,
-        resp.summerCity,
-        statesByAbbr[resp.state] ? statesByAbbr[resp.state].name : "",
-        statesByAbbr[resp.summerState]
-          ? statesByAbbr[resp.summerState].name
-          : "",
-        resp.country,
-        resp.summerCountry,
-        resp.org,
-        resp.summerOrg,
-        resp.name,
-      ]
-        .filter(x => x)
-        .includes(query)
-    ) {
-      results.push(resp.idx);
-    }
-  }
-  store.dispatch({ type: "SHOW_DETAILS", responses: results });
+function doSearch(query, index) {
+  store.dispatch({
+    type: "SHOW_DETAILS",
+    responses: index.get(query).map(resp => resp.idx),
+  });
 }
 
 class SearchBar extends React.Component {
@@ -153,18 +191,20 @@ class SearchBar extends React.Component {
       resolver: "custom",
       events: {
         search: (query, callback) => {
-          const normQuery = normalize(query);
+          const normQuery = normalize(query).split(" ");
           const results = [];
-          for (const item of this.props.suggestions) {
+          this.props.index.forEach((_, item) => {
             const normItem = normalize(item);
-            if (normItem.includes(normQuery)) {
-              results.push({ text: item });
-              // Limit to 10 results, like Google.
-              if (results.length >= 10) {
-                break;
+            for (const part of normQuery) {
+              if (!normItem.includes(part)) {
+                return;
               }
             }
-          }
+            // Limit to 10 results, like Google.
+            if (results.length < 10) {
+              results.push({ text: item });
+            }
+          });
           callback(results);
         },
       },
@@ -190,7 +230,7 @@ class SearchBar extends React.Component {
     // searches that aren't autosuggested.
     $(this.input.current).on("autocomplete.select", (_event, item) => {
       $(this.input.current).blur();
-      doSearch(item.text, this.props.responses);
+      doSearch(item.text, this.props.index);
     });
     // Unfocus the input on ESC.
     $(this.input.current).on("keyup", event => {
@@ -212,7 +252,10 @@ class SearchBar extends React.Component {
   }
 }
 
-export default connect(state => ({
-  responses: state.responses,
-  suggestions: state.responses && getSearchSuggestions(state.responses),
-}))(SearchBar);
+export default connect(state => {
+  const responses = tagAll(state.responses, state.geotagView);
+  return {
+    responses: responses,
+    index: responses && getSearchIndex(responses),
+  };
+})(SearchBar);

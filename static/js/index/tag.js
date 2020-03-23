@@ -13,7 +13,7 @@ function formatCity(city, state, country) {
   );
 }
 
-export function geotag(response, view) {
+export function tag(response, view) {
   const summerPlansAvailable =
     response.summerPlans ||
     response.summerCity ||
@@ -72,9 +72,9 @@ export function geotag(response, view) {
     info.desc += " at " + info.org;
   }
   info.loc = formatCity(info.city, info.state, info.country);
-  return { ...response, plan: info };
+  return { ...response, tag: info };
 }
 
-export function geotagAll(responses, view) {
-  return responses.map(resp => geotag(resp, view));
+export function tagAll(responses, view) {
+  return responses && responses.map(resp => tag(resp, view));
 }

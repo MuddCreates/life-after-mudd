@@ -7,7 +7,7 @@ import { Feature, Layer } from "react-mapbox-gl";
 import { connect } from "react-redux";
 
 import { mapboxAccessToken } from "../../shared";
-import { geotagAll } from "../geotag";
+import { tagAll } from "../tag";
 import { store } from "../redux";
 import { GeotagView } from "../state";
 
@@ -59,7 +59,7 @@ class MapView extends React.Component {
         >
           {this.props.responses.map(resp => (
             <Feature
-              coordinates={[resp.plan.latLong.lng, resp.plan.latLong.lat]}
+              coordinates={[resp.tag.latLong.lng, resp.tag.latLong.lat]}
               key={resp.idx}
               properties={{
                 displayed:
@@ -148,8 +148,6 @@ class MapView extends React.Component {
 export default connect(state => ({
   responses:
     state.responses &&
-    geotagAll(state.responses, state.geotagView).filter(
-      resp => resp.plan.latLong,
-    ),
+    tagAll(state.responses, state.geotagView).filter(resp => resp.tag.latLong),
   displayedResponses: new Set(state.displayedResponses),
 }))(MapView);
