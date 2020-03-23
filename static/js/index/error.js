@@ -24,15 +24,21 @@ function getErrorMessage(error) {
   }
 }
 
+let alreadyCrashed = false;
+
 // Instantly crash the webapp and try to display a human-friendly
 // error page. If that fails, fall back to alert(). error can be
 // literally anything that seems like an error.
 export function failHard(error) {
+  if (alreadyCrashed) {
+    return;
+  } else {
+    alreadyCrashed = true;
+  }
   console.error("Crashing app due to error:", error);
-  let elt;
   try {
     const msg = getErrorMessage(error);
-    elt = MessageScreen(
+    const elt = MessageScreen(
       <p>
         Sorry, there was a totally unexpected error.{" "}
         {msg ? (
@@ -76,10 +82,16 @@ export function failHard(error) {
         </ul>
       </div>,
     );
+    try {
+      document.getElementById("app").remove();
+    } catch (_) {
+      // whatever
+    }
+    render(elt, document.getElementById("error"));
   } catch (newError) {
     alert(
       `An error occurred (${newError}) while trying to display an error message (${error}). Sorry!`,
     );
   }
-  render(elt, document.getElementById("app"));
+  throw "error raised in order to break control flow";
 }
