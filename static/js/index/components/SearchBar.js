@@ -137,7 +137,7 @@ function getSearchIndex(responses) {
 function normalize(query) {
   return latinize(query)
     .toLowerCase()
-    .replace(/[^a-z ]/g, "")
+    .replace(/[^a-z ]/g, " ")
     .replace(/ +/g, " ");
 }
 
@@ -191,7 +191,9 @@ class SearchBar extends React.Component {
       resolver: "custom",
       events: {
         search: (query, callback) => {
-          const normQuery = normalize(query).split(" ");
+          const normQuery = normalize(query)
+            .split(" ")
+            .filter(x => x);
           const results = [];
           this.props.index.forEach((_, item) => {
             const normItem = normalize(item);
@@ -249,6 +251,36 @@ class SearchBar extends React.Component {
         }
       });
     }
+    // Fix highlighting behavior. (Why isn't this customizable?)
+    dd._showMatchedText = dd.showMatchedText;
+    dd.showMatchedText = (text, query) => {
+      const folded = latinize(text).toLowerCase();
+      if (folded.length !== text.length) {
+        // Oh shoot this sounds hard, fall back to something less
+        // intelligent.
+        return dd._showMatchedText(text, query);
+      }
+      const highlighted = new Array(folded.length).fill(false);
+      for (const part of normalize(query)
+        .split(" ")
+        .filter(x => x)) {
+        let start = 0;
+        let index;
+        while ((index = folded.indexOf(part, start)) != -1) {
+          console.log(`found ${part} at index ${index} in ${folded}`);
+          for (let i = index; i < index + part.length; i++) {
+            highlighted[i] = true;
+          }
+          start = index + part.length;
+        }
+      }
+      // Just stick <b></b> around every individual bolded character.
+      // It looks dumb but nobody is reading the DOM.
+      return text
+        .split("")
+        .map((char, idx) => (highlighted[idx] ? `<b>${char}</b>` : char))
+        .join("");
+    };
   }
 }
 
