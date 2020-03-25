@@ -9,6 +9,7 @@ import google.auth.transport.requests
 import google.oauth2.id_token
 
 import sheets
+import sessions
 
 ADMIN_ENABLED = bool(os.environ.get("LAM_ADMIN_ENABLED"))
 AUTOFETCH_ENABLED = bool(os.environ.get("LAM_AUTOFETCH_ENABLED"))
@@ -99,23 +100,25 @@ def get_data():
             raise TypeError
     except (KeyError, TypeError, json.JSONDecodeError):
         return "Request did not include token", 400
-    try:
-        # This API call takes about 125ms in my testing. Could be
-        # optimized by doing our own JWT validation, probably. But
-        # that would really suck so let's hold off on that for now.
-        #
-        # https://developers.google.com/identity/sign-in/web/backend-auth
-        idinfo = google.oauth2.id_token.verify_oauth2_token(
-            token,
-            google.auth.transport.requests.Request(),
-            "548868103597-3th6ihbnejkscon1950m9mm31misvhk9.apps.googleusercontent.com",
-        )
-        if idinfo["iss"] not in ("accounts.google.com", "https://accounts.google.com"):
-            raise ValueError("Wrong issuer: {}".format(idinfo["iss"]))
-        if idinfo["hd"] != "g.hmc.edu":
-            raise ValueError("Wrong domain: {}".format(idinfo["hd"]))
-    except ValueError as e:
-        return "Bad token: {}".format(e), 401
+    if not sessions.check_token(token):
+        try:
+            # This API call takes about 125ms in my testing. Could be
+            # optimized by doing our own JWT validation, probably. But
+            # that would really suck so let's hold off on that for now.
+            #
+            # https://developers.google.com/identity/sign-in/web/backend-auth
+            idinfo = google.oauth2.id_token.verify_oauth2_token(
+                token,
+                google.auth.transport.requests.Request(),
+                "548868103597-3th6ihbnejkscon1950m9mm31misvhk9.apps.googleusercontent.com",
+            )
+            if idinfo["iss"] not in ("accounts.google.com", "https://accounts.google.com"):
+                raise ValueError("Wrong issuer: {}".format(idinfo["iss"]))
+            if idinfo["hd"] != "g.hmc.edu":
+                raise ValueError("Wrong domain: {}".format(idinfo["hd"]))
+            sessions.add_token(token)
+        except ValueError as e:
+            return "Bad token: {}".format(e), 401
     try:
         with open("data.json") as f:
             responses = json.load(f)
