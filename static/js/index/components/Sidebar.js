@@ -4,6 +4,7 @@ import React from "react";
 import { Fragment } from "react";
 import { connect } from "react-redux";
 
+import { sidebarWidthFraction } from "../config";
 import { tagAll } from "../tag";
 
 function groupPlans(responses) {
@@ -36,9 +37,9 @@ class Sidebar extends React.Component {
       <div
         style={{
           position: "absolute",
-          left: "70%",
+          left: `${(1 - sidebarWidthFraction) * 100}%`,
           top: "0",
-          width: "30%",
+          width: `${sidebarWidthFraction * 100}%`,
           height: "100%",
           padding: "10px",
           background: "white",
