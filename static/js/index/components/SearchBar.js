@@ -218,44 +218,23 @@ class SearchBar extends React.Component {
       minLength: 0,
       autoSelect: false,
     });
-    // Autoselect the first suggestion.
-    //
-    // https://github.com/xcash/bootstrap-autocomplete/issues/28#issuecomment-602104553
     const ac = $(this.input.current).data("autoComplete");
     const dd = ac._dd;
-    dd._refreshItemList = dd.refreshItemList;
-    dd.refreshItemList = () => {
-      dd._refreshItemList();
-      dd.focusNextItem();
-    };
-    // Bring the suggestions list back when the user clicks back into
-    // the field.
-    $(this.input.current).on("focus", () => {
-      ac.handlerTyped($(this.input.current).val());
-    });
     // Do a search when an item is selected. We don't allow any
     // searches that aren't autosuggested.
     $(this.input.current).on("autocomplete.select", (_event, item) => {
       $(this.input.current).blur();
       doSearch(item.text, this.props.index);
     });
-    // Unfocus the input on ESC.
-    $(this.input.current).on("keyup", event => {
-      if (event.key === "Escape") {
-        $(this.input.current).blur();
-      }
-    });
     // Don't dismiss the suggestions on RET unless a
     // suggestion was actually accepted.
-    for (const trigger of ["keyup", "keydown"]) {
-      $(this.input.current).on(trigger, event => {
-        if (event.key === "Enter") {
-          if (!dd.isItemFocused) {
-            dd.show();
-          }
+    $(this.input.current).on("keypress", event => {
+      if (event.key === "Enter") {
+        if (!dd.isItemFocused) {
+          dd.show();
         }
-      });
-    }
+      }
+    });
     // Fix highlighting behavior. (Why isn't this customizable?)
     dd._showMatchedText = dd.showMatchedText;
     dd.showMatchedText = (text, query) => {

@@ -9,7 +9,7 @@
     "@mapbox/mapbox-gl-geocoder": "^4.5.1",
     "@types/react": "^16.9.19",
     "bootstrap": "^4.4.1",
-    "bootstrap-autocomplete": "^2.3.2",
+    "bootstrap-autocomplete": "https://github.com/MuddCreates/bootstrap-autocomplete#hack/life-after-mudd",
     "jquery": "^3.4.1",
     "latinize": "^0.4.1",
     "mapbox-gl": "^1.7.0",

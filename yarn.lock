@@ -1510,10 +1510,9 @@ boolbase@^1.0.0, boolbase@~1.0.0:
   resolved "https://registry.yarnpkg.com/boolbase/-/boolbase-1.0.0.tgz#68dff5fbe60c51eb37725ea9e3ed310dcc1e776e"
   integrity sha1-aN/1++YMUes3cl6p4+0xDcwed24=
 
-bootstrap-autocomplete@^2.3.2:
-  version "2.3.2"
-  resolved "https://registry.yarnpkg.com/bootstrap-autocomplete/-/bootstrap-autocomplete-2.3.2.tgz#18c17c5b54d5edcd1e440ce5ff5e4dbbbb2b74f1"
-  integrity sha512-oFKgkPUUKlglAD4ixrr36WVrPFXTXcz2kQTJEFkSGw2J15xzUIoFoRTNSZsiaNReqa11j0/69zY5pC3gaFdUoA==
+"bootstrap-autocomplete@https://github.com/MuddCreates/bootstrap-autocomplete#hack/life-after-mudd":
+  version "2.3.3"
+  resolved "https://github.com/MuddCreates/bootstrap-autocomplete#cc640a927ac9d20c738f26315138d5807ac5e521"
 
 bootstrap@^4.4.1:
   version "4.4.1"
