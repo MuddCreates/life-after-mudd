@@ -40,7 +40,7 @@ const searchSources = [
     },
   },
   {
-    field: resp => resp.tag.state,
+    field: resp => (statesByAbbr[resp.tag.state] || {}).name,
     alias: Object.fromEntries(
       Object.entries(statesByName).map(([name, state]) => [
         name,
@@ -95,6 +95,9 @@ function getSearchIndex(responses) {
         if (source.field && !source.name) {
           values = responses.map(resp => {
             let val = source.field(resp);
+            if (!val) {
+              return null;
+            }
             if (source.rename && source.rename[val]) {
               val = source.rename[val];
             }
@@ -110,12 +113,14 @@ function getSearchIndex(responses) {
         } else {
           failHard(`Malformed search source: ${JSON.stringify(source)}`);
         }
-        values.forEach(({ response: resp, val }) => {
-          if (!index.has(val)) {
-            index.set(val, { priority: idx, responses: [] });
-          }
-          index.get(val).responses.push(resp);
-        });
+        values
+          .filter(x => x)
+          .forEach(({ response: resp, val }) => {
+            if (!index.has(val)) {
+              index.set(val, { priority: idx, responses: [] });
+            }
+            index.get(val).responses.push(resp);
+          });
       }),
     );
   index.delete("");
