@@ -272,7 +272,6 @@ class SearchBar extends React.Component {
         let start = 0;
         let index;
         while ((index = folded.indexOf(part, start)) != -1) {
-          console.log(`found ${part} at index ${index} in ${folded}`);
           for (let i = index; i < index + part.length; i++) {
             highlighted[i] = true;
           }
