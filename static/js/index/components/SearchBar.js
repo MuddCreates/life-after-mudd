@@ -151,6 +151,9 @@ function doSearch(query, index) {
     type: "SHOW_DETAILS",
     responses: index.get(query).map(resp => resp.idx),
   });
+  store.dispatch({
+    type: "UPDATE_MAP_VIEW_ZOOM",
+  });
 }
 
 class SearchBar extends React.Component {
