@@ -116,7 +116,9 @@ function fillDefaults(responses) {
     r.rawSummerCityState = clean(r.rawSummerCityState);
     r.email = r.email || r.rawEmail.replace("g.hmc.edu", "hmc.edu");
     r.name = clean(r.name || r.rawName);
-    r.major = clean(r.major || r.rawMajor);
+    if (!r.major) {
+      r.major = clean(r.rawMajor.split(", ").join(" + "));
+    }
     r.path = clean(r.path || r.rawPath);
     r.org = capitalize(clean(r.org || r.rawOrg));
     if (r.org.toUpperCase() == "FB") {
