@@ -94,17 +94,18 @@ class MapView extends React.Component {
           top = Math.max(top, resp.tag.latLong.lat);
         });
       // There is a limit for how much we zoom in.
+      const zoomLimit = 0.2; // minimum width of window in degrees
       let horizDisp = right - left;
-      if (horizDisp < 0.006) {
-        left -= 0.003 - horizDisp / 2;
-        right += 0.003 - horizDisp / 2;
-        horizDisp = 0.006;
+      if (horizDisp < zoomLimit) {
+        left -= (zoomLimit - horizDisp) / 2;
+        right += (zoomLimit - horizDisp) / 2;
+        horizDisp = zoomLimit;
       }
       let vertDisp = top - bottom;
-      if (vertDisp < 0.006) {
-        bottom -= 0.003 - vertDisp / 2;
-        top += 0.003 - vertDisp / 2;
-        vertDisp = 0.006;
+      if (vertDisp < zoomLimit) {
+        bottom -= (zoomLimit - vertDisp) / 2;
+        top += (zoomLimit - vertDisp) / 2;
+        vertDisp = zoomLimit;
       }
       left -= horizDisp / 4;
       right += horizDisp / 4;
