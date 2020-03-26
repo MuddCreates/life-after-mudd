@@ -180,6 +180,7 @@ class SearchBar extends React.Component {
           left: "20px",
           top: "20px",
           width: "1000px",
+          touchAction: "none",
         }}
       >
         <div className="mapboxgl-ctrl-geocoder mapboxgl-ctrl">
