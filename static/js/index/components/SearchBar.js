@@ -31,7 +31,7 @@ const searchSources = [
       Job: "Job/Internship/Working",
     },
   },
-  resp => resp.major,
+  resp => resp.major.split(" + "),
   {
     field: resp => resp.tag.city,
     alias: {
@@ -93,19 +93,24 @@ function getSearchIndex(responses) {
       sources.forEach(source => {
         let values;
         if (source.field && !source.name) {
-          values = responses.map(resp => {
-            let val = source.field(resp);
-            if (!val) {
-              return null;
-            }
-            if (source.rename && source.rename[val]) {
-              val = source.rename[val];
-            }
-            if (source.alias && source.alias[val]) {
-              val = `${val} (${source.alias[val]})`;
-            }
-            return { response: resp, val };
-          });
+          values = [].concat.apply(
+            [],
+            responses.map(resp => {
+              let vals = source.field(resp);
+              if (!Array.isArray(vals)) {
+                vals = [vals];
+              }
+              return vals.map(val => {
+                if (source.rename && source.rename[val]) {
+                  val = source.rename[val];
+                }
+                if (source.alias && source.alias[val]) {
+                  val = `${val} (${source.alias[val]})`;
+                }
+                return { response: resp, val };
+              });
+            }),
+          );
         } else if (source.name && source.filter && !source.field) {
           values = responses
             .filter(resp => source.filter(resp))
@@ -113,14 +118,12 @@ function getSearchIndex(responses) {
         } else {
           failHard(`Malformed search source: ${JSON.stringify(source)}`);
         }
-        values
-          .filter(x => x)
-          .forEach(({ response: resp, val }) => {
-            if (!index.has(val)) {
-              index.set(val, { priority: idx, responses: [] });
-            }
-            index.get(val).responses.push(resp);
-          });
+        values.forEach(({ response: resp, val }) => {
+          if (!index.has(val)) {
+            index.set(val, { priority: idx, responses: [] });
+          }
+          index.get(val).responses.push(resp);
+        });
       }),
     );
   index.delete("");
