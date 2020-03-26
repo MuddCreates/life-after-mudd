@@ -180,6 +180,7 @@ class SearchBar extends React.Component {
           left: "20px",
           top: "20px",
           width: "1000px",
+          maxWidth: "calc(100% - 40px)",
           touchAction: "none",
         }}
       >
