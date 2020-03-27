@@ -267,6 +267,10 @@ class SearchBar extends React.Component {
       }
       // Just stick <b></b> around every individual bolded character.
       // It looks dumb but nobody is reading the DOM.
+      //
+      // In case you're wondering why this API doesn't create
+      // horrifyingly obvious XSS exploits, the answer is it totally
+      // does and you should blame bootstrap-autocomplete.
       return text
         .split("")
         .map((char, idx) => (highlighted[idx] ? `<b>${char}</b>` : char))
