@@ -33,7 +33,7 @@ async function setData(data) {
 
 function normalizeWhitespace(str) {
   let parts = str.split(/\s+/);
-  parts = parts.filter(part => part);
+  parts = parts.filter((part) => part);
   return parts.join(" ");
 }
 
@@ -101,7 +101,7 @@ function clean(field) {
 }
 
 function fillDefaults(responses) {
-  return responses.map(r => {
+  return responses.map((r) => {
     r = { ...r };
     // Make it so form response updates are automatically queued for
     // reprocessing.
@@ -165,7 +165,7 @@ function initMap(id) {
     trackProximity: false,
   });
   search.__onChange = search._onChange;
-  search._onChange = function() {
+  search._onChange = function () {
     this._inputEl._focus = this._inputEl.focus;
     this._inputEl.focus = () => {};
     search.__onChange();
@@ -191,18 +191,14 @@ function saveFormData() {
   r.state = $("#state-input").val();
   r.country = $("#country-input").val();
   if ($("#city-coords-input").val()) {
-    [r.cityLat, r.cityLong] = $("#city-coords-input")
-      .val()
-      .split(", ");
+    [r.cityLat, r.cityLong] = $("#city-coords-input").val().split(", ");
   } else {
     r.cityLat = "";
     r.cityLong = "";
   }
   r.org = $("#org-input").val();
   if ($("#org-coords-input").val()) {
-    [r.orgLat, r.orgLong] = $("#org-coords-input")
-      .val()
-      .split(", ");
+    [r.orgLat, r.orgLong] = $("#org-coords-input").val().split(", ");
   } else {
     r.orgLat = "";
     r.orgLong = "";
@@ -295,9 +291,7 @@ function resetMap(map) {
 
 function initPage() {
   const responses = $("body").data("responses");
-  $("#response-dropdown")
-    .find("option")
-    .remove();
+  $("#response-dropdown").find("option").remove();
   responses.forEach((response, idx) => {
     $("#response-dropdown").append(
       $("<option>", {
@@ -313,15 +307,15 @@ function initPage() {
   });
   $("#next-button").on("click", submitForm);
   $("#response-form").on("submit", submitForm);
-  $("#major-dropdown a").on("click", function() {
+  $("#major-dropdown a").on("click", function () {
     const value = $(this).text();
     $("#major-input").val(value);
   });
-  $("#path-dropdown a").on("click", function() {
+  $("#path-dropdown a").on("click", function () {
     const value = $(this).text();
     $("#path-input").val(value);
   });
-  $("#summer-path-dropdown a").on("click", function() {
+  $("#summer-path-dropdown a").on("click", function () {
     const value = $(this).text();
     $("#summer-path-input").val(value);
   });
@@ -349,7 +343,7 @@ function initPage() {
     },
   ]) {
     initMap(map.attr("id"));
-    const setCoords = coords => {
+    const setCoords = (coords) => {
       coords = coords || map.data("search").getProximity();
       if (coords) {
         const { latitude, longitude } = coords;
@@ -359,7 +353,7 @@ function initPage() {
       }
     };
     setButton.on("click", () => setCoords());
-    map.data("search").on("result", response => {
+    map.data("search").on("result", (response) => {
       const idx = $("body").data("idx");
       const [longitude, latitude] = response.result.center;
       map.data("search").setProximity({ latitude, longitude });
@@ -371,7 +365,7 @@ function initPage() {
         map.data("onFirstResult", null);
       }
     });
-    map.data("search").on("results", response => {
+    map.data("search").on("results", (response) => {
       if (response.features.length === 0) {
         resetMap(map);
       }
@@ -469,8 +463,8 @@ main().catch(console.error);
 
 // https://github.com/parcel-bundler/parcel/issues/2894#issuecomment-544607028
 if (module.hot) {
-  module.hot.accept(function() {
-    setTimeout(function() {
+  module.hot.accept(function () {
+    setTimeout(function () {
       location.reload();
     }, 300);
   });

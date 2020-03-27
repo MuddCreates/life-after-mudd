@@ -31,7 +31,7 @@ class LoginModal extends React.Component {
             Waiting for Google to report your login. If something went wrong,{" "}
             <a
               href="#"
-              onClick={event => {
+              onClick={(event) => {
                 store.dispatch(oauthLoginAction);
                 event.preventDefault();
               }}
@@ -54,7 +54,7 @@ class LoginModal extends React.Component {
   }
 }
 
-export default connect(state => ({
+export default connect((state) => ({
   modalShown: state.showingModal,
   modalWaiting: state.modalWaiting,
 }))(LoginModal);

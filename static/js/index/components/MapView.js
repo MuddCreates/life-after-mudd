@@ -62,7 +62,7 @@ class MapView extends React.Component {
             ],
           }}
         >
-          {this.props.responses.map(resp => (
+          {this.props.responses.map((resp) => (
             <Feature
               coordinates={[resp.tag.latLong.lng, resp.tag.latLong.lat]}
               key={resp.idx}
@@ -86,8 +86,8 @@ class MapView extends React.Component {
       let top = -Infinity;
       let bottom = Infinity;
       this.props.responses
-        .filter(resp => this.props.displayedResponses.has(resp.idx))
-        .forEach(resp => {
+        .filter((resp) => this.props.displayedResponses.has(resp.idx))
+        .forEach((resp) => {
           left = Math.min(left, resp.tag.latLong.lng);
           right = Math.max(right, resp.tag.latLong.lng);
           bottom = Math.min(bottom, resp.tag.latLong.lat);
@@ -172,7 +172,7 @@ class MapView extends React.Component {
     } else {
       map.getCanvas().style.cursor = "default";
     }
-    this.props.responses.forEach(resp => {
+    this.props.responses.forEach((resp) => {
       map.setFeatureState(
         { source: "people", id: resp.idx },
         { hover: nearbyPoints.has(resp.idx) },
@@ -193,10 +193,12 @@ class MapView extends React.Component {
   };
 }
 
-export default connect(state => ({
+export default connect((state) => ({
   responses:
     state.responses &&
-    tagAll(state.responses, state.geotagView).filter(resp => resp.tag.latLong),
+    tagAll(state.responses, state.geotagView).filter(
+      (resp) => resp.tag.latLong,
+    ),
   displayedResponses: new Set(state.displayedResponses),
   serial: state.mapViewSerial,
 }))(MapView);

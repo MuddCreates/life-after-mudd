@@ -76,5 +76,5 @@ export function tag(response, view) {
 }
 
 export function tagAll(responses, view) {
-  return responses && responses.map(resp => tag(resp, view));
+  return responses && responses.map((resp) => tag(resp, view));
 }

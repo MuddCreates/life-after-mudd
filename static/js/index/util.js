@@ -6,7 +6,7 @@ import { failHard } from "./error";
 // exception occurs, the app crashes and displays an error message.
 // Works with both synchronous and asynchronous actions.
 export function thunk(action) {
-  return dispatch => {
+  return (dispatch) => {
     try {
       let result = action(dispatch);
       // https://stackoverflow.com/a/38339199/3538165

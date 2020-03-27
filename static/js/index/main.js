@@ -23,7 +23,7 @@ async function main() {
   await store.dispatch(oauthSetupAction);
 }
 
-window.addEventListener("error", event => {
+window.addEventListener("error", (event) => {
   failHard(event.error);
 });
 main().catch(failHard);

@@ -20,11 +20,11 @@ function groupPlans(responses) {
   }
   return Object.keys(index)
     .sort()
-    .map(loc => ({
+    .map((loc) => ({
       loc,
       descs: Object.keys(index[loc])
         .sort()
-        .map(desc => ({ desc, responses: index[loc][desc] })),
+        .map((desc) => ({ desc, responses: index[loc][desc] })),
     }));
 }
 
@@ -66,10 +66,12 @@ class Sidebar extends React.Component {
   }
 }
 
-export default connect(state => {
+export default connect((state) => {
   const displayedResponses = new Set(state.displayedResponses);
   return {
-    responses: state.responses.filter(resp => displayedResponses.has(resp.idx)),
+    responses: state.responses.filter((resp) =>
+      displayedResponses.has(resp.idx),
+    ),
     geotagView: state.geotagView,
   };
 })(Sidebar);

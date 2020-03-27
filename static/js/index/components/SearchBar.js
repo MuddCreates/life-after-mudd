@@ -26,21 +26,21 @@ for (const state of new UsaStates().states) {
 
 const searchSources = [
   {
-    field: resp => resp.path,
+    field: (resp) => resp.path,
     rename: {
       Job: "Job/Internship/Working",
     },
   },
-  resp => resp.major.split(" + "),
+  (resp) => resp.major.split(" + "),
   {
-    field: resp => resp.tag.city,
+    field: (resp) => resp.tag.city,
     alias: {
       "New York City": "NYC",
       "San Francisco": "SF",
     },
   },
   {
-    field: resp => (statesByAbbr[resp.tag.state] || {}).name,
+    field: (resp) => (statesByAbbr[resp.tag.state] || {}).name,
     alias: Object.fromEntries(
       Object.entries(statesByName).map(([name, state]) => [
         name,
@@ -51,7 +51,7 @@ const searchSources = [
   [
     {
       name: "San Francisco (SF) Bay Area",
-      filter: resp =>
+      filter: (resp) =>
         resp.tag.latLong.lat > 36.878 &&
         resp.tag.latLong.lat < 38.859 &&
         resp.tag.latLong.lng > -123.569 &&
@@ -59,7 +59,7 @@ const searchSources = [
     },
     {
       name: "Seattle Area",
-      filter: resp =>
+      filter: (resp) =>
         resp.tag.latLong.lat > 46.724 &&
         resp.tag.latLong.lat < 48.309 &&
         resp.tag.latLong.lng > -122.725 &&
@@ -67,20 +67,20 @@ const searchSources = [
     },
   ],
   {
-    field: resp => resp.tag.country,
+    field: (resp) => resp.tag.country,
     alias: { "United States": "USA" },
   },
   {
-    field: resp => resp.tag.org,
+    field: (resp) => resp.tag.org,
     alias: { Facebook: "FB" },
   },
-  resp => resp.name,
+  (resp) => resp.name,
 ];
 
 function getSearchIndex(responses) {
   const index = new Map();
   searchSources
-    .map(source => {
+    .map((source) => {
       if (typeof source === "function") {
         source = { field: source };
       }
@@ -90,17 +90,17 @@ function getSearchIndex(responses) {
       return source;
     })
     .forEach((sources, idx) =>
-      sources.forEach(source => {
+      sources.forEach((source) => {
         let values;
         if (source.field && !source.name) {
           values = [].concat.apply(
             [],
-            responses.map(resp => {
+            responses.map((resp) => {
               let vals = source.field(resp);
               if (!Array.isArray(vals)) {
                 vals = [vals];
               }
-              return vals.map(val => {
+              return vals.map((val) => {
                 if (source.rename && source.rename[val]) {
                   val = source.rename[val];
                 }
@@ -113,8 +113,8 @@ function getSearchIndex(responses) {
           );
         } else if (source.name && source.filter && !source.field) {
           values = responses
-            .filter(resp => source.filter(resp))
-            .map(resp => ({ response: resp, val: source.name }));
+            .filter((resp) => source.filter(resp))
+            .map((resp) => ({ response: resp, val: source.name }));
         } else {
           failHard(`Malformed search source: ${JSON.stringify(source)}`);
         }
@@ -152,7 +152,7 @@ function normalize(query) {
 function doSearch(query, index) {
   store.dispatch({
     type: "SHOW_DETAILS",
-    responses: index.get(query).map(resp => resp.idx),
+    responses: index.get(query).map((resp) => resp.idx),
   });
   store.dispatch({
     type: "UPDATE_MAP_VIEW_ZOOM",
@@ -206,7 +206,7 @@ class SearchBar extends React.Component {
         search: (query, callback) => {
           const normQuery = normalize(query)
             .split(" ")
-            .filter(x => x);
+            .filter((x) => x);
           const results = [];
           this.props.index.forEach((_, item) => {
             const normItem = normalize(item);
@@ -236,7 +236,7 @@ class SearchBar extends React.Component {
     });
     // Don't dismiss the suggestions on RET unless a
     // suggestion was actually accepted.
-    $(this.input.current).on("keypress", event => {
+    $(this.input.current).on("keypress", (event) => {
       if (event.key === "Enter") {
         if (!dd.isItemFocused) {
           dd.show();
@@ -255,7 +255,7 @@ class SearchBar extends React.Component {
       const highlighted = new Array(folded.length).fill(false);
       for (const part of normalize(query)
         .split(" ")
-        .filter(x => x)) {
+        .filter((x) => x)) {
         let start = 0;
         let index;
         while ((index = folded.indexOf(part, start)) != -1) {
@@ -275,7 +275,7 @@ class SearchBar extends React.Component {
   }
 }
 
-export default connect(state => {
+export default connect((state) => {
   const responses = tagAll(state.responses, state.geotagView);
   return {
     responses: responses,
