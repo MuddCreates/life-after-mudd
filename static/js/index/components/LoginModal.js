@@ -28,8 +28,7 @@ class LoginModal extends React.Component {
       body = (
         <>
           <p>
-            Waiting for you to log in with Google. If you close the login
-            window,{" "}
+            Waiting for Google to report your login. If something went wrong,{" "}
             <a
               href="#"
               onClick={event => {
@@ -39,7 +38,7 @@ class LoginModal extends React.Component {
             >
               click here
             </a>{" "}
-            to open another one.
+            to try again.
           </p>
         </>
       );
