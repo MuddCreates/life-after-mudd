@@ -11,7 +11,7 @@ help: ## Show this message
 
 .PHONY: docker
 docker: ## Run shell with source code and deps inside Docker
-	@scripts/docker-compose.bash run --service-ports web
+	@scripts/docker-compose.bash run --service-ports web-dev
 
 .PHONY: tmux
 tmux: ## Start tmux so you can run commands in parallel
@@ -51,7 +51,7 @@ image-run: ## Build and run Docker image for deployment
 
 .PHONY: deploy
 deploy: image ## Deploy webapp to Heroku
-	scripts/docker.bash tag web-prod registry.heroku.com/life-after-mudd/web
+	scripts/docker.bash tag lifeaftermudd_web-prod registry.heroku.com/life-after-mudd/web
 	heroku auth:token | scripts/docker.bash login --username=_ --password-stdin registry.heroku.com
 	scripts/docker.bash push registry.heroku.com/life-after-mudd/web
 	heroku container:release web -a life-after-mudd
