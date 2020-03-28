@@ -1,3 +1,6 @@
+UID := $(shell id -u)
+export UID
+
 .PHONY: help
 help: ## Show this message
 	@echo "usage:" >&2
@@ -8,7 +11,7 @@ help: ## Show this message
 
 .PHONY: docker
 docker: ## Run shell with source code and deps inside Docker
-	@scripts/docker-build.bash "$(CMD)"
+	@scripts/docker-compose.bash run --service-ports web
 
 .PHONY: tmux
 tmux: ## Start tmux so you can run commands in parallel
@@ -40,7 +43,7 @@ app-dev: ## Start webserver in admin mode, with live-reload
 
 .PHONY: image
 image: ## Build Docker image for deployment
-	@scripts/docker-build.bash --prod
+	@scripts/docker-compose.bash build web-prod
 
 .PHONY: image-run
 image-run: ## Build and run Docker image for deployment
@@ -48,7 +51,7 @@ image-run: ## Build and run Docker image for deployment
 
 .PHONY: deploy
 deploy: image ## Deploy webapp to Heroku
-	scripts/docker.bash tag life-after-mudd registry.heroku.com/life-after-mudd/web
+	scripts/docker.bash tag web-prod registry.heroku.com/life-after-mudd/web
 	heroku auth:token | scripts/docker.bash login --username=_ --password-stdin registry.heroku.com
 	scripts/docker.bash push registry.heroku.com/life-after-mudd/web
 	heroku container:release web -a life-after-mudd
