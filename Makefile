@@ -11,9 +11,7 @@ help: ## Show this message
 
 .PHONY: docker
 docker: ## Run shell with source code and deps inside Docker
-	@scripts/docker-compose.bash down --remove-orphans
-	@scripts/docker-compose.bash run --service-ports web-dev || true
-	@scripts/docker-compose.bash down --remove-orphans
+	@scripts/docker-compose.bash run --rm --service-ports web-dev
 
 .PHONY: down
 down: ## Download responses from Google Sheets to local JSON
@@ -45,9 +43,7 @@ image: ## Build Docker image for deployment
 
 .PHONY: image-run
 image-run: ## Build and run Docker image for deployment
-	@scripts/docker-compose.bash down --remove-orphans
-	@scripts/docker-compose.bash run web-prod || true
-	@scripts/docker-compose.bash down --remove-orphans
+	@scripts/docker-compose.bash run --rm web-prod
 
 .PHONY: deploy
 deploy: image ## Deploy webapp to Heroku
