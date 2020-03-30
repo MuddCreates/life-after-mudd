@@ -31,7 +31,7 @@ build-dev: ## Build static files for development, and watch for changes
 
 .PHONY: app-prod
 app-prod: ## Start webserver for production
-	LAM_AUTOFETCH_ENABLED=1 gunicorn --workers 1 --threads 1 --bind $${HOST:-0.0.0.0}:$${PORT:-8080} app:app
+	LAM_AUTOFETCH_ENABLED=1 gunicorn --workers 1 --threads 1 --bind $${HOST:-127.0.0.1}:$${PORT:-8080} app:app
 
 .PHONY: app-dev
 app-dev: ## Start webserver in admin mode, with live-reload
@@ -43,7 +43,7 @@ image: ## Build Docker image for deployment
 
 .PHONY: image-run
 image-run: ## Build and run Docker image for deployment
-	@scripts/docker-build.bash --prod-run
+	@scripts/docker-compose.bash run web-prod
 
 .PHONY: deploy
 deploy: image ## Deploy webapp to Heroku
