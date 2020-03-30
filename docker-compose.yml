@@ -23,6 +23,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    image: life-after-mudd
     depends_on:
       - redis
     environment:

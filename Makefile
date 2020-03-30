@@ -54,7 +54,7 @@ image-run: image ## Build and run Docker image for deployment
 
 .PHONY: deploy
 deploy: image ## Deploy webapp to Heroku
-	scripts/docker.bash tag lifeaftermudd_web-prod	\
+	scripts/docker.bash tag life-after-mudd		\
 		registry.heroku.com/life-after-mudd/web
 	heroku auth:token | scripts/docker.bash login			\
 		--username=_ --password-stdin registry.heroku.com
