@@ -39,7 +39,7 @@ function cleanResponses(responses) {
 // Make the UI say it's fetching the data. Then make an API request.
 // Once it returns, clean it up and show the data on the map in the
 // UI.
-export const fetchAction = thunk(async dispatch => {
+export const fetchAction = thunk(async (dispatch) => {
   dispatch({ type: "FETCHING_DATA" });
   const GoogleAuth = gapi.auth2.getAuthInstance();
   const oauthToken = GoogleAuth.currentUser.get().getAuthResponse().id_token;

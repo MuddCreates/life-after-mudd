@@ -26,21 +26,21 @@ for (const state of new UsaStates().states) {
 
 const searchSources = [
   {
-    field: resp => resp.path,
+    field: (resp) => resp.path,
     rename: {
       Job: "Job/Internship/Working",
     },
   },
-  resp => resp.major,
+  (resp) => resp.major.split(" + "),
   {
-    field: resp => resp.tag.city,
+    field: (resp) => resp.tag.city,
     alias: {
       "New York City": "NYC",
       "San Francisco": "SF",
     },
   },
   {
-    field: resp => resp.tag.state,
+    field: (resp) => (statesByAbbr[resp.tag.state] || {}).name,
     alias: Object.fromEntries(
       Object.entries(statesByName).map(([name, state]) => [
         name,
@@ -51,7 +51,7 @@ const searchSources = [
   [
     {
       name: "San Francisco (SF) Bay Area",
-      filter: resp =>
+      filter: (resp) =>
         resp.tag.latLong.lat > 36.878 &&
         resp.tag.latLong.lat < 38.859 &&
         resp.tag.latLong.lng > -123.569 &&
@@ -59,7 +59,7 @@ const searchSources = [
     },
     {
       name: "Seattle Area",
-      filter: resp =>
+      filter: (resp) =>
         resp.tag.latLong.lat > 46.724 &&
         resp.tag.latLong.lat < 48.309 &&
         resp.tag.latLong.lng > -122.725 &&
@@ -67,20 +67,20 @@ const searchSources = [
     },
   ],
   {
-    field: resp => resp.tag.country,
+    field: (resp) => resp.tag.country,
     alias: { "United States": "USA" },
   },
   {
-    field: resp => resp.tag.org,
+    field: (resp) => resp.tag.org,
     alias: { Facebook: "FB" },
   },
-  resp => resp.name,
+  (resp) => resp.name,
 ];
 
 function getSearchIndex(responses) {
   const index = new Map();
   searchSources
-    .map(source => {
+    .map((source) => {
       if (typeof source === "function") {
         source = { field: source };
       }
@@ -90,23 +90,31 @@ function getSearchIndex(responses) {
       return source;
     })
     .forEach((sources, idx) =>
-      sources.forEach(source => {
+      sources.forEach((source) => {
         let values;
         if (source.field && !source.name) {
-          values = responses.map(resp => {
-            let val = source.field(resp);
-            if (source.rename && source.rename[val]) {
-              val = source.rename[val];
-            }
-            if (source.alias && source.alias[val]) {
-              val = `${val} (${source.alias[val]})`;
-            }
-            return { response: resp, val };
-          });
+          values = [].concat.apply(
+            [],
+            responses.map((resp) => {
+              let vals = source.field(resp);
+              if (!Array.isArray(vals)) {
+                vals = [vals];
+              }
+              return vals.map((val) => {
+                if (source.rename && source.rename[val]) {
+                  val = source.rename[val];
+                }
+                if (source.alias && source.alias[val]) {
+                  val = `${val} (${source.alias[val]})`;
+                }
+                return { response: resp, val };
+              });
+            }),
+          );
         } else if (source.name && source.filter && !source.field) {
           values = responses
-            .filter(resp => source.filter(resp))
-            .map(resp => ({ response: resp, val: source.name }));
+            .filter((resp) => source.filter(resp))
+            .map((resp) => ({ response: resp, val: source.name }));
         } else {
           failHard(`Malformed search source: ${JSON.stringify(source)}`);
         }
@@ -137,14 +145,17 @@ function getSearchIndex(responses) {
 function normalize(query) {
   return latinize(query)
     .toLowerCase()
-    .replace(/[^a-z ]/g, "")
+    .replace(/[^a-z ]/g, " ")
     .replace(/ +/g, " ");
 }
 
 function doSearch(query, index) {
   store.dispatch({
     type: "SHOW_DETAILS",
-    responses: index.get(query).map(resp => resp.idx),
+    responses: index.get(query).map((resp) => resp.idx),
+  });
+  store.dispatch({
+    type: "UPDATE_MAP_VIEW_ZOOM",
   });
 }
 
@@ -169,6 +180,8 @@ class SearchBar extends React.Component {
           left: "20px",
           top: "20px",
           width: "1000px",
+          maxWidth: "calc(100% - 40px)",
+          touchAction: "none",
         }}
       >
         <div className="mapboxgl-ctrl-geocoder mapboxgl-ctrl">
@@ -191,7 +204,9 @@ class SearchBar extends React.Component {
       resolver: "custom",
       events: {
         search: (query, callback) => {
-          const normQuery = normalize(query).split(" ");
+          const normQuery = normalize(query)
+            .split(" ")
+            .filter((x) => x);
           const results = [];
           this.props.index.forEach((_, item) => {
             const normItem = normalize(item);
@@ -211,48 +226,60 @@ class SearchBar extends React.Component {
       minLength: 0,
       autoSelect: false,
     });
-    // Autoselect the first suggestion.
-    //
-    // https://github.com/xcash/bootstrap-autocomplete/issues/28#issuecomment-602104553
     const ac = $(this.input.current).data("autoComplete");
     const dd = ac._dd;
-    dd._refreshItemList = dd.refreshItemList;
-    dd.refreshItemList = () => {
-      dd._refreshItemList();
-      dd.focusNextItem();
-    };
-    // Bring the suggestions list back when the user clicks back into
-    // the field.
-    $(this.input.current).on("focus", () => {
-      ac.handlerTyped($(this.input.current).val());
-    });
     // Do a search when an item is selected. We don't allow any
     // searches that aren't autosuggested.
     $(this.input.current).on("autocomplete.select", (_event, item) => {
       $(this.input.current).blur();
       doSearch(item.text, this.props.index);
     });
-    // Unfocus the input on ESC.
-    $(this.input.current).on("keyup", event => {
-      if (event.key === "Escape") {
-        $(this.input.current).blur();
-      }
-    });
     // Don't dismiss the suggestions on RET unless a
     // suggestion was actually accepted.
-    for (const trigger of ["keyup", "keydown"]) {
-      $(this.input.current).on(trigger, event => {
-        if (event.key === "Enter") {
-          if (!dd.isItemFocused) {
-            dd.show();
-          }
+    $(this.input.current).on("keypress", (event) => {
+      if (event.key === "Enter") {
+        if (!dd.isItemFocused) {
+          dd.show();
         }
-      });
-    }
+      }
+    });
+    // Fix highlighting behavior. (Why isn't this customizable?)
+    dd._showMatchedText = dd.showMatchedText;
+    dd.showMatchedText = (text, query) => {
+      const folded = latinize(text).toLowerCase();
+      if (folded.length !== text.length) {
+        // Oh shoot this sounds hard, fall back to something less
+        // intelligent.
+        return dd._showMatchedText(text, query);
+      }
+      const highlighted = new Array(folded.length).fill(false);
+      for (const part of normalize(query)
+        .split(" ")
+        .filter((x) => x)) {
+        let start = 0;
+        let index;
+        while ((index = folded.indexOf(part, start)) != -1) {
+          for (let i = index; i < index + part.length; i++) {
+            highlighted[i] = true;
+          }
+          start = index + part.length;
+        }
+      }
+      // Just stick <b></b> around every individual bolded character.
+      // It looks dumb but nobody is reading the DOM.
+      //
+      // In case you're wondering why this API doesn't create
+      // horrifyingly obvious XSS exploits, the answer is it totally
+      // does and you should blame bootstrap-autocomplete.
+      return text
+        .split("")
+        .map((char, idx) => (highlighted[idx] ? `<b>${char}</b>` : char))
+        .join("");
+    };
   }
 }
 
-export default connect(state => {
+export default connect((state) => {
   const responses = tagAll(state.responses, state.geotagView);
   return {
     responses: responses,

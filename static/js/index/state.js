@@ -37,6 +37,9 @@ export const initialState = {
   geotagView: GeotagView.standard,
   // Set of idx keys for the responses that are displayed.
   displayedResponses: null,
+  // Incremented when we want to the map view to adjust its zoom
+  // position (happens when we do a search).
+  mapViewSerial: 0,
 };
 
 // Global reducer for the app's Redux store.
@@ -76,6 +79,11 @@ export const reducer = (state = initialState, action) => {
       return {
         ...state,
         displayedResponses: null,
+      };
+    case "UPDATE_MAP_VIEW_ZOOM":
+      return {
+        ...state,
+        mapViewSerial: state.mapViewSerial + 1,
       };
     default:
       return state;

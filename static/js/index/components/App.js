@@ -41,8 +41,8 @@ class App extends React.Component {
           fadeSpeed={0}
           styles={{
             wrapper: { width: "100%", height: "100%" },
-            overlay: base => ({ ...base, background: "white" }),
-            content: base => ({ ...base, color: "black" }),
+            overlay: (base) => ({ ...base, background: "white" }),
+            content: (base) => ({ ...base, color: "black" }),
           }}
         >
           <MapView />
@@ -68,7 +68,7 @@ class App extends React.Component {
   }
 }
 
-export default connect(state => ({
+export default connect((state) => ({
   loadingStatus: state.loadingStatus,
   showingSidebar: state.displayedResponses !== null,
 }))(App);
