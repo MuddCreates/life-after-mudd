@@ -104,7 +104,8 @@ def get_data():
         try:
             # This API call takes about 125ms in my testing. Could be
             # optimized by doing our own JWT validation, probably. But
-            # that would really suck so let's hold off on that for now.
+            # that would really suck so let's hold off on that for
+            # now.
             #
             # https://developers.google.com/identity/sign-in/web/backend-auth
             idinfo = google.oauth2.id_token.verify_oauth2_token(
@@ -112,7 +113,10 @@ def get_data():
                 google.auth.transport.requests.Request(),
                 "548868103597-3th6ihbnejkscon1950m9mm31misvhk9.apps.googleusercontent.com",
             )
-            if idinfo["iss"] not in ("accounts.google.com", "https://accounts.google.com"):
+            if idinfo["iss"] not in (
+                "accounts.google.com",
+                "https://accounts.google.com",
+            ):
                 raise ValueError("Wrong issuer: {}".format(idinfo["iss"]))
             if idinfo["hd"] != "g.hmc.edu":
                 raise ValueError("Wrong domain: {}".format(idinfo["hd"]))
