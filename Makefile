@@ -13,10 +13,6 @@ help: ## Show this message
 docker: ## Run shell with source code and deps inside Docker
 	@scripts/docker-compose.bash run --service-ports web-dev
 
-.PHONY: tmux
-tmux: ## Start tmux so you can run commands in parallel
-	tmux new-session -s tmux
-
 .PHONY: down
 down: ## Download responses from Google Sheets to local JSON
 	./sheets.py download

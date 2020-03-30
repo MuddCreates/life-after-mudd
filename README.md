@@ -5,15 +5,13 @@ after graduation, using data from [this Google
 Form](https://forms.gle/PqEHTjpBDGBXfH4W8).
 
 First install [Docker](https://www.docker.com/). Then, to run:
-* Set up project and dependencies inside a Docker container (with
-  source synchronized with repo checkout), `make docker`.
-* Start up tmux, `make tmux`. Recall that `ctrl+b c` opens a new
-  window and `ctrl+b p/n` move between windows.
 * Obtain Google Drive API key from **@raxod502** and place it in
   `.oauth-private-key.json`.
+* Set up project and dependencies inside a Docker container (with
+  source synchronized with repo checkout), `make docker`.
 * Download form data, `make down`.
-* Build static site in development mode, `make build-dev`.
-* Start the development server, `make app-dev`.
+* Start the development server and build the static site in
+  development mode, `make app-dev & make build-dev`.
 * Head to <http://localhost:8080/admin> for the admin dashboard, and
   <http://localhost:8080> for the main webapp.
 
