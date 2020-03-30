@@ -1,4 +1,5 @@
 import os
+
 import redis
 
 # Some characters at the end of the token change each time, so we only use the
