@@ -1,4 +1,5 @@
 import os
+import sys
 
 import redis
 
@@ -19,7 +20,10 @@ if redis_url is not None:
     try:
         r = redis.from_url(redis_url)
     except:
-        print(f"failed to connect to redis at url: {redis_url}")
+        print(
+            f"Failed to connect to Redis, disabling OAuth caching: {redis_url}",
+            file=sys.stderr,
+        )
 
 
 def add_token(token, expiration_seconds=500):
