@@ -15,9 +15,11 @@ if redis_url is not None:
     except:
         print(f"failed to connect to redis at url: {redis_url}")
 
+
 def add_token(token, expiration_seconds=500):
     if r is not None:
         r.sadd(SET_NAME, token[:PREFIX_LENGTH])
+
 
 def check_token(token):
     if r is not None:
