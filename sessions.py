@@ -19,7 +19,7 @@ r = None
 if redis_url is not None:
     try:
         r = redis.from_url(redis_url)
-    except:
+    except Exception:
         print(
             f"Failed to connect to Redis, disabling OAuth caching: {redis_url}",
             file=sys.stderr,
