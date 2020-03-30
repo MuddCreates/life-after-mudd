@@ -11,8 +11,8 @@ services:
     volumes:
       - .:/home/docker/src
     ports:
-      - "8080:8080"
-      - "8081:8081"
+      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:8081:8081"
     environment:
       - HOST=0.0.0.0
       - PORT=8080
@@ -33,6 +33,6 @@ services:
       - REDIS_URL=redis://redis:6379
       - LAM_OAUTH_PRIVATE_KEY
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
   redis:
     image: "redis:alpine"
