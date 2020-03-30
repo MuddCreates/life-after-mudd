@@ -11,6 +11,7 @@ help: ## Show this message
 
 .PHONY: docker
 docker: ## Run shell with source code and deps inside Docker
+	@scripts/docker-compose.bash build web-dev
 	@scripts/docker-compose.bash run --rm --service-ports web-dev
 
 .PHONY: down
@@ -42,8 +43,8 @@ image: ## Build Docker image for deployment
 	@scripts/docker-compose.bash build web-prod
 
 .PHONY: image-run
-image-run: ## Build and run Docker image for deployment
-	@scripts/docker-compose.bash run --rm web-prod
+image-run: image ## Build and run Docker image for deployment
+	@scripts/docker-compose.bash run --rm -e LAM_OAUTH_PRIVATE_KEY=$$(< .oauth-private-key.json) web-prod
 
 .PHONY: deploy
 deploy: image ## Deploy webapp to Heroku
