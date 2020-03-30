@@ -1,3 +1,6 @@
+UID := $(shell id -u)
+export UID
+
 .PHONY: help
 help: ## Show this message
 	@echo "usage:" >&2
@@ -8,11 +11,8 @@ help: ## Show this message
 
 .PHONY: docker
 docker: ## Run shell with source code and deps inside Docker
-	@scripts/docker-build.bash "$(CMD)"
-
-.PHONY: tmux
-tmux: ## Start tmux so you can run commands in parallel
-	tmux new-session -s tmux
+	@scripts/docker-compose.bash build web-dev
+	@scripts/docker-compose.bash run --rm --service-ports web-dev
 
 .PHONY: down
 down: ## Download responses from Google Sheets to local JSON
@@ -32,24 +32,32 @@ build-dev: ## Build static files for development, and watch for changes
 
 .PHONY: app-prod
 app-prod: ## Start webserver for production
-	LAM_AUTOFETCH_ENABLED=1 gunicorn --workers 1 --threads 1 --bind $${HOST:-0.0.0.0}:$${PORT:-8080} app:app
+	LAM_AUTOFETCH_ENABLED=1						\
+		gunicorn --workers 1 --threads 1			\
+		--bind $${HOST:-127.0.0.1}:$${PORT:-8080} app:app
 
 .PHONY: app-dev
 app-dev: ## Start webserver in admin mode, with live-reload
-	LAM_ADMIN_ENABLED=1 watchexec -r -e py "flask run --host $${HOST:-127.0.0.1} --port $${PORT:-8080}"
+	LAM_ADMIN_ENABLED=1 watchexec -r -e py					\
+		"flask run --host $${HOST:-127.0.0.1} --port $${PORT:-8080}"
 
 .PHONY: image
 image: ## Build Docker image for deployment
-	@scripts/docker-build.bash --prod
+	@scripts/docker-compose.bash build web-prod
 
 .PHONY: image-run
-image-run: ## Build and run Docker image for deployment
-	@scripts/docker-build.bash --prod-run
+image-run: image ## Build and run Docker image for deployment
+	@LAM_OAUTH_PRIVATE_KEY="$$(< .oauth-private-key.json)"		\
+		scripts/docker-compose.bash run --rm --service-ports	\
+		-e LAM_OAUTH_PRIVATE_KEY web-prod			\
+		poetry run make app-prod
 
 .PHONY: deploy
 deploy: image ## Deploy webapp to Heroku
-	scripts/docker.bash tag life-after-mudd registry.heroku.com/life-after-mudd/web
-	heroku auth:token | scripts/docker.bash login --username=_ --password-stdin registry.heroku.com
+	scripts/docker.bash tag life-after-mudd		\
+		registry.heroku.com/life-after-mudd/web
+	heroku auth:token | scripts/docker.bash login			\
+		--username=_ --password-stdin registry.heroku.com
 	scripts/docker.bash push registry.heroku.com/life-after-mudd/web
 	heroku container:release web -a life-after-mudd
 

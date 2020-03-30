@@ -1,0 +1,37 @@
+version: "3"
+services:
+  web-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        - UID
+    depends_on:
+      - redis
+    volumes:
+      - .:/home/docker/src
+    ports:
+      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:8081:8081"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8080
+      - HMR_PORT=8081
+      - REDIS_URL=redis://redis:6379
+      - LAM_OAUTH_PRIVATE_KEY
+  web-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: life-after-mudd
+    depends_on:
+      - redis
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8080
+      - REDIS_URL=redis://redis:6379
+      - LAM_OAUTH_PRIVATE_KEY
+    ports:
+      - "127.0.0.1:8080:8080"
+  redis:
+    image: "redis:alpine"

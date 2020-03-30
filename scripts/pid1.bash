@@ -17,11 +17,6 @@ export LC_ALL=C.UTF-8
 # container.
 export POETRY_VIRTUALENVS_PATH="$PWD/.docker-venv"
 
-# We need the app server to bind to all interfaces even if it's
-# running in development mode, otherwise it won't be accessible
-# outside the container.
-export HOST=0.0.0.0
-
 poetry install
 yarn install
 exec poetry run "$@"
