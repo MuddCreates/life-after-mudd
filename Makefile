@@ -49,7 +49,8 @@ image: ## Build Docker image for deployment
 image-run: image ## Build and run Docker image for deployment
 	@LAM_OAUTH_PRIVATE_KEY="$$(< .oauth-private-key.json)"		\
 		scripts/docker-compose.bash run --rm --service-ports	\
-		-e LAM_OAUTH_PRIVATE_KEY web-prod
+		-e LAM_OAUTH_PRIVATE_KEY web-prod			\
+		poetry run make app-prod
 
 .PHONY: deploy
 deploy: image ## Deploy webapp to Heroku
