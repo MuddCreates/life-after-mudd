@@ -19,8 +19,6 @@ services:
       - HMR_PORT=8081
       - REDIS_URL=redis://redis:6379
       - LAM_OAUTH_PRIVATE_KEY
-    stdin_open: true
-    tty: true
   web-prod:
     build:
       context: .
