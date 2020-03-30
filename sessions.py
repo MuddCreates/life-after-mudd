@@ -2,12 +2,17 @@ import os
 
 import redis
 
-# Some characters at the end of the token change each time, so we only use the
-# The first time dependent field is ~500 characters in (at_hash)
+# Each time an OAuth token is issued to the same user, the last few
+# characters in the token change because they represent a hash which
+# differs for each issuance. We want to use OAuth tokens as a way to
+# identify when we are seeing the same user more than once, so we
+# employ the following disgusting hack to just restrict our attention
+# to the part of the token that doesn't change.
 PREFIX_LENGTH = 475
 SET_NAME = "TOKENS"
 
-# Heroku sets REDIS_URL to access the redis server
+# In production, we expect REDIS_URL to be set by Heroku. In
+# development, it comes from docker-compose.yml.
 redis_url = os.environ.get("REDIS_URL")
 r = None
 if redis_url is not None:
