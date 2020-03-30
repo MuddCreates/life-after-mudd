@@ -13,9 +13,10 @@ import sessions
 
 ADMIN_ENABLED = bool(os.environ.get("LAM_ADMIN_ENABLED"))
 AUTOFETCH_ENABLED = bool(os.environ.get("LAM_AUTOFETCH_ENABLED"))
+TLS_ENABLED = bool(os.environ.get("LAM_TLS_ENABLED"))
 
 app = flask.Flask(__name__)
-if not ADMIN_ENABLED:
+if TLS_ENABLED:
     flask_talisman.Talisman(app, content_security_policy=None)
 
 
