@@ -12,7 +12,8 @@ help: ## Show this message
 .PHONY: docker
 docker: ## Run shell with source code and deps inside Docker
 	@scripts/docker-compose.bash build web-dev
-	@scripts/docker-compose.bash run --rm --service-ports web-dev
+	@scripts/docker-compose.bash run --service-ports web-dev || true
+	@scripts/docker-compose.bash down
 
 .PHONY: down
 down: ## Download responses from Google Sheets to local JSON
@@ -47,10 +48,12 @@ image: ## Build Docker image for deployment
 
 .PHONY: image-run
 image-run: image ## Build and run Docker image for deployment
-	@LAM_OAUTH_PRIVATE_KEY="$$(< .oauth-private-key.json)"		\
-		scripts/docker-compose.bash run --rm --service-ports	\
-		-e LAM_OAUTH_PRIVATE_KEY web-prod			\
-		poetry run make app-prod
+	@scripts/docker-compose.bash down
+	@LAM_OAUTH_PRIVATE_KEY="$$(< .oauth-private-key.json)"	\
+		scripts/docker-compose.bash run --service-ports	\
+		-e LAM_OAUTH_PRIVATE_KEY web-prod		\
+		poetry run make app-prod || true
+	@scripts/docker-compose.bash down
 
 .PHONY: deploy
 deploy: image ## Deploy webapp to Heroku
