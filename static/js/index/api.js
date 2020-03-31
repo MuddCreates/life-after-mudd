@@ -1,6 +1,8 @@
 "use strict";
 
 import { thunk } from "./util";
+import Cookies from 'js-cookie';
+import { oauthSetupAction } from "./oauth";
 
 // Given a latitude and longitude (in reverse order), where both
 // values are strings, parse them into floats and return an object
@@ -41,8 +43,15 @@ function cleanResponses(responses) {
 // UI.
 export const fetchAction = thunk(async (dispatch) => {
   dispatch({ type: "FETCHING_DATA" });
-  const GoogleAuth = gapi.auth2.getAuthInstance();
-  const oauthToken = GoogleAuth.currentUser.get().getAuthResponse().id_token;
+
+  // Skip getting Oauth token if it is already stored as a cookie
+  let oauthToken = Cookies.get('oauthToken');
+    if (oauthToken === undefined) {
+        const GoogleAuth = gapi.auth2.getAuthInstance();
+        oauthToken = GoogleAuth.currentUser.get().getAuthResponse().id_token;
+        // Oauth tokens are persisted in cookies for one month
+        Cookies.set('oauthToken', oauthToken, {expires: 31});
+    }
   const response = await fetch("/api/v1/data", {
     method: "POST",
     headers: {
@@ -61,11 +70,20 @@ export const fetchAction = thunk(async (dispatch) => {
       // explanation. Who does that server think it is, anyway? We
       // don't need it anyway.
     }
-    throw new Error(`Got status ${response.status} from API` + explanation);
+
+    // Handle a bad oauth token saved locally by deleting the cookie and rerunning the oauthSetupAction phase
+    if (explanation === ": Bad token: Could not verify token signature."){
+      Cookies.remove('oauthToken');
+      dispatch(oauthSetupAction);
+    } else {
+      throw new Error(`Got status ${response.status} from API` + explanation);
+    }
   }
-  const responses = cleanResponses(await response.json());
-  dispatch({
-    type: "SHOW_DATA",
-    responses,
-  });
+  else {
+    const responses = cleanResponses(await response.json());
+    dispatch({
+      type: "SHOW_DATA",
+      responses,
+    });
+  }
 });
