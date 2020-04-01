@@ -117,7 +117,11 @@ function fillDefaults(responses) {
     r.email = r.email || r.rawEmail.replace("g.hmc.edu", "hmc.edu");
     r.name = clean(r.name || r.rawName);
     if (!r.major) {
-      r.major = clean(r.rawMajor.split(", ").join(" + "));
+      r.major = r.rawMajor
+        .split(", ")
+        .map((x) => capitalize(clean(x)))
+        .filter((x) => x)
+        .join(" + ");
     }
     r.path = clean(r.path || r.rawPath);
     r.org = capitalize(clean(r.org || r.rawOrg));
