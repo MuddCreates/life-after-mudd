@@ -64,8 +64,10 @@ export const fetchAction = thunk(async (dispatch) => {
   });
   if (!response.ok) {
     let explanation = "";
+    let err = null;
     try {
-      explanation = ": " + (await response.text());
+      err = await response.text();
+      explanation = ": " + err;
     } catch (e) {
       // If stream is interrupted, forget about getting an
       // explanation. Who does that server think it is, anyway? We
@@ -76,7 +78,7 @@ export const fetchAction = thunk(async (dispatch) => {
     Cookies.remove("oauthToken");
 
     // Handle a bad OAuth token cookie by rerunning the oauthSetupAction phase
-    if (explanation.startsWith(": Bad token")) {
+    if (err.startsWith("Bad token")) {
       dispatch(oauthSetupAction);
     } else {
       throw new Error(`Got status ${response.status} from API` + explanation);
