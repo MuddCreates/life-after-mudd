@@ -29,3 +29,16 @@ warning " > @mapbox/mapbox-gl-geocoder@4.5.1" has unmet peer dependency "mapbox-
 Because Parcel is incompatible with mapbox-gl for dumb reasons, we
 need to include mapbox-gl via `<script>` tag. Hence it's not installed
 through Yarn; that would just be misleading.
+
+## Test on mobile
+
+Unfortunately testing on mobile is, as always, a huge pain. First you
+must have SSH access to a server with a public IP address, call it
+`IP`. Suppose you can SSH with `ssh SERVER`. Then first run:
+
+    $ ssh -R 0.0.0.0:1234:localhost:8080 -N SERVER
+
+Now you can access the local webserver from anywhere on the Internet
+(include your mobile device of choice) at the URL
+
+    http://IP.xip.io:1234/
