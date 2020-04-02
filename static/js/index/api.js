@@ -72,10 +72,11 @@ export const fetchAction = thunk(async (dispatch) => {
       // don't need it anyway.
     }
 
-    // Handle a bad OAuth token saved locally by deleting the cookie
-    // and rerunning the oauthSetupAction phase
+    // Delete OAuth token in case it caused the error
+    Cookies.remove("oauthToken");
+
+    // Handle a bad OAuth token cookie by rerunning the oauthSetupAction phase
     if (explanation.startsWith(": Bad token")) {
-      Cookies.remove("oauthToken");
       dispatch(oauthSetupAction);
     } else {
       throw new Error(`Got status ${response.status} from API` + explanation);
