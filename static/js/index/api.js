@@ -2,8 +2,8 @@
 
 import Cookies from "js-cookie";
 
-import { thunk } from "./util";
 import { oauthSetupAction } from "./oauth";
+import { thunk } from "./util";
 
 // Given a latitude and longitude (in reverse order), where both
 // values are strings, parse them into floats and return an object
