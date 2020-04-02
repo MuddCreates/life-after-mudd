@@ -14,7 +14,7 @@ import { thunk } from "./util";
 const oauthCheckAuthAction = thunk((dispatch) => {
   dispatch({ type: "VERIFYING_OAUTH" });
 
-  // Only get auth instances if oauth token isn't in cookie
+  // Only get auth instances if OAuth token isn't in cookie
   if (Cookies.get("oauthToken") === undefined) {
     const GoogleAuth = gapi.auth2.getAuthInstance();
     if (GoogleAuth.currentUser.get().hasGrantedScopes("email")) {
@@ -33,7 +33,7 @@ const oauthCheckAuthAction = thunk((dispatch) => {
 export const oauthSetupAction = thunk(async (dispatch) => {
   dispatch({ type: "VERIFYING_OAUTH" });
 
-  // Only get auth instances if oauth token isn't in cookie
+  // Only get auth instances if OAuth token isn't in cookie
   if (Cookies.get("oauthToken") === undefined) {
     // https://developers.google.com/identity/protocols/OAuth2UserAgent
     await new Promise((resolve) => gapi.load("client:auth2", resolve));

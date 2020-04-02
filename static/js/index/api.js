@@ -45,12 +45,12 @@ function cleanResponses(responses) {
 export const fetchAction = thunk(async (dispatch) => {
   dispatch({ type: "FETCHING_DATA" });
 
-  // Skip getting Oauth token if it is already stored as a cookie
+  // Skip getting OAuth token if it is already stored as a cookie
   let oauthToken = Cookies.get("oauthToken");
   if (oauthToken === undefined) {
     const GoogleAuth = gapi.auth2.getAuthInstance();
     oauthToken = GoogleAuth.currentUser.get().getAuthResponse().id_token;
-    // Oauth tokens are persisted in cookies for one month
+    // OAuth tokens are persisted in cookies for one month
     Cookies.set("oauthToken", oauthToken, { expires: 31 });
   }
   const response = await fetch("/api/v1/data", {
