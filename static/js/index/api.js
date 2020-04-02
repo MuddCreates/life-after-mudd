@@ -72,8 +72,9 @@ export const fetchAction = thunk(async (dispatch) => {
       // don't need it anyway.
     }
 
-    // Handle a bad oauth token saved locally by deleting the cookie and rerunning the oauthSetupAction phase
-    if (explanation === ": Bad token: Could not verify token signature.") {
+    // Handle a bad OAuth token saved locally by deleting the cookie
+    // and rerunning the oauthSetupAction phase
+    if (explanation.startsWith(": Bad token")) {
       Cookies.remove("oauthToken");
       dispatch(oauthSetupAction);
     } else {
