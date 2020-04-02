@@ -64,6 +64,10 @@ deploy: image ## Deploy webapp to Heroku
 	scripts/docker.bash push registry.heroku.com/life-after-mudd/web
 	heroku container:release web -a life-after-mudd
 
+.PHONY: flush
+flush: ## Delete contents of Redis
+	scripts/docker-compose.bash exec redis redis-cli FLUSHALL
+
 .PHONY: sandwich
 sandwich: ## https://xkcd.com/149/
 	@if bash -c '[ "$${EUID}" != 0 ]'; then		\
