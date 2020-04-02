@@ -1,7 +1,8 @@
 "use strict";
 
-import { thunk } from "./util";
 import Cookies from "js-cookie";
+
+import { thunk } from "./util";
 import { oauthSetupAction } from "./oauth";
 
 // Given a latitude and longitude (in reverse order), where both

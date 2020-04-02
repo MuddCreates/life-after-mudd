@@ -1,8 +1,9 @@
 "use strict";
 
+import Cookies from "js-cookie";
+
 import { fetchAction } from "./api";
 import { thunk } from "./util";
-import Cookies from "js-cookie";
 
 // Check if the session is currently authenticated with the necessary
 // permissions. If it is and the UI is currently in an OAuth state,
