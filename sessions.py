@@ -3,15 +3,6 @@ import sys
 
 import redis
 
-# Each time an OAuth token is issued to the same user, the last few
-# characters in the token change because they represent a hash which
-# differs for each issuance. We want to use OAuth tokens as a way to
-# identify when we are seeing the same user more than once, so we
-# employ the following disgusting hack to just restrict our attention
-# to the part of the token that doesn't change. This variable holds
-# the length of the prefix that we consider.
-PREFIX_LENGTH = 475
-
 # Redis key used to store the set of known-good tokens.
 SET_NAME = "TOKENS"
 
@@ -39,11 +30,11 @@ else:
 
 def add_token(token, expiration_seconds=OAUTH_CACHE_TIMEOUT):
     if r:
-        r.sadd(SET_NAME, token[:PREFIX_LENGTH])
+        r.sadd(SET_NAME, token)
 
 
 def check_token(token):
     if r:
-        return r.sismember(SET_NAME, token[:PREFIX_LENGTH])
+        return r.sismember(SET_NAME, token)
     else:
         return False

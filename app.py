@@ -123,6 +123,7 @@ def get_data():
                 raise ValueError("Wrong domain: {}".format(idinfo["hd"]))
             sessions.add_token(token)
         except ValueError as e:
+            # Be careful changing. This is a magic string for the front end
             return "Bad token: {}".format(e), 401
     try:
         with open("data.json") as f:

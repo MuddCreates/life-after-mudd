@@ -121,7 +121,7 @@ class MapView extends React.Component {
       this.lastBounds = bounds;
     }
     return (
-      <div>
+      <div id="mapContainerContainer">
         <Map
           style="mapbox://styles/raxod502/ck6nxepcj03jv1jqe6a7p8om4"
           fitBounds={bounds}
@@ -193,6 +193,20 @@ class MapView extends React.Component {
       }
     }
   };
+  componentDidMount() {
+    // XXX: Horrifying hack. On Android there is a bug that affects at
+    // least Chrome and Firefox where the viewport gets resized when
+    // the on-screen keyboard comes up (which happens when you focus
+    // any text input). This looks like trash because the map
+    // automatically zooms to fit the new viewport. No such issue on
+    // iOS. We hack it by just freezing the app's height on load, but
+    // only on Android.
+    if (navigator.userAgent.toLowerCase().indexOf("android") != -1) {
+      const c = document.getElementById("mapContainerContainer").children[0];
+      window.c = c;
+      c.style.height = c.offsetHeight + "px";
+    }
+  }
 }
 
 export default connect((state) => ({

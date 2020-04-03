@@ -11,9 +11,9 @@ help: ## Show this message
 
 .PHONY: docker
 docker: ## Run shell with source code and deps inside Docker
-	@scripts/docker-compose.bash build web-dev
-	@scripts/docker-compose.bash run --service-ports web-dev || true
-	@scripts/docker-compose.bash down
+	scripts/docker-compose.bash build web-dev
+	scripts/docker-compose.bash run --service-ports web-dev || true
+	scripts/docker-compose.bash down
 
 .PHONY: down
 down: ## Download responses from Google Sheets to local JSON
@@ -44,16 +44,16 @@ app-dev: ## Start webserver in admin mode, with live-reload
 
 .PHONY: image
 image: ## Build Docker image for deployment
-	@scripts/docker-compose.bash build web-prod
+	scripts/docker-compose.bash build web-prod
 
 .PHONY: image-run
 image-run: image ## Build and run Docker image for deployment
-	@scripts/docker-compose.bash down
-	@LAM_OAUTH_PRIVATE_KEY="$$(< .oauth-private-key.json)"	\
+	scripts/docker-compose.bash down
+	LAM_OAUTH_PRIVATE_KEY="$$(< .oauth-private-key.json)"	\
 		scripts/docker-compose.bash run --service-ports	\
 		-e LAM_OAUTH_PRIVATE_KEY web-prod		\
 		poetry run make app-prod || true
-	@scripts/docker-compose.bash down
+	scripts/docker-compose.bash down
 
 .PHONY: deploy
 deploy: image ## Deploy webapp to Heroku
@@ -63,6 +63,10 @@ deploy: image ## Deploy webapp to Heroku
 		--username=_ --password-stdin registry.heroku.com
 	scripts/docker.bash push registry.heroku.com/life-after-mudd/web
 	heroku container:release web -a life-after-mudd
+
+.PHONY: flush
+flush: ## Delete contents of Redis
+	scripts/docker-compose.bash exec redis redis-cli FLUSHALL
 
 .PHONY: sandwich
 sandwich: ## https://xkcd.com/149/
