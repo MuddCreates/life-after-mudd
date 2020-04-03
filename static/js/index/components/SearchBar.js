@@ -16,6 +16,7 @@ require("bootstrap-autocomplete");
 import { failHard } from "../error";
 import { tagAll } from "../tag";
 import { store } from "../redux";
+import { SidebarView } from "../state";
 
 const statesByName = {};
 const statesByAbbr = {};
@@ -153,6 +154,7 @@ function doSearch(query, index) {
   store.dispatch({
     type: "SHOW_DETAILS",
     responses: index.get(query).map((resp) => resp.idx),
+    sidebarView: SidebarView.summaryView,
   });
   store.dispatch({
     type: "UPDATE_MAP_VIEW_ZOOM",

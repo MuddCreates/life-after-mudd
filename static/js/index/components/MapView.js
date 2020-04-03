@@ -11,6 +11,7 @@ import { sidebarWidthFraction } from "../config";
 import { tagAll } from "../tag";
 import { store } from "../redux";
 import { GeotagView } from "../state";
+import { SidebarView } from "../state";
 
 const CIRCLE_RADIUS = 10;
 const HIGHLIGHT_BBOX_RADIUS = 10;
@@ -183,6 +184,7 @@ class MapView extends React.Component {
         store.dispatch({
           type: "SHOW_DETAILS",
           responses: Array.from(nearbyPoints),
+          sidebarView: SidebarView.summaryView,
         });
       } else {
         store.dispatch({
