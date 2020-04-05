@@ -20,10 +20,12 @@ export const GeotagView = Object.freeze({
 });
 
 export const SidebarView = Object.freeze({
-  // Show results grouped by location, then company
+  // Show results grouped by location, then organization
   summaryView: "summaryView",
   // Show detailed info about a particular person
   detailView: "detailView",
+  // Show results grouped by organization, then location
+  organizationView: "organizationView",
 })
 
 // Initial state for the Redux store. Covers the whole app.

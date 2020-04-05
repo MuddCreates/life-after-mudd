@@ -47,13 +47,37 @@ function describeSubject(taggedSubject){
 
 class Sidebar extends React.Component {
   render() {
-    const grouped = groupPlansConfigurable(
-      tagAll(this.props.responses, this.props.geotagView), resp => resp.tag.loc, resp => resp.tag.desc,
-    );
+    let grouped = null;
+    let firstKeyAction = null;
+    let secondKeyAction = null;
     let sidebarContent = null;
+
     switch (this.props.sidebarView){
       case SidebarView.summaryView:
-        console.log("in summary view");
+      grouped = groupPlansConfigurable(
+        tagAll(this.props.responses, this.props.geotagView), resp => resp.tag.loc, resp => resp.tag.desc,
+      );
+      firstKeyAction = (secondKeys) => {
+        store.dispatch({
+          type: "SHOW_DETAILS",
+          responses: secondKeys.flatMap(item => item.responses.map(resp => resp.idx)),
+          sidebarView: SidebarView.summaryView,
+        });
+        store.dispatch({
+          type: "UPDATE_MAP_VIEW_ZOOM",
+        });
+      };
+
+      secondKeyAction = (responses) => {
+        store.dispatch({
+          type: "SHOW_DETAILS",
+          responses: responses.map(resp => resp.idx),
+          sidebarView: SidebarView.organizationView,
+        });
+        store.dispatch({
+          type: "UPDATE_MAP_VIEW_ZOOM",
+        });
+      };
         sidebarContent = (
         <div
           style={{
@@ -69,18 +93,84 @@ class Sidebar extends React.Component {
         >
           {grouped.map(({ firstKey, secondKeys}, idx) => (
             <Fragment key={idx}>
-              <h5>
+              <h5 onClick={() => firstKeyAction(secondKeys)}>
                 <b>{firstKey}</b>
               </h5>
               {secondKeys.map(({ secondKey, responses }, idx) => (
                 <Fragment key={idx}>
-                  <b>{secondKey}</b>
+                  <b onClick={()=>secondKeyAction(responses)}>{secondKey}</b>
                   {responses.map((resp, idx) => (
                       <div
                     key={idx}
                     onClick={
                       () => {
-                        console.log([resp]);
+                        store.dispatch({
+                        type: "SHOW_DETAILS",
+                        responses: [resp.idx],
+                          sidebarView: SidebarView.detailView,
+                        });
+                      }
+                    }>{resp.name || "Anonymous"}</div>
+                  ))}
+                </Fragment>
+              ))}
+            </Fragment>
+          ))}
+        </div>
+        );
+      break;
+
+    case SidebarView.organizationView:
+      grouped = groupPlansConfigurable(
+        tagAll(this.props.responses, this.props.geotagView), resp => resp.tag.desc, resp => resp.tag.loc,
+      );
+      firstKeyAction = (secondKeys) => {
+        store.dispatch({
+          type: "SHOW_DETAILS",
+          responses: secondKeys.flatMap(item => item.responses.map(resp => resp.idx)),
+          sidebarView: SidebarView.organizationView,
+        });
+        store.dispatch({
+          type: "UPDATE_MAP_VIEW_ZOOM",
+        });
+      };
+
+      secondKeyAction = (responses) => {
+        store.dispatch({
+          type: "SHOW_DETAILS",
+          responses: responses.map(resp => resp.idx),
+          sidebarView: SidebarView.summaryView,
+        });
+        store.dispatch({
+          type: "UPDATE_MAP_VIEW_ZOOM",
+        });
+      };
+        sidebarContent = (
+        <div
+          style={{
+            position: "absolute",
+            left: `${(1 - sidebarWidthFraction) * 100}%`,
+            top: "0",
+            width: `${sidebarWidthFraction * 100}%`,
+            height: "100%",
+            padding: "10px",
+            background: "white",
+            zIndex: "3",
+          }}
+        >
+          {grouped.map(({ firstKey, secondKeys}, idx) => (
+            <Fragment key={idx}>
+              <h5 onClick={() => firstKeyAction(secondKeys)}>
+                <b>{firstKey}</b>
+              </h5>
+              {secondKeys.map(({ secondKey, responses }, idx) => (
+                <Fragment key={idx}>
+                  <b onClick={()=>secondKeyAction(responses)}>{secondKey}</b>
+                  {responses.map((resp, idx) => (
+                      <div
+                    key={idx}
+                    onClick={
+                      () => {
                         store.dispatch({
                         type: "SHOW_DETAILS",
                         responses: [resp.idx],
@@ -98,8 +188,6 @@ class Sidebar extends React.Component {
       break;
     case SidebarView.detailView:
       const subject = tag(this.props.responses[0], this.props.geotagView);
-      console.log("in detailed view");
-      console.log(subject);
       sidebarContent = (
           <div
         style={{
