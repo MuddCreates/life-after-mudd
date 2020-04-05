@@ -9,31 +9,46 @@ import { store } from "../redux";
 import { SidebarView } from "../state";
 import { tag, tagAll } from "../tag";
 
-function groupPlans(responses) {
+function groupPlansConfigurable(responses, getFirstGroupKey, getSecondGroupKey) {
   const index = {};
   for (const resp of responses) {
-    if (!index[resp.tag.loc]) {
-      index[resp.tag.loc] = [];
+    const firstGroupKey = getFirstGroupKey(resp);
+    const secondGroupKey = getSecondGroupKey(resp);
+
+    if (!index[firstGroupKey]) {
+      index[firstGroupKey] = [];
     }
-    if (!index[resp.tag.loc][resp.tag.desc]) {
-      index[resp.tag.loc][resp.tag.desc] = [];
+    if (!index[firstGroupKey][secondGroupKey]) {
+      index[firstGroupKey][secondGroupKey] = [];
     }
-    index[resp.tag.loc][resp.tag.desc].push(resp);
+    index[firstGroupKey][secondGroupKey].push(resp);
   }
   return Object.keys(index)
     .sort()
-    .map((loc) => ({
-      loc,
-      descs: Object.keys(index[loc])
+    .map((firstKey) => ({
+      firstKey,
+      secondKeys: Object.keys(index[firstKey])
         .sort()
-        .map((desc) => ({ desc, responses: index[loc][desc] })),
+        .map((secondKey) => ({ secondKey, responses: index[firstKey][secondKey] })),
     }));
+}
+
+// TODO: Ignore empty fields
+function describeSubject(taggedSubject){
+  return (
+      <div>
+      <h5><b> {taggedSubject.name}</b></h5>
+      <div>{taggedSubject.tag.desc} in {taggedSubject.tag.loc}</div>
+      <div>Majored in {taggedSubject.major}</div>
+      <div>Note: {taggedSubject.comments}</div>
+    </div>
+  );
 }
 
 class Sidebar extends React.Component {
   render() {
-    const grouped = groupPlans(
-      tagAll(this.props.responses, this.props.geotagView),
+    const grouped = groupPlansConfigurable(
+      tagAll(this.props.responses, this.props.geotagView), resp => resp.tag.loc, resp => resp.tag.desc,
     );
     let sidebarContent = null;
     switch (this.props.sidebarView){
@@ -52,14 +67,14 @@ class Sidebar extends React.Component {
             zIndex: "3",
           }}
         >
-          {grouped.map(({ loc, descs }, idx) => (
+          {grouped.map(({ firstKey, secondKeys}, idx) => (
             <Fragment key={idx}>
               <h5>
-                <b>{loc}</b>
+                <b>{firstKey}</b>
               </h5>
-              {descs.map(({ desc, responses }, idx) => (
+              {secondKeys.map(({ secondKey, responses }, idx) => (
                 <Fragment key={idx}>
-                  <b>{desc}</b>
+                  <b>{secondKey}</b>
                   {responses.map((resp, idx) => (
                       <div
                     key={idx}
@@ -98,10 +113,7 @@ class Sidebar extends React.Component {
           zIndex: "3",
         }}
           >
-            <h5>
-              <b>{subject.name}</b>
-            </h5>
-          <div>Working at {subject.org} in {subject.tag.loc}</div>
+          {describeSubject(subject)}
           </div>
       );
     }
