@@ -60,8 +60,14 @@ class App extends React.Component {
       });
     }
   }
+  resizeListener() {
+    store.dispatch({
+      type: "WINDOW_RESIZED",
+    });
+  }
   componentDidMount() {
     document.addEventListener("keydown", this.keyListener, false);
+    window.addEventListener("resize", this.resizeListener);
   }
   componentWillUnmount() {
     document.removeEventListener("keydown", this.keyListener, false);

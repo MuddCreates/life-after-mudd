@@ -7,7 +7,7 @@ import { Feature, Layer } from "react-mapbox-gl";
 import { connect } from "react-redux";
 
 import { mapboxAccessToken } from "../../shared";
-import { sidebarWidthFraction } from "../config";
+import { sidebarWidthFraction, sidebarHeightFraction } from "../config";
 import { tagAll } from "../tag";
 import { store } from "../redux";
 import { GeotagView } from "../state";
@@ -107,11 +107,19 @@ class MapView extends React.Component {
         top += (zoomLimit - vertDisp) / 2;
         vertDisp = zoomLimit;
       }
-      left -= horizDisp / 4;
-      right += horizDisp / 4;
-      bottom -= vertDisp / 4;
-      top += vertDisp / 4;
-      right += (right - left) * (1 / (1 - sidebarWidthFraction) - 1);
+      left -= horizDisp / 3;
+      right += horizDisp / 3;
+      bottom -= vertDisp / 3;
+      top += vertDisp / 3;
+      // Account for sidebar.
+      if (this.props.sidebarVertical) {
+        right +=
+          ((right - left) * sidebarWidthFraction) / (1 - sidebarWidthFraction);
+      } else {
+        bottom -=
+          ((top - bottom) * sidebarHeightFraction) /
+          (1 - sidebarHeightFraction);
+      }
       bounds = [
         [left, bottom],
         [right, top],
@@ -215,4 +223,5 @@ export default connect((state) => ({
     ),
   displayedResponses: new Set(state.displayedResponses),
   serial: state.mapViewSerial,
+  sidebarVertical: state.landscape,
 }))(MapView);

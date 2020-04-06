@@ -19,3 +19,8 @@ export function thunk(action) {
     }
   };
 }
+
+// Return true if the browser is in landscape mode, false otherwise.
+export function inLandscapeMode() {
+  return window.matchMedia("(orientation: landscape)").matches;
+}

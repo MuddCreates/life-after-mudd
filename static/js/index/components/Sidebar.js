@@ -4,7 +4,7 @@ import React from "react";
 import { Fragment } from "react";
 import { connect } from "react-redux";
 
-import { sidebarWidthFraction } from "../config";
+import { sidebarWidthFraction, sidebarHeightFraction } from "../config";
 import { tagAll } from "../tag";
 
 function groupPlans(responses) {
@@ -33,19 +33,29 @@ class Sidebar extends React.Component {
     const grouped = groupPlans(
       tagAll(this.props.responses, this.props.geotagView),
     );
+    const style = {
+      position: "absolute",
+      padding: "10px",
+      background: "white",
+      zIndex: "3",
+    };
+    if (this.props.showVertically) {
+      Object.assign(style, {
+        left: `${(1 - sidebarWidthFraction) * 100}%`,
+        top: "0",
+        width: `${sidebarWidthFraction * 100}%`,
+        height: "100%",
+      });
+    } else {
+      Object.assign(style, {
+        left: "0",
+        top: `${(1 - sidebarHeightFraction) * 100}%`,
+        width: "100%",
+        height: `${sidebarHeightFraction * 100}%`,
+      });
+    }
     return (
-      <div
-        style={{
-          position: "absolute",
-          left: `${(1 - sidebarWidthFraction) * 100}%`,
-          top: "0",
-          width: `${sidebarWidthFraction * 100}%`,
-          height: "100%",
-          padding: "10px",
-          background: "white",
-          zIndex: "3",
-        }}
-      >
+      <div style={style}>
         {grouped.map(({ loc, descs }, idx) => (
           <Fragment key={idx}>
             <h5>
@@ -73,5 +83,6 @@ export default connect((state) => {
       displayedResponses.has(resp.idx),
     ),
     geotagView: state.geotagView,
+    showVertically: state.landscape,
   };
 })(Sidebar);
