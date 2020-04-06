@@ -107,6 +107,7 @@ class MapView extends React.Component {
         top += (zoomLimit - vertDisp) / 2;
         vertDisp = zoomLimit;
       }
+      // Add extra margin just for show.
       left -= horizDisp / 3;
       right += horizDisp / 3;
       bottom -= vertDisp / 3;
