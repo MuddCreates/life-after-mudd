@@ -7,7 +7,11 @@ import { Feature, Layer } from "react-mapbox-gl";
 import { connect } from "react-redux";
 
 import { mapboxAccessToken } from "../../shared";
-import { sidebarWidthFraction, sidebarHeightFraction } from "../config";
+import {
+  searchBarOcclusion,
+  sidebarWidthFraction,
+  sidebarHeightFraction,
+} from "../config";
 import { tagAll } from "../tag";
 import { store } from "../redux";
 import { GeotagView } from "../state";
@@ -112,15 +116,19 @@ class MapView extends React.Component {
       right += horizDisp / 3;
       bottom -= vertDisp / 3;
       top += vertDisp / 3;
-      // Account for sidebar.
+      // Account for sidebar and search bar.
+      const searchBarHeightFraction = searchBarOcclusion / window.innerHeight;
+      const prevWidth = right - left;
+      const prevHeight = top - bottom;
       if (this.props.sidebarVertical) {
         right +=
-          ((right - left) * sidebarWidthFraction) / (1 - sidebarWidthFraction);
+          (prevWidth * sidebarWidthFraction) / (1 - sidebarWidthFraction);
       } else {
         bottom -=
-          ((top - bottom) * sidebarHeightFraction) /
-          (1 - sidebarHeightFraction);
+          (prevHeight * sidebarHeightFraction) / (1 - sidebarHeightFraction);
       }
+      top +=
+        (prevHeight * searchBarHeightFraction) / (1 - searchBarHeightFraction);
       bounds = [
         [left, bottom],
         [right, top],

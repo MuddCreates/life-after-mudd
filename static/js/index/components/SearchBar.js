@@ -171,6 +171,9 @@ class SearchBar extends React.Component {
     // search bar resizes depending on screen width like this, so I
     // copied and pasted CSS properties from the Chrome inspector (to
     // make them unconditional) until it stopped moving around. Yuck!
+    //
+    // When changing layout stuff here, also change searchBarOcclusion
+    // in config.js.
     const input = (
       <input
         className="mapboxgl-ctrl-geocoder--input"
