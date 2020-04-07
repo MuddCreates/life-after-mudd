@@ -261,6 +261,13 @@ class SearchBar extends React.Component {
         }
       }
     });
+    // ESC dismisses our completions. Prevent it from bubbling up and
+    // doing other stuff too, like dismissing the sidebar.
+    $(this.input.current).on("keydown", (event) => {
+      if (event.key === "Escape") {
+        event.stopImmediatePropagation();
+      }
+    });
     // Fix highlighting behavior. (Why isn't this customizable?)
     dd._showMatchedText = dd.showMatchedText;
     dd.showMatchedText = (text, query) => {
