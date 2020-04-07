@@ -11,4 +11,10 @@ export const sidebarHeightFraction = 0.4;
 // highest-level search bar wrapper element and doing offsetTop +
 // offsetHeight. This should be changed if the CSS hacks in
 // SearchBar.js are changed.
-export const searchBarOcclusion = 56;
+export const searchBarOcclusion = 36 + 20;
+
+// Minimum number of pixels allowed for the map view before we
+// force portait mode regardless of height. This was calculated by
+// adding the search bar desired width to twice its padding. Again,
+// change this if the CSS hacks in SearchBar.js are modified.
+export const minLandscapeWidth = 333 + 40;

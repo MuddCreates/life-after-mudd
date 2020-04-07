@@ -1,5 +1,6 @@
 "use strict";
 
+import { minLandscapeWidth, sidebarWidthFraction } from "./config";
 import { failHard } from "./error";
 
 // Given a Redux action, wrap it with error handling so that if an
@@ -22,5 +23,8 @@ export function thunk(action) {
 
 // Return true if the browser is in landscape mode, false otherwise.
 export function inLandscapeMode() {
-  return window.matchMedia("(orientation: landscape)").matches;
+  return (
+    window.matchMedia("(orientation: landscape)").matches &&
+    window.innerWidth * (1 - sidebarWidthFraction) >= minLandscapeWidth
+  );
 }
