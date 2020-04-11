@@ -13,8 +13,11 @@ export const sidebarHeightFraction = 0.4;
 // SearchBar.js are changed.
 export const searchBarOcclusion = 36 + 20;
 
+// Width of the search bar in pixels.
+export const searchBarWidth = 333;
+
 // Minimum number of pixels allowed for the map view before we
 // force portait mode regardless of height. This was calculated by
 // adding the search bar desired width to twice its padding. Again,
 // change this if the CSS hacks in SearchBar.js are modified.
-export const minLandscapeWidth = 333 + 40;
+export const minLandscapeWidth = searchBarWidth + 40;

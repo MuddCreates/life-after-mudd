@@ -13,6 +13,7 @@ window.$ = window.jQuery = require("jquery");
 require("bootstrap");
 require("bootstrap-autocomplete");
 
+import { searchBarWidth } from "../config";
 import { failHard } from "../error";
 import { tagAll } from "../tag";
 import { store } from "../redux";
@@ -189,13 +190,14 @@ class SearchBar extends React.Component {
           position: "absolute",
           left: "20px",
           top: "20px",
-          width: "333px",
+          width: `${searchBarWidth}px`,
+          maxWidth: "calc(100% - 40px)",
           touchAction: "none",
         }}
       >
         <div
           className="mapboxgl-ctrl-geocoder mapboxgl-ctrl"
-          style={{ width: "100%" }}
+          style={{ width: "100%", maxWidth: "100%" }}
         >
           <svg
             className="mapboxgl-ctrl-geocoder--icon mapboxgl-ctrl-geocoder--icon-search"
