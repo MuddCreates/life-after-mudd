@@ -6,6 +6,11 @@ import { connect } from "react-redux";
 
 import { sidebarWidthFraction, sidebarHeightFraction } from "../config";
 import { tagAll } from "../tag";
+import {
+  allowResizingWindow,
+  originalWindowWidth,
+  originalWindowHeight,
+} from "../util";
 
 function groupPlans(responses) {
   const index = {};
@@ -41,17 +46,25 @@ class Sidebar extends React.Component {
     };
     if (this.props.showVertically) {
       Object.assign(style, {
-        left: `${(1 - sidebarWidthFraction) * 100}%`,
+        left: allowResizingWindow()
+          ? `${(1 - sidebarWidthFraction) * 100}%`
+          : `${(1 - sidebarWidthFraction) * originalWindowWidth}px`,
         top: "0",
-        width: `${sidebarWidthFraction * 100}%`,
-        height: "100%",
+        width: allowResizingWindow()
+          ? `${sidebarWidthFraction * 100}%`
+          : `${sidebarWidthFraction * originalWindowWidth}px`,
+        height: allowResizingWindow() ? "100%" : `${originalWindowHeight}px`,
       });
     } else {
       Object.assign(style, {
         left: "0",
-        top: `${(1 - sidebarHeightFraction) * 100}%`,
-        width: "100%",
-        height: `${sidebarHeightFraction * 100}%`,
+        top: allowResizingWindow()
+          ? `${(1 - sidebarHeightFraction) * 100}%`
+          : `${(1 - sidebarHeightFraction) * originalWindowHeight}px`,
+        width: allowResizingWindow() ? "100%" : `${originalWindowWidth}px`,
+        height: allowResizingWindow()
+          ? `${sidebarHeightFraction * 100}%`
+          : `${sidebarHeightFraction * originalWindowHeight}px`,
       });
     }
     return (

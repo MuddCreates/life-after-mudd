@@ -33,7 +33,7 @@ class App extends React.Component {
         failHard(`Unknown loading status: ${this.props.loadingStatus}`);
     }
     return (
-      <>
+      <div style={{ overflow: "hidden" }}>
         <LoadingOverlay
           active={isLoading}
           spinner={<ScaleLoader />}
@@ -50,7 +50,7 @@ class App extends React.Component {
           {this.props.showingSidebar && <Sidebar />}
         </LoadingOverlay>
         <LoginModal />
-      </>
+      </div>
     );
   }
   keyListener(e) {

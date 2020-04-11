@@ -28,3 +28,18 @@ export function inLandscapeMode() {
     window.innerWidth * (1 - sidebarWidthFraction) >= minLandscapeWidth
   );
 }
+
+export const originalWindowWidth = window.innerWidth;
+export const originalWindowHeight = window.innerHeight;
+
+// XXX: Horrifying hack. On Android there is a bug that affects at
+// least Chrome and Firefox where the viewport gets resized when
+// the on-screen keyboard comes up (which happens when you focus
+// any text input). This looks like trash because it breaks a bunch of
+// pieces of CSS and causes stuff to resize. No such issue on
+// iOS. We hack it by just freezing the app's height on load and then
+// hardcoding that height into all of our generated CSS, but only on
+// Android (otherwise we use proper CSS). Thanks, Google.
+export function allowResizingWindow() {
+  return navigator.userAgent.toLowerCase().indexOf("android") === -1;
+}

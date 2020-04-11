@@ -1,6 +1,5 @@
 "use strict";
 
-import $ from "jquery";
 import React from "react";
 import ReactMapboxGl from "react-mapbox-gl";
 import { Feature, Layer } from "react-mapbox-gl";
@@ -14,7 +13,7 @@ import {
 } from "../config";
 import { tagAll } from "../tag";
 import { store } from "../redux";
-import { GeotagView } from "../state";
+import { allowResizingWindow, originalWindowHeight } from "../util";
 
 const CIRCLE_RADIUS = 10;
 const HIGHLIGHT_BBOX_RADIUS = 10;
@@ -146,7 +145,11 @@ class MapView extends React.Component {
           onMouseDown={this.onMouseEvent}
           onMouseMove={this.onMouseEvent}
           onMouseUp={this.onMouseEvent}
-          containerStyle={{ height: "100vh" }}
+          containerStyle={{
+            height: allowResizingWindow()
+              ? "100vh"
+              : originalWindowHeight + "px",
+          }}
         >
           {layer}
         </Map>
@@ -208,20 +211,6 @@ class MapView extends React.Component {
       }
     }
   };
-  componentDidMount() {
-    // XXX: Horrifying hack. On Android there is a bug that affects at
-    // least Chrome and Firefox where the viewport gets resized when
-    // the on-screen keyboard comes up (which happens when you focus
-    // any text input). This looks like trash because the map
-    // automatically zooms to fit the new viewport. No such issue on
-    // iOS. We hack it by just freezing the app's height on load, but
-    // only on Android.
-    if (navigator.userAgent.toLowerCase().indexOf("android") != -1) {
-      const c = document.getElementById("mapContainerContainer").children[0];
-      window.c = c;
-      c.style.height = c.offsetHeight + "px";
-    }
-  }
 }
 
 export default connect((state) => ({

@@ -1,6 +1,6 @@
 "use strict";
 
-import { inLandscapeMode } from "./util";
+import { allowResizingWindow, inLandscapeMode } from "./util";
 
 // Enum that indicates whether a loading spinner is displayed
 // overlaying the map, and if so what message is shown.
@@ -90,10 +90,13 @@ export const reducer = (state = initialState, action) => {
         mapViewSerial: state.mapViewSerial + 1,
       };
     case "WINDOW_RESIZED":
-      return {
-        ...state,
-        landscape: inLandscapeMode(),
-      };
+      if (allowResizingWindow()) {
+        state = {
+          ...state,
+          landscape: inLandscapeMode(),
+        };
+      }
+      return state;
     default:
       return state;
   }
