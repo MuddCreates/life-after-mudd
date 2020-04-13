@@ -80,6 +80,7 @@ class MapView extends React.Component {
       );
     }
     let bounds = this.lastBounds;
+    let animated = false;
     if (
       this.lastSerial !== this.props.serial &&
       this.props.displayedResponses.size > 0
@@ -134,13 +135,14 @@ class MapView extends React.Component {
       ];
       this.lastSerial = this.props.serial;
       this.lastBounds = bounds;
+      animated = true;
     }
     return (
       <div id="mapContainerContainer">
         <Map
           style="mapbox://styles/raxod502/ck6nxepcj03jv1jqe6a7p8om4"
           fitBounds={bounds}
-          fitBoundsOptions={{ duration: 0 }}
+          fitBoundsOptions={{ duration: animated ? 3000 : 0 }}
           onClick={this.onMouseEvent}
           onMouseDown={this.onMouseEvent}
           onMouseMove={this.onMouseEvent}
