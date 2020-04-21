@@ -303,7 +303,18 @@ class SearchBar extends React.Component {
         .map((char, idx) => (highlighted[idx] ? `<b>${char}</b>` : char))
         .join("");
     };
+    document.addEventListener("keydown", this.keyListener, false);
   }
+  keyListener = (e) => {
+    if (
+      e.key === "/" &&
+      document.activeElement.tagName.toLowerCase() !== "input"
+    ) {
+      console.log(document.activeElement.tagName);
+      $(this.input.current).focus();
+      e.preventDefault();
+    }
+  };
 }
 
 export default connect((state) => {
