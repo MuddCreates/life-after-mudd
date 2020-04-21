@@ -85,15 +85,17 @@ class MapView extends React.Component {
       );
     }
     return (
-      <div id="mapContainerContainer">
+      <div
+        id="mapContainerContainer"
+        onClick={this.onMouseEvent}
+        onMouseDown={this.onMouseEvent}
+        onMouseMove={this.onMouseEvent}
+        onMouseUp={this.onMouseEvent}
+      >
         <Map
           style="mapbox://styles/raxod502/ck6nxepcj03jv1jqe6a7p8om4"
           fitBounds={this.initialBounds}
           fitBoundsOptions={{ duration: 0 }}
-          onClick={this.onMouseEvent}
-          onMouseDown={this.onMouseEvent}
-          onMouseMove={this.onMouseEvent}
-          onMouseUp={this.onMouseEvent}
           onStyleLoad={(map) => {
             // Need to extract the actual Mapbox map so we can use it
             // from componentDidUpdate.
@@ -228,9 +230,9 @@ class MapView extends React.Component {
     }
     return nearbyPoints;
   };
-  onMouseEvent = (map, e) => {
-    window.map = map;
-    if (!map.getLayer("people")) {
+  onMouseEvent = (e) => {
+    console.log(e.type);
+    if (!this.map || !this.map.getLayer("people")) {
       // Map not fully loaded yet, refrain from messing with it to
       // avoid errors.
       return;
@@ -242,17 +244,20 @@ class MapView extends React.Component {
     } else if (e.type === "mousemove" && this.mouseState !== "up") {
       this.mouseState = "drag";
     }
-    const nearbyPoints = this.getNearbyPoints(map, e.point);
+    const nearbyPoints = this.getNearbyPoints(this.map, {
+      x: e.clientX,
+      y: e.clientY,
+    });
     // This follows the conventions set by Google Maps.
-    if (nearbyPoints.size > 0) {
-      map.getCanvas().style.cursor = "pointer";
-    } else if (this.mouseState === "drag") {
-      map.getCanvas().style.cursor = "move";
+    if (this.mouseState === "drag") {
+      this.map.getCanvas().style.cursor = "move";
+    } else if (nearbyPoints.size > 0) {
+      this.map.getCanvas().style.cursor = "pointer";
     } else {
-      map.getCanvas().style.cursor = "default";
+      this.map.getCanvas().style.cursor = "default";
     }
     this.props.responses.forEach((resp) => {
-      map.setFeatureState(
+      this.map.setFeatureState(
         { source: "people", id: resp.idx },
         { hover: nearbyPoints.has(resp.idx) },
       );
