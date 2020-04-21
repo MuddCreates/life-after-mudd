@@ -33,162 +33,104 @@ function groupPlansConfigurable(responses, getFirstGroupKey, getSecondGroupKey) 
     }));
 }
 
-// TODO: Ignore empty fields
+function createTwoLevelViewJSX(taggedData, firstKeyView, secondKeyView, firstGroupBy, secondGroupBy){
+  const groupedData = groupPlansConfigurable(
+    taggedData, firstGroupBy, secondGroupBy,
+  );
+  const firstKeyAction = (secondKeys) => {
+    store.dispatch({
+      type: "SHOW_DETAILS",
+      responses: secondKeys.flatMap(item => item.responses.map(resp => resp.idx)),
+      sidebarView: firstKeyView,
+    });
+    store.dispatch({
+      type: "UPDATE_MAP_VIEW_ZOOM",
+    });
+  };
+
+  const secondKeyAction = (responses) => {
+    store.dispatch({
+      type: "SHOW_DETAILS",
+      responses: responses.map(resp => resp.idx),
+      sidebarView: secondKeyView,
+    });
+    store.dispatch({
+      type: "UPDATE_MAP_VIEW_ZOOM",
+    });
+  };
+  return (
+        <div
+          style={{
+            position: "absolute",
+            left: `${(1 - sidebarWidthFraction) * 100}%`,
+            top: "0",
+            width: `${sidebarWidthFraction * 100}%`,
+            height: "100%",
+            padding: "10px",
+            background: "white",
+            zIndex: "3",
+          }}
+        >
+          {groupedData.map(({ firstKey, secondKeys}, idx) => (
+            <Fragment key={idx}>
+              <h5 onClick={() => firstKeyAction(secondKeys)}>
+                <b>{firstKey}</b>
+              </h5>
+              {secondKeys.map(({ secondKey, responses }, idx) => (
+                <Fragment key={idx}>
+                  <b onClick={()=>secondKeyAction(responses)}>{secondKey}</b>
+                  {responses.map((resp, idx) => (
+                      <div
+                    key={idx}
+                    onClick={
+                      () => {
+                        store.dispatch({
+                        type: "SHOW_DETAILS",
+                        responses: [resp.idx],
+                          sidebarView: SidebarView.detailView,
+                        });
+                      }
+                    }>{resp.name || "Anonymous"}</div>
+                  ))}
+                </Fragment>
+              ))}
+            </Fragment>
+          ))}
+        </div>
+  );
+}
+
 function describeSubject(taggedSubject){
+  let fields = [];
+  if(taggedSubject.tag.desc && taggedSubject.tag.loc){
+    fields.push(<div>{taggedSubject.tag.desc} in {taggedSubject.tag.loc}</div>);
+  }
+  if (taggedSubject.major) {
+    fields.push(<div>Majored in {taggedSubject.major}</div>);
+  }
+  if (taggedSubject.comments){
+    fields.push(<div>Note: {taggedSubject.comments}</div>);
+  }
+  // TODO: Figure out how to cleanly add keys to fields elements
   return (
       <div>
       <h5><b> {taggedSubject.name}</b></h5>
-      <div>{taggedSubject.tag.desc} in {taggedSubject.tag.loc}</div>
-      <div>Majored in {taggedSubject.major}</div>
-      <div>Note: {taggedSubject.comments}</div>
+      {fields}
     </div>
   );
 }
 
 class Sidebar extends React.Component {
   render() {
-    let grouped = null;
-    let firstKeyAction = null;
-    let secondKeyAction = null;
     let sidebarContent = null;
+    const taggedData = tagAll(this.props.responses, this.props.geotagView);
+    let groupedData = groupPlansConfigurable(
+      tagAll(this.props.responses, this.props.geotagView), resp => resp.tag.loc, resp => resp.tag.desc,
+    );
 
-    switch (this.props.sidebarView){
-      case SidebarView.summaryView:
-      grouped = groupPlansConfigurable(
-        tagAll(this.props.responses, this.props.geotagView), resp => resp.tag.loc, resp => resp.tag.desc,
-      );
-      firstKeyAction = (secondKeys) => {
-        store.dispatch({
-          type: "SHOW_DETAILS",
-          responses: secondKeys.flatMap(item => item.responses.map(resp => resp.idx)),
-          sidebarView: SidebarView.summaryView,
-        });
-        store.dispatch({
-          type: "UPDATE_MAP_VIEW_ZOOM",
-        });
-      };
-
-      secondKeyAction = (responses) => {
-        store.dispatch({
-          type: "SHOW_DETAILS",
-          responses: responses.map(resp => resp.idx),
-          sidebarView: SidebarView.organizationView,
-        });
-        store.dispatch({
-          type: "UPDATE_MAP_VIEW_ZOOM",
-        });
-      };
-        sidebarContent = (
-        <div
-          style={{
-            position: "absolute",
-            left: `${(1 - sidebarWidthFraction) * 100}%`,
-            top: "0",
-            width: `${sidebarWidthFraction * 100}%`,
-            height: "100%",
-            padding: "10px",
-            background: "white",
-            zIndex: "3",
-          }}
-        >
-          {grouped.map(({ firstKey, secondKeys}, idx) => (
-            <Fragment key={idx}>
-              <h5 onClick={() => firstKeyAction(secondKeys)}>
-                <b>{firstKey}</b>
-              </h5>
-              {secondKeys.map(({ secondKey, responses }, idx) => (
-                <Fragment key={idx}>
-                  <b onClick={()=>secondKeyAction(responses)}>{secondKey}</b>
-                  {responses.map((resp, idx) => (
-                      <div
-                    key={idx}
-                    onClick={
-                      () => {
-                        store.dispatch({
-                        type: "SHOW_DETAILS",
-                        responses: [resp.idx],
-                          sidebarView: SidebarView.detailView,
-                        });
-                      }
-                    }>{resp.name || "Anonymous"}</div>
-                  ))}
-                </Fragment>
-              ))}
-            </Fragment>
-          ))}
-        </div>
-        );
-      break;
-
-    case SidebarView.organizationView:
-      grouped = groupPlansConfigurable(
-        tagAll(this.props.responses, this.props.geotagView), resp => resp.tag.desc, resp => resp.tag.loc,
-      );
-      firstKeyAction = (secondKeys) => {
-        store.dispatch({
-          type: "SHOW_DETAILS",
-          responses: secondKeys.flatMap(item => item.responses.map(resp => resp.idx)),
-          sidebarView: SidebarView.organizationView,
-        });
-        store.dispatch({
-          type: "UPDATE_MAP_VIEW_ZOOM",
-        });
-      };
-
-      secondKeyAction = (responses) => {
-        store.dispatch({
-          type: "SHOW_DETAILS",
-          responses: responses.map(resp => resp.idx),
-          sidebarView: SidebarView.summaryView,
-        });
-        store.dispatch({
-          type: "UPDATE_MAP_VIEW_ZOOM",
-        });
-      };
-        sidebarContent = (
-        <div
-          style={{
-            position: "absolute",
-            left: `${(1 - sidebarWidthFraction) * 100}%`,
-            top: "0",
-            width: `${sidebarWidthFraction * 100}%`,
-            height: "100%",
-            padding: "10px",
-            background: "white",
-            zIndex: "3",
-          }}
-        >
-          {grouped.map(({ firstKey, secondKeys}, idx) => (
-            <Fragment key={idx}>
-              <h5 onClick={() => firstKeyAction(secondKeys)}>
-                <b>{firstKey}</b>
-              </h5>
-              {secondKeys.map(({ secondKey, responses }, idx) => (
-                <Fragment key={idx}>
-                  <b onClick={()=>secondKeyAction(responses)}>{secondKey}</b>
-                  {responses.map((resp, idx) => (
-                      <div
-                    key={idx}
-                    onClick={
-                      () => {
-                        store.dispatch({
-                        type: "SHOW_DETAILS",
-                        responses: [resp.idx],
-                          sidebarView: SidebarView.detailView,
-                        });
-                      }
-                    }>{resp.name || "Anonymous"}</div>
-                  ))}
-                </Fragment>
-              ))}
-            </Fragment>
-          ))}
-        </div>
-        );
-      break;
-    case SidebarView.detailView:
+    if (this.props.sidebarView === SidebarView.detailView){
       const subject = tag(this.props.responses[0], this.props.geotagView);
-      sidebarContent = (
+      return (
           <div
         style={{
           position: "absolute",
@@ -202,13 +144,20 @@ class Sidebar extends React.Component {
         }}
           >
           {describeSubject(subject)}
-          </div>
+        </div>
       );
+    } else {
+      // for all view made with createTwoLevelViewJSX
+      switch (this.props.sidebarView){
+      case SidebarView.summaryView:
+        return createTwoLevelViewJSX(taggedData, SidebarView.summaryView, SidebarView.organizationView, resp => resp.tag.loc, resp => resp.tag.desc);
+
+      case SidebarView.organizationView:
+        return createTwoLevelViewJSX(taggedData, SidebarView.organizationView, SidebarView.summaryView, resp => resp.tag.desc, resp => resp.tag.loc);
+      }
     }
-    return (
-      sidebarContent
-    );
-  }
+  };
+
 }
 
 export default connect((state) => {
