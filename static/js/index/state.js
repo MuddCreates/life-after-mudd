@@ -1,5 +1,7 @@
 "use strict";
 
+import { allowResizingWindow, inLandscapeMode } from "./util";
+
 // Enum that indicates whether a loading spinner is displayed
 // overlaying the map, and if so what message is shown.
 export const LoadingStatus = Object.freeze({
@@ -51,6 +53,8 @@ export const initialState = {
   // Incremented when we want to the map view to adjust its zoom
   // position (happens when we do a search).
   mapViewSerial: 0,
+  // Whether the browser is in landscape mode.
+  landscape: inLandscapeMode(),
 };
 
 // Global reducer for the app's Redux store.
@@ -97,6 +101,14 @@ export const reducer = (state = initialState, action) => {
         ...state,
         mapViewSerial: state.mapViewSerial + 1,
       };
+    case "WINDOW_RESIZED":
+      if (allowResizingWindow()) {
+        state = {
+          ...state,
+          landscape: inLandscapeMode(),
+        };
+      }
+      return state;
     default:
       return state;
   }

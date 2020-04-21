@@ -4,10 +4,15 @@ import React from "react";
 import { Fragment } from "react";
 import { connect } from "react-redux";
 
-import { sidebarWidthFraction } from "../config";
+import { sidebarWidthFraction, sidebarHeightFraction } from "../config";
 import { store } from "../redux";
 import { SidebarView } from "../state";
 import { tag, tagAll } from "../tag";
+import {
+  allowResizingWindow,
+  originalWindowWidth,
+  originalWindowHeight,
+} from "../util";
 
 function groupPlansConfigurable(responses, getFirstGroupKey, getSecondGroupKey) {
   const index = {};
@@ -59,18 +64,6 @@ function createTwoLevelViewJSX(taggedData, firstKeyView, secondKeyView, firstGro
     });
   };
   return (
-        <div
-          style={{
-            position: "absolute",
-            left: `${(1 - sidebarWidthFraction) * 100}%`,
-            top: "0",
-            width: `${sidebarWidthFraction * 100}%`,
-            height: "100%",
-            padding: "10px",
-            background: "white",
-            zIndex: "3",
-          }}
-        >
           {groupedData.map(({ firstKey, secondKeys}, idx) => (
             <Fragment key={idx}>
               <h5 onClick={() => firstKeyAction(secondKeys)}>
@@ -96,7 +89,6 @@ function createTwoLevelViewJSX(taggedData, firstKeyView, secondKeyView, firstGro
               ))}
             </Fragment>
           ))}
-        </div>
   );
 }
 
@@ -127,35 +119,64 @@ class Sidebar extends React.Component {
     let groupedData = groupPlansConfigurable(
       tagAll(this.props.responses, this.props.geotagView), resp => resp.tag.loc, resp => resp.tag.desc,
     );
+    const style = {
+      position: "absolute",
+      padding: "10px",
+      background: "white",
+      zIndex: "3",
+      overflowY: "auto",
+    };
+    if (this.props.showVertically) {
+      Object.assign(style, {
+        left: allowResizingWindow()
+          ? `${(1 - sidebarWidthFraction) * 100}%`
+          : `${(1 - sidebarWidthFraction) * originalWindowWidth}px`,
+        top: "0",
+        width: allowResizingWindow()
+          ? `${sidebarWidthFraction * 100}%`
+          : `${sidebarWidthFraction * originalWindowWidth}px`,
+        height: allowResizingWindow() ? "100%" : `${originalWindowHeight}px`,
+      });
+    } else {
+      Object.assign(style, {
+        left: "0",
+        top: allowResizingWindow()
+          ? `${(1 - sidebarHeightFraction) * 100}%`
+          : `${(1 - sidebarHeightFraction) * originalWindowHeight}px`,
+        width: allowResizingWindow() ? "100%" : `${originalWindowWidth}px`,
+        height: allowResizingWindow()
+          ? `${sidebarHeightFraction * 100}%`
+          : `${sidebarHeightFraction * originalWindowHeight}px`,
+      });
+    }
 
     if (this.props.sidebarView === SidebarView.detailView){
       const subject = tag(this.props.responses[0], this.props.geotagView);
       return (
           <div
-        style={{
-          position: "absolute",
-          left: `${(1 - sidebarWidthFraction) * 100}%`,
-          top: "0",
-          width: `${sidebarWidthFraction * 100}%`,
-          height: "100%",
-          padding: "10px",
-          background: "white",
-          zIndex: "3",
-        }}
+        style={style}
           >
           {describeSubject(subject)}
         </div>
       );
     } else {
       // for all view made with createTwoLevelViewJSX
+      let sidebarBody = null;
       switch (this.props.sidebarView){
       case SidebarView.summaryView:
-        return createTwoLevelViewJSX(taggedData, SidebarView.summaryView, SidebarView.organizationView, resp => resp.tag.loc, resp => resp.tag.desc);
+        sidebarBody = createTwoLevelViewJSX(taggedData, SidebarView.summaryView, SidebarView.organizationView, resp => resp.tag.loc, resp => resp.tag.desc);
+        break;
 
       case SidebarView.organizationView:
-        return createTwoLevelViewJSX(taggedData, SidebarView.organizationView, SidebarView.summaryView, resp => resp.tag.desc, resp => resp.tag.loc);
+        sidebarBody = createTwoLevelViewJSX(taggedData, SidebarView.organizationView, SidebarView.summaryView, resp => resp.tag.desc, resp => resp.tag.loc);
+        break;
       }
     }
+    return (
+        <div style={style}>
+        {sidebarBody}
+        </div>
+    );
   };
 
 }
@@ -168,5 +189,6 @@ export default connect((state) => {
     ),
     geotagView: state.geotagView,
     sidebarView: state.sidebarView,
+    showVertically: state.landscape,
   };
 })(Sidebar);

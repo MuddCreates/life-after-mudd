@@ -33,7 +33,7 @@ class App extends React.Component {
         failHard(`Unknown loading status: ${this.props.loadingStatus}`);
     }
     return (
-      <>
+      <div style={{ overflow: "hidden" }}>
         <LoadingOverlay
           active={isLoading}
           spinner={<ScaleLoader />}
@@ -50,7 +50,7 @@ class App extends React.Component {
           {this.props.showingSidebar && <Sidebar />}
         </LoadingOverlay>
         <LoginModal />
-      </>
+      </div>
     );
   }
   keyListener(e) {
@@ -60,8 +60,14 @@ class App extends React.Component {
       });
     }
   }
+  resizeListener() {
+    store.dispatch({
+      type: "WINDOW_RESIZED",
+    });
+  }
   componentDidMount() {
     document.addEventListener("keydown", this.keyListener, false);
+    window.addEventListener("resize", this.resizeListener);
   }
   componentWillUnmount() {
     document.removeEventListener("keydown", this.keyListener, false);

@@ -5188,7 +5188,7 @@ react-loading-overlay@^1.0.1:
 
 "react-mapbox-gl@https://github.com/MuddCreates/react-mapbox-gl#hack/mapbox-gl-from-cdn":
   version "4.8.2"
-  resolved "https://github.com/MuddCreates/react-mapbox-gl#27362270a75e5d0a769a73c972c5412ed987c77e"
+  resolved "https://github.com/MuddCreates/react-mapbox-gl#621a576f8869553e24d69ccccfe2f7bd440765e9"
   dependencies:
     "@turf/bbox" "4.7.3"
     "@turf/helpers" "4.7.3"
