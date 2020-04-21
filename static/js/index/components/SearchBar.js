@@ -179,7 +179,7 @@ class SearchBar extends React.Component {
       <input
         className="mapboxgl-ctrl-geocoder--input"
         type="text"
-        placeholder="Search"
+        placeholder="Search for person, company, area, ..."
         ref={this.input}
         style={{ height: "36px", fontSize: "15px", padding: "6px 35px" }}
       />
