@@ -64,7 +64,7 @@ function createTwoLevelViewJSX(taggedData, firstKeyView, secondKeyView, firstGro
     });
   };
   return (
-          {groupedData.map(({ firstKey, secondKeys}, idx) => (
+          groupedData.map(({ firstKey, secondKeys}, idx) => (
             <Fragment key={idx}>
               <h5 onClick={() => firstKeyAction(secondKeys)}>
                 <b>{firstKey}</b>
@@ -88,7 +88,7 @@ function createTwoLevelViewJSX(taggedData, firstKeyView, secondKeyView, firstGro
                 </Fragment>
               ))}
             </Fragment>
-          ))}
+          ))
   );
 }
 
@@ -150,18 +150,12 @@ class Sidebar extends React.Component {
       });
     }
 
+    let sidebarBody = null;
     if (this.props.sidebarView === SidebarView.detailView){
       const subject = tag(this.props.responses[0], this.props.geotagView);
-      return (
-          <div
-        style={style}
-          >
-          {describeSubject(subject)}
-        </div>
-      );
+      sidebarBody = describeSubject(subject);
     } else {
       // for all view made with createTwoLevelViewJSX
-      let sidebarBody = null;
       switch (this.props.sidebarView){
       case SidebarView.summaryView:
         sidebarBody = createTwoLevelViewJSX(taggedData, SidebarView.summaryView, SidebarView.organizationView, resp => resp.tag.loc, resp => resp.tag.desc);
