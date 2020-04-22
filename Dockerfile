@@ -1,4 +1,4 @@
-FROM ubuntu:disco
+FROM ubuntu:eoan
 
 COPY scripts/docker-install-system.bash /tmp/
 RUN /tmp/docker-install-system.bash
