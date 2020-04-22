@@ -21,6 +21,15 @@ export const GeotagView = Object.freeze({
   summer: "summer",
 });
 
+export const SidebarView = Object.freeze({
+  // Show results grouped by location, then organization
+  summaryView: "summaryView",
+  // Show detailed info about a particular person
+  detailView: "detailView",
+  // Show results grouped by organization, then location
+  organizationView: "organizationView",
+})
+
 // Initial state for the Redux store. Covers the whole app.
 export const initialState = {
   // Whether a loading indicator should be shown, and if so what the
@@ -34,6 +43,8 @@ export const initialState = {
   // List of objects. As retrieved from the API, with some minor
   // touch-ups. Each object has an idx key which can be used as a uid.
   responses: null,
+  // What info is shown in the sidebar
+  sidebarView: SidebarView.summaryView,
   // Whether to give precedence to summer plans or next-year plans in
   // map and detail views.
   geotagView: GeotagView.standard,
@@ -78,6 +89,7 @@ export const reducer = (state = initialState, action) => {
       return {
         ...state,
         displayedResponses: action.responses,
+        sidebarView: action.sidebarView,
       };
     case "HIDE_DETAILS":
       return {

@@ -14,6 +14,10 @@ import {
 import { tagAll } from "../tag";
 import { store } from "../redux";
 import {
+  GeotagView,
+  SidebarView,
+} from "../state";
+import {
   allowResizingWindow,
   originalWindowHeight,
   originalWindowWidth,
@@ -267,6 +271,7 @@ class MapView extends React.Component {
         store.dispatch({
           type: "SHOW_DETAILS",
           responses: Array.from(nearbyPoints),
+          sidebarView: SidebarView.summaryView,
         });
       } else {
         store.dispatch({
