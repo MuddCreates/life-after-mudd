@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Fragment } from "react";
+import Button from 'react-bootstrap/Button';
 import { connect } from "react-redux";
 
 import { sidebarWidthFraction, sidebarHeightFraction } from "../config";
@@ -82,28 +83,48 @@ function createTwoLevelViewJSX(
   };
   return groupedData.map(({ firstKey, secondKeys }, idx) => (
     <Fragment key={idx}>
-      <h5 onClick={() => firstKeyAction(secondKeys)}>
+      <Button
+      onClick={() => firstKeyAction(secondKeys)}
+      variant="primary"
+      size = "lg"
+    >
+      <h5 >
         <b>{firstKey}</b>
       </h5>
+      </Button>
+      <ul>
       {secondKeys.map(({ secondKey, responses }, idx) => (
-        <Fragment key={idx}>
-          <b onClick={() => secondKeyAction(responses)}>{secondKey}</b>
+        <li key={idx}>
+        <Fragment>
+          <Button
+          variant = "outline-primary"
+          size = "sm"
+          onClick={() => secondKeyAction(responses)}>
+            <b> {secondKey}</b>
+          </Button>
+          <ul>
           {responses.map((resp, idx) => (
-            <div
-              key={idx}
-              onClick={() => {
-                store.dispatch({
-                  type: "SHOW_DETAILS",
-                  responses: [resp.idx],
-                  sidebarView: SidebarView.detailView,
-                });
-              }}
-            >
-              {resp.name || "Anonymous"}
-            </div>
+            <li key={idx}>
+              <Button
+                onClick={() => {
+                  store.dispatch({
+                    type: "SHOW_DETAILS",
+                    responses: [resp.idx],
+                    sidebarView: SidebarView.detailView,
+                  });
+                }}
+                variant="outline-secondary"
+                size="sm"
+              >
+                {resp.name || "Anonymous"}
+              </Button>
+            </li>
           ))}
+          </ul>
         </Fragment>
+        </li>
       ))}
+    </ul>
     </Fragment>
   ));
 }
