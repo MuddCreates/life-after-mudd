@@ -312,7 +312,6 @@ class SearchBar extends React.Component {
       e.key === "/" &&
       document.activeElement.tagName.toLowerCase() !== "input"
     ) {
-      console.log(document.activeElement.tagName);
       $(this.input.current).focus();
       e.preventDefault();
     }

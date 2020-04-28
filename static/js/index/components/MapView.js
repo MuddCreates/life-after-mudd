@@ -235,7 +235,6 @@ class MapView extends React.Component {
     return nearbyPoints;
   };
   onMouseEvent = (e) => {
-    console.log(e.type);
     if (!this.map || !this.map.getLayer("people")) {
       // Map not fully loaded yet, refrain from messing with it to
       // avoid errors.
