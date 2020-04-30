@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Fragment } from "react";
-import Button from 'react-bootstrap/Button';
+import Button from "react-bootstrap/Button";
 import { connect } from "react-redux";
 
 import { sidebarWidthFraction, sidebarHeightFraction } from "../config";
@@ -46,18 +46,19 @@ function groupPlansConfigurable(
     }));
 }
 
-
 class Sidebar extends React.Component {
-  doSearch(searchGetter, searchValue, view){
+  doSearch(searchGetter, searchValue, view) {
     store.dispatch({
       type: "SHOW_DETAILS",
-      responses: this.props.index.filter(resp => (searchGetter(resp) === searchValue)).map(resp => resp.idx),
+      responses: this.props.index
+        .filter((resp) => searchGetter(resp) === searchValue)
+        .map((resp) => resp.idx),
       sidebarView: view,
     });
     store.dispatch({
       type: "UPDATE_MAP_VIEW_ZOOM",
     });
-  };
+  }
 
   createTwoLevelViewJSX(
     taggedData,
@@ -74,81 +75,118 @@ class Sidebar extends React.Component {
     return groupedData.map(({ firstKey, secondKeys }, idx) => (
       <Fragment key={idx}>
         <Button
-      onClick={
-        () => this.doSearch(firstGroupBy, firstGroupBy(secondKeys[0].responses[0]), firstKeyView)
-      }
-        variant="primary"
-        size = "lg"
-      >
-        <h5 >
-          <b>{firstKey}</b>
-        </h5>
+          onClick={() =>
+            this.doSearch(
+              firstGroupBy,
+              firstGroupBy(secondKeys[0].responses[0]),
+              firstKeyView,
+            )
+          }
+          variant="primary"
+          size="lg"
+        >
+          <h5>
+            <b>{firstKey}</b>
+          </h5>
         </Button>
         <ul>
-        {secondKeys.map(({ secondKey, responses }, idx) => (
-          <li key={idx}>
-          <Fragment>
-            <Button
-            variant = "outline-primary"
-            size = "sm"
-          onClick={
-            () => this.doSearch(secondGroupBy, secondGroupBy(responses[0]), secondKeyView)
-          }>
-              <b> {secondKey}</b>
-            </Button>
-            <ul>
-            {responses.map((resp, idx) => (
-              <li key={idx}>
+          {secondKeys.map(({ secondKey, responses }, idx) => (
+            <li key={idx}>
+              <Fragment>
                 <Button
-                  onClick={() => {
-                    store.dispatch({
-                      type: "SHOW_DETAILS",
-                      responses: [resp.idx],
-                      sidebarView: SidebarView.detailView,
-                    });
-                  }}
-                  variant="outline-secondary"
+                  variant="outline-primary"
                   size="sm"
+                  onClick={() =>
+                    this.doSearch(
+                      secondGroupBy,
+                      secondGroupBy(responses[0]),
+                      secondKeyView,
+                    )
+                  }
                 >
-                  {resp.name || "Anonymous"}
+                  <b> {secondKey}</b>
                 </Button>
-              </li>
-            ))}
-            </ul>
-          </Fragment>
-          </li>
-        ))}
-      </ul>
+                <ul>
+                  {responses.map((resp, idx) => (
+                    <li key={idx}>
+                      <Button
+                        onClick={() => {
+                          store.dispatch({
+                            type: "SHOW_DETAILS",
+                            responses: [resp.idx],
+                            sidebarView: SidebarView.detailView,
+                          });
+                        }}
+                        variant="outline-secondary"
+                        size="sm"
+                      >
+                        {resp.name || "Anonymous"}
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
+              </Fragment>
+            </li>
+          ))}
+        </ul>
       </Fragment>
     ));
-  };
+  }
 
   describeSubject(taggedSubject, index) {
     let fields = [];
     if (taggedSubject.tag.desc && taggedSubject.tag.loc) {
       fields.push(
         <div>
-          <Button variant="outline-secondary" size="sm" onClick={
-            () => this.doSearch(resp => resp.tag.desc, taggedSubject.tag.desc, SidebarView.organizationView)
-          }>
-          {taggedSubject.tag.desc}
-        </Button>
+          <Button
+            variant="outline-secondary"
+            size="sm"
+            onClick={() =>
+              this.doSearch(
+                (resp) => resp.tag.desc,
+                taggedSubject.tag.desc,
+                SidebarView.organizationView,
+              )
+            }
+          >
+            {taggedSubject.tag.desc}
+          </Button>
           {" in "}
-          <Button variant="outline-secondary" size="sm" onClick={
-            () => this.doSearch(resp => resp.tag.loc, taggedSubject.tag.loc, SidebarView.summaryView)
-          }>
-          {taggedSubject.tag.loc}
-        </Button>
+          <Button
+            variant="outline-secondary"
+            size="sm"
+            onClick={() =>
+              this.doSearch(
+                (resp) => resp.tag.loc,
+                taggedSubject.tag.loc,
+                SidebarView.summaryView,
+              )
+            }
+          >
+            {taggedSubject.tag.loc}
+          </Button>
         </div>,
       );
     }
     if (taggedSubject.major) {
-      fields.push(<div>{"Majored in "}
-                  <Button variant="outline-secondary" size="sm" onClick={
-                    () => this.doSearch(resp => resp.major, taggedSubject.major, SidebarView.summaryView)
-                  }>
-                  {taggedSubject.major}
-                  </Button></div>);
+      fields.push(
+        <div>
+          {"Majored in "}
+          <Button
+            variant="outline-secondary"
+            size="sm"
+            onClick={() =>
+              this.doSearch(
+                (resp) => resp.major,
+                taggedSubject.major,
+                SidebarView.summaryView,
+              )
+            }
+          >
+            {taggedSubject.major}
+          </Button>
+        </div>,
+      );
     }
     if (taggedSubject.comments) {
       fields.push(<div>Note: {taggedSubject.comments}</div>);
@@ -162,7 +200,7 @@ class Sidebar extends React.Component {
         {fields}
       </div>
     );
-  };
+  }
 
   render() {
     let sidebarContent = null;
@@ -239,7 +277,9 @@ class Sidebar extends React.Component {
 
 export default connect((state) => {
   const displayedResponses = new Set(state.displayedResponses);
-  const responses = state.responses.filter((resp) => displayedResponses.has(resp.idx));
+  const responses = state.responses.filter((resp) =>
+    displayedResponses.has(resp.idx),
+  );
   return {
     responses: responses,
     geotagView: state.geotagView,
