@@ -56,6 +56,7 @@ const searchSources = [
     {
       name: "San Francisco (SF) Bay Area",
       filter: (resp) =>
+        resp.tag.latLong &&
         resp.tag.latLong.lat > 36.878 &&
         resp.tag.latLong.lat < 38.859 &&
         resp.tag.latLong.lng > -123.569 &&
@@ -64,6 +65,7 @@ const searchSources = [
     {
       name: "Seattle Area",
       filter: (resp) =>
+        resp.tag.latLong &&
         resp.tag.latLong.lat > 46.724 &&
         resp.tag.latLong.lat < 48.309 &&
         resp.tag.latLong.lng > -122.725 &&

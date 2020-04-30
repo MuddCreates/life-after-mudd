@@ -109,6 +109,11 @@ export const reducer = (state = initialState, action) => {
         };
       }
       return state;
+  case "UPDATE_GEOTAG_VIEW":
+    return {
+      ...state,
+      geotagView: action.geotagView,
+    };
     default:
       return state;
   }

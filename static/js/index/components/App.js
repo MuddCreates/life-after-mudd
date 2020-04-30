@@ -13,6 +13,7 @@ import LoginModal from "./LoginModal";
 import MapView from "./MapView";
 import SearchBar from "./SearchBar";
 import Sidebar from "./Sidebar";
+import ViewToggle from "./ViewToggle";
 
 // Wrapper component that is rendered at the root. Displays loading
 // messages, handles OAuth, wraps the main map app.
@@ -48,6 +49,7 @@ class App extends React.Component {
         >
           <MapView />
           <SearchBar />
+        <ViewToggle />
           {this.props.showingSidebar && <Sidebar />}
         </LoadingOverlay>
         <LoginModal />
