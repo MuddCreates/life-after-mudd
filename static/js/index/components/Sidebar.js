@@ -210,6 +210,9 @@ class Sidebar extends React.Component {
       background: "white",
       zIndex: "3",
       overflowY: "auto",
+      borderLeftStyle: "solid",
+      borderLeftColor: "silver",
+      borderLeftWidth: "1px",
     };
     if (this.props.showVertically) {
       Object.assign(style, {
