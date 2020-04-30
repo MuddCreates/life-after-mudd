@@ -101,6 +101,7 @@ def get_unprocessed(responses):
 
 
 def download_form_responses():
+    print("Downloading form responses...", file=sys.stderr)
     worksheet = get_worksheet()
     responses = read_form_responses(worksheet)
     messenger_key = os.environ.get("MESSENGER_PAGE_KEY")
