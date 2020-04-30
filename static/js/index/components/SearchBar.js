@@ -13,7 +13,9 @@ window.$ = window.jQuery = require("jquery");
 require("bootstrap");
 require("bootstrap-autocomplete");
 
-import { searchBarWidth } from "../config";
+import "@fortawesome/fontawesome-free/css/all.css";
+
+import { searchBarHeight, searchBarPadding, searchBarWidth } from "../config";
 import { failHard } from "../error";
 import { tagAll } from "../tag";
 import { store } from "../redux";
@@ -181,43 +183,123 @@ class SearchBar extends React.Component {
       <input
         className="mapboxgl-ctrl-geocoder--input"
         type="text"
-        placeholder="Search for person, company, area, ..."
+        placeholder="person, company, area..."
         ref={this.input}
         style={{ height: "36px", fontSize: "15px", padding: "6px 35px" }}
       />
     );
+    // We display padding, then the search bar, then padding, then the
+    // help button, then padding. Three pieces of padding.
     return (
-      <div
-        style={{
-          position: "absolute",
-          left: "20px",
-          top: "20px",
-          width: `${searchBarWidth}px`,
-          maxWidth: "calc(100% - 40px)",
-          touchAction: "none",
-        }}
-      >
+      <>
         <div
-          className="mapboxgl-ctrl-geocoder mapboxgl-ctrl"
-          style={{ width: "100%", maxWidth: "100%" }}
+          style={{
+            position: "absolute",
+            left: `${searchBarPadding}px`,
+            top: `${searchBarPadding}px`,
+            width: `${searchBarWidth}px`,
+            maxWidth: `calc(100% - ${
+              searchBarPadding * 3 + searchBarHeight
+            }px)`,
+            touchAction: "none",
+          }}
         >
-          <svg
-            className="mapboxgl-ctrl-geocoder--icon mapboxgl-ctrl-geocoder--icon-search"
-            viewBox="0 0 18 18"
-            width="18"
-            height="18"
-            style={{
-              left: "7px",
-              width: "20px",
-              height: "20px",
-              top: "8px",
-            }}
+          <div
+            className="mapboxgl-ctrl-geocoder mapboxgl-ctrl"
+            style={{ width: "100%", maxWidth: "100%" }}
           >
-            <path d="M7.4 2.5c-2.7 0-4.9 2.2-4.9 4.9s2.2 4.9 4.9 4.9c1 0 1.8-.2 2.5-.8l3.7 3.7c.2.2.4.3.8.3.7 0 1.1-.4 1.1-1.1 0-.3-.1-.5-.3-.8L11.4 10c.4-.8.8-1.6.8-2.5.1-2.8-2.1-5-4.8-5zm0 1.6c1.8 0 3.2 1.4 3.2 3.2s-1.4 3.2-3.2 3.2-3.3-1.3-3.3-3.1 1.4-3.3 3.3-3.3z"></path>
-          </svg>
-          {input}
+            <svg
+              className="mapboxgl-ctrl-geocoder--icon mapboxgl-ctrl-geocoder--icon-search"
+              viewBox="0 0 18 18"
+              width="18"
+              height="18"
+              style={{
+                left: "7px",
+                width: "20px",
+                height: "20px",
+                top: "8px",
+              }}
+            >
+              <path d="M7.4 2.5c-2.7 0-4.9 2.2-4.9 4.9s2.2 4.9 4.9 4.9c1 0 1.8-.2 2.5-.8l3.7 3.7c.2.2.4.3.8.3.7 0 1.1-.4 1.1-1.1 0-.3-.1-.5-.3-.8L11.4 10c.4-.8.8-1.6.8-2.5.1-2.8-2.1-5-4.8-5zm0 1.6c1.8 0 3.2 1.4 3.2 3.2s-1.4 3.2-3.2 3.2-3.3-1.3-3.3-3.1 1.4-3.3 3.3-3.3z"></path>
+            </svg>
+            {input}
+          </div>
         </div>
-      </div>
+        <button
+          style={{
+            position: "absolute",
+            right: `${searchBarPadding}px`,
+            top: `${searchBarPadding}px`,
+            width: `${searchBarHeight}px`,
+            height: `${searchBarHeight}px`,
+            backgroundColor: "white",
+            borderColor: "white",
+            padding: "0",
+            // copied from mapboxgl-ctrl-geocoder
+            boxShadow: "rgba(0, 0, 0, 0.1) 0px 0px 10px 2px",
+          }}
+          type="button"
+          className="btn btn-light"
+          data-toggle="modal"
+          data-target="#about-modal"
+        >
+          <span className="fas fa-info-circle"></span>
+        </button>
+        <div className="modal fade" tabIndex="-1" id="about-modal">
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">About</h5>
+                <button type="button" className="close" data-dismiss="modal">
+                  <span>&times;</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                <p>
+                  Created by Radon Rosborough.{" "}
+                  <a href="mailto:rrosborough@hmc.edu">Email me</a> if you have
+                  questions or feedback!
+                </p>
+                <p>
+                  Source code is available{" "}
+                  <a href="https://github.com/MuddCreates/life-after-mudd">
+                    on GitHub
+                  </a>
+                  . I welcome{" "}
+                  <a href="https://github.com/MuddCreates/life-after-mudd/issues">
+                    bug reports
+                  </a>{" "}
+                  or improvements.
+                </p>
+                <p>
+                  Data comes from{" "}
+                  <a href="https://forms.gle/PqEHTjpBDGBXfH4W8">
+                    this Google Form
+                  </a>
+                  . Add your post-graduation plans!
+                </p>
+                <p>Quick tips:</p>
+                <ul>
+                  <li>
+                    You can search for people, companies, majors, or regions
+                    ("Bay Area"). Anything that was submitted on the form!
+                  </li>
+                  <li>
+                    Keyboard shortcuts: escape to cancel search and sidebar,
+                    forward-slash to start a new search
+                  </li>
+                  <li>
+                    If you'd like the raw data, you can grab it from the Network
+                    tab in your browser's development tools. Please do not
+                    publicize it beyond the Class of 2020, as per the Honor
+                    Code.
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
     );
   }
   componentDidMount() {

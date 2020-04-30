@@ -13,10 +13,7 @@ import {
 } from "../config";
 import { tagAll } from "../tag";
 import { store } from "../redux";
-import {
-  GeotagView,
-  SidebarView,
-} from "../state";
+import { GeotagView, SidebarView } from "../state";
 import {
   allowResizingWindow,
   originalWindowHeight,
