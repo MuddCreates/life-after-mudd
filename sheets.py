@@ -111,7 +111,7 @@ def download_form_responses():
             with open("data.json") as f:
                 old_responses = json.load(f)
         except FileNotFoundError:
-            pass
+            print("(first fetch)", file=sys.stderr)
         else:
             old_names = get_unprocessed(old_responses)
             new_names = get_unprocessed(responses)
@@ -141,9 +141,14 @@ def download_form_responses():
                     resp.raise_for_status()
                 except requests.exceptions.RequestException as e:
                     print(f"Notification failed: {e}{details}", file=sys.stderr)
+            else:
+                print("(no change since last time)", file=sys.stderr)
+    else:
+        print("(no Messenger credentials, skipping notification)", file=sys.stderr)
     with open("data.json.tmp", "w") as f:
         json.dump(responses, f)
     os.rename("data.json.tmp", "data.json")
+    print("... finished downloading form responses", file=sys.stderr)
 
 
 def upload_form_responses():
