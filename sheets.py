@@ -6,6 +6,7 @@ import sys
 
 import gspread
 import oauth2client.service_account
+import requests
 
 
 COLUMNS = (
@@ -91,9 +92,54 @@ def write_form_responses(worksheet, responses):
     worksheet.update_cells(cells)
 
 
+def get_unprocessed(responses):
+    names = set()
+    for response in responses:
+        if response["processed"] != response["timestamp"]:
+            names.add(response["rawName"])
+    return names
+
+
 def download_form_responses():
     worksheet = get_worksheet()
     responses = read_form_responses(worksheet)
+    messenger_key = os.environ.get("MESSENGER_PAGE_KEY")
+    messenger_user_id = os.environ.get("MESSENGER_USER_ID")
+    if messenger_key and messenger_user_id:
+        try:
+            with open("data.json") as f:
+                old_responses = json.load(f)
+        except FileNotFoundError:
+            pass
+        else:
+            old_names = get_unprocessed(old_responses)
+            new_names = get_unprocessed(responses)
+            added_names = sorted(new_names - old_names)
+            if added_names:
+                plural = "s" if len(added_names) != 1 else ""
+                print(
+                    f"Notifying to Messenger ID {messenger_user_id} about "
+                    f"{len(added_names)} new response{plural}",
+                    file=sys.stderr,
+                )
+                list_str = ", ".join(added_names)
+                details = ""
+                try:
+                    resp = requests.post(
+                        "https://graph.facebook.com/v2.6/me/messages",
+                        params={"access_token": messenger_key},
+                        json={
+                            "recipient": {"id": messenger_user_id},
+                            "message": {
+                                "text": f"New form response{plural}: {list_str}"
+                            },
+                        },
+                        timeout=5,
+                    )
+                    details = " " + resp.text
+                    resp.raise_for_status()
+                except requests.exceptions.RequestException as e:
+                    print(f"Notification failed: {e}{details}", file=sys.stderr)
     with open("data.json.tmp", "w") as f:
         json.dump(responses, f)
     os.rename("data.json.tmp", "data.json")

@@ -49,9 +49,10 @@ image: ## Build Docker image for deployment
 .PHONY: image-run
 image-run: image ## Build and run Docker image for deployment
 	scripts/docker-compose.bash down
-	LAM_OAUTH_PRIVATE_KEY="$$(< .oauth-private-key.json)"	\
-		scripts/docker-compose.bash run --service-ports	\
-		-e LAM_OAUTH_PRIVATE_KEY web-prod		\
+	LAM_OAUTH_PRIVATE_KEY="$$(< .oauth-private-key.json)"			\
+		scripts/docker-compose.bash run --service-ports			\
+		-e LAM_OAUTH_PRIVATE_KEY					\
+		-e MESSENGER_PAGE_KEY -e MESSENGER_USER_ID web-prod		\
 		poetry run make app-prod || true
 	scripts/docker-compose.bash down
 
