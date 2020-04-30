@@ -6,14 +6,22 @@ export const sidebarWidthFraction = 0.3;
 // in portrait mode.
 export const sidebarHeightFraction = 0.4;
 
-// Number of pixels from the top of the screen that are considered
-// occluded by the search bar. Calculated manually by inspecting the
-// highest-level search bar wrapper element and doing offsetTop +
-// offsetHeight. This should be changed if the CSS hacks in
-// SearchBar.js are changed.
-export const searchBarOcclusion = 36 + 20;
+// Visible height of the search bar in pixels. Calculated manually by
+// inspecting the highest-level search bar wrapper element and
+// checking offsetHeight.
+export const searchBarHeight = 36;
 
-// Width of the search bar in pixels.
+// Number of pixels between the search bar and the side of the screen.
+// Calculated manually by inspecting the highest-level search bar
+// wrapper element and checking offsetTop.
+export const searchBarPadding = 20;
+
+// Number of pixels from the top of the screen that are considered
+// occluded by the search bar.
+export const searchBarOcclusion = searchBarPadding + searchBarHeight;
+
+// Desired width of the search bar in pixels. It will be smaller than
+// this if the screen is not big enough.
 export const searchBarWidth = 333;
 
 // Minimum number of pixels allowed for the map view before we

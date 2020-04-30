@@ -6,11 +6,12 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.13.0",
     "@mapbox/mapbox-gl-geocoder": "^4.5.1",
     "@types/react": "^16.9.19",
     "bootstrap": "^4.4.1",
     "bootstrap-autocomplete": "https://github.com/MuddCreates/bootstrap-autocomplete#hack/life-after-mudd",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "js-cookie": "^2.2.1",
     "latinize": "^0.4.1",
     "mapbox-gl": "^1.7.0",

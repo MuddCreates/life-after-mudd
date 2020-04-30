@@ -155,7 +155,7 @@ if AUTOFETCH_ENABLED:
         try:
             sheets.download_form_responses()
         finally:
-            timer = threading.Timer(60, sheets.download_form_responses)
+            timer = threading.Timer(60, start_autofetch)
             timer.daemon = True
             timer.start()
 

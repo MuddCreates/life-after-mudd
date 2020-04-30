@@ -1,5 +1,6 @@
 "use strict";
 
+import $ from "jquery";
 import React from "react";
 import LoadingOverlay from "react-loading-overlay";
 import { connect } from "react-redux";
