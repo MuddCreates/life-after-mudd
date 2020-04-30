@@ -133,7 +133,7 @@ class Sidebar extends React.Component {
     ));
   }
 
-  describeSubject(taggedSubject, index) {
+  describeSubject(taggedSubject) {
     let fields = [];
     if (taggedSubject.tag.desc && taggedSubject.tag.loc) {
       fields.push(
@@ -203,13 +203,7 @@ class Sidebar extends React.Component {
   }
 
   render() {
-    let sidebarContent = null;
     const taggedData = tagAll(this.props.responses, this.props.geotagView);
-    let groupedData = groupPlansConfigurable(
-      tagAll(this.props.responses, this.props.geotagView),
-      (resp) => resp.tag.loc,
-      (resp) => resp.tag.desc,
-    );
     const style = {
       position: "absolute",
       padding: "10px",
