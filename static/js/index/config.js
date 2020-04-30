@@ -22,7 +22,7 @@ export const searchBarOcclusion = searchBarPadding + searchBarHeight;
 
 // Desired width of the search bar in pixels. It will be smaller than
 // this if the screen is not big enough.
-export const searchBarWidth = 1000;
+export const searchBarWidth = 333;
 
 // Minimum number of pixels allowed for the map view before we
 // force portait mode regardless of height. This was calculated by
