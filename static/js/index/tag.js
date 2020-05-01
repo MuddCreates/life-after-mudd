@@ -3,14 +3,12 @@
 import { failHard } from "./error";
 import { GeotagView } from "./state";
 
-function formatCity(city, state, country) {
+export function formatCity(city, state, country) {
   // User will assume cities are in the US unless otherwise specified.
   if (country === "United States") {
     country = "";
   }
-  return (
-    [city, state, country].filter(Boolean).join(", ") || "No location given"
-  );
+  return [city, state, country].filter(Boolean).join(", ");
 }
 
 export function tag(response, view) {

@@ -3,7 +3,6 @@
 import _ from "lodash";
 import React from "react";
 import { Fragment } from "react";
-import Button from "react-bootstrap/Button";
 import { connect } from "react-redux";
 
 import {
@@ -13,7 +12,7 @@ import {
 } from "../config";
 import { store } from "../redux";
 import { SidebarView } from "../state";
-import { tag, tagAll } from "../tag";
+import { formatCity, tag, tagAll } from "../tag";
 import {
   allowResizingWindow,
   originalWindowWidth,
@@ -52,7 +51,7 @@ function groupPlansConfigurable(
 }
 
 class Sidebar extends React.Component {
-  doSearch(searchGetter, searchValue, view) {
+  doSimpleSearch(searchGetter, searchValue, view) {
     store.dispatch({
       type: "SHOW_DETAILS",
       responses: this.props.index
@@ -98,7 +97,7 @@ class Sidebar extends React.Component {
               href="#"
               onClick={(e) => {
                 e.preventDefault();
-                this.doSearch(
+                this.doSimpleSearch(
                   firstGroupBy,
                   firstGroupBy(secondKeys[0].responses[0]),
                   firstKeyView,
@@ -127,7 +126,7 @@ class Sidebar extends React.Component {
                 href="#"
                 onClick={(e) => {
                   e.preventDefault();
-                  this.doSearch(
+                  this.doSimpleSearch(
                     secondGroupBy,
                     secondGroupBy(responses[0]),
                     secondKeyView,
@@ -175,71 +174,132 @@ class Sidebar extends React.Component {
     ));
   }
 
-  describeSubject(taggedSubject) {
-    let fields = [];
-    if (taggedSubject.tag.desc && taggedSubject.tag.loc) {
-      fields.push(
-        <div>
-          <Button
-            variant="outline-secondary"
-            size="sm"
-            onClick={() =>
-              this.doSearch(
-                (resp) => resp.tag.desc,
-                taggedSubject.tag.desc,
-                SidebarView.organizationView,
-              )
-            }
-          >
-            {taggedSubject.tag.desc}
-          </Button>
-          {" in "}
-          <Button
-            variant="outline-secondary"
-            size="sm"
-            onClick={() =>
-              this.doSearch(
-                (resp) => resp.tag.loc,
-                taggedSubject.tag.loc,
-                SidebarView.summaryView,
-              )
-            }
-          >
-            {taggedSubject.tag.loc}
-          </Button>
-        </div>,
-      );
-    }
-    if (taggedSubject.major) {
-      fields.push(
-        <div>
-          {"Majored in "}
-          <Button
-            variant="outline-secondary"
-            size="sm"
-            onClick={() =>
-              this.doSearch(
-                (resp) => resp.major,
-                taggedSubject.major,
-                SidebarView.summaryView,
-              )
-            }
-          >
-            {taggedSubject.major}
-          </Button>
-        </div>,
-      );
-    }
-    if (taggedSubject.comments) {
-      fields.push(<div>Note: {taggedSubject.comments}</div>);
-    }
-    // TODO: Figure out how to cleanly add keys to fields elements
+  detailItem({ resp, icon, field, separator, noLink }) {
+    const fields = (resp) => {
+      let vals = field(resp);
+      if (!vals) {
+        return null;
+      }
+      if (!Array.isArray(vals)) {
+        vals = [vals];
+      }
+      if (vals.length === 0) {
+        return null;
+      }
+      return vals;
+    };
     return (
-      <div>
+      fields(resp) && (
+        <p
+          style={{
+            marginBottom: "8px",
+          }}
+        >
+          <span
+            className={`fas fa-${icon}`}
+            style={{
+              paddingRight: "10px",
+              width: "30px",
+              textAlign: "center",
+            }}
+          ></span>{" "}
+          {fields(resp).map((val, idx) => (
+            <Fragment key={idx}>
+              {idx !== 0 && separator}
+              {noLink ? (
+                val
+              ) : (
+                <a
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    store.dispatch({
+                      type: "SHOW_DETAILS",
+                      responses: this.props.index
+                        .filter(
+                          (resp) => fields(resp) && fields(resp).includes(val),
+                        )
+                        .map((resp) => resp.idx),
+                      sidebarView: SidebarView.summaryView,
+                    });
+                    store.dispatch({
+                      type: "UPDATE_MAP_VIEW_ZOOM",
+                    });
+                  }}
+                >
+                  {val}
+                </a>
+              )}
+            </Fragment>
+          ))}
+        </p>
+      )
+    );
+  }
+
+  detailView(resp) {
+    return (
+      <div
+        style={{
+          paddingLeft: "3px",
+        }}
+      >
         <h5>
-          <b> {taggedSubject.name}</b>
+          <b>{resp.name || "Anonymous"}</b>
         </h5>
-        {fields}
+        {this.detailItem({
+          resp,
+          icon: "graduation-cap",
+          field: (resp) => resp.major && resp.major.split(" + "),
+          separator: " + ",
+        })}
+        {this.detailItem({
+          resp,
+          icon: "globe-americas",
+          field: (resp) => formatCity(resp.city, resp.state, resp.country),
+        })}
+        {this.detailItem({
+          resp,
+          icon: resp.path === "Graduate school" ? "university" : "building",
+          field: (resp) => resp.org,
+        })}
+        {(resp.summerPlans ||
+          resp.summerCity ||
+          resp.summerState ||
+          resp.summerCountry ||
+          resp.summerOrg) && (
+          <>
+            <p
+              style={{
+                marginTop: "25px",
+                marginBottom: "8px",
+              }}
+            >
+              <b>Summer plans</b>
+            </p>
+            {this.detailItem({
+              resp,
+              icon: "bullseye",
+              field: (resp) => resp.summerPlans,
+              noLink: true,
+            })}
+            {this.detailItem({
+              resp,
+              icon: "globe-americas",
+              field: (resp) =>
+                formatCity(
+                  resp.summerCity,
+                  resp.summerState,
+                  resp.summerCountry,
+                ),
+            })}
+            {this.detailItem({
+              resp,
+              icon: "building",
+              field: (resp) => resp.summerOrg,
+            })}
+          </>
+        )}
       </div>
     );
   }
@@ -282,7 +342,7 @@ class Sidebar extends React.Component {
     let sidebarBody = null;
     if (this.props.sidebarView === SidebarView.detailView) {
       const subject = tag(this.props.responses[0], this.props.geotagView);
-      sidebarBody = this.describeSubject(subject);
+      sidebarBody = this.detailView(subject);
     } else {
       // for all view made with createTwoLevelViewJSX
       switch (this.props.sidebarView) {
