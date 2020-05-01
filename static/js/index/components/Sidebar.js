@@ -298,6 +298,37 @@ class Sidebar extends React.Component {
               icon: "building",
               field: (resp) => resp.summerOrg,
             })}
+            {resp.comments && (
+              <p
+                style={{
+                  marginTop: "55px",
+                }}
+              >
+                <span
+                  style={{
+                    position: "absolute",
+                  }}
+                >
+                  <span
+                    style={{
+                      color: "#ccc",
+                      fontSize: "400%",
+                      position: "absolute",
+                      top: "-45px",
+                    }}
+                  >
+                    &ldquo;
+                  </span>
+                </span>
+                <span
+                  style={{
+                    marginLeft: "5px",
+                  }}
+                >
+                  {resp.comments}
+                </span>
+              </p>
+            )}
           </>
         )}
       </div>
