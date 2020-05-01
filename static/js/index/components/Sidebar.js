@@ -1,5 +1,6 @@
 "use strict";
 
+import _ from "lodash";
 import React from "react";
 import { Fragment } from "react";
 import Button from "react-bootstrap/Button";
@@ -41,7 +42,7 @@ function groupPlansConfigurable(
         .sort()
         .map((secondKey) => ({
           secondKey,
-          responses: index[firstKey][secondKey],
+          responses: _.sortBy(index[firstKey][secondKey], "name"),
         })),
     }));
 }
