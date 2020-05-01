@@ -279,7 +279,7 @@ class Sidebar extends React.Component {
             </p>
             {this.detailItem({
               resp,
-              icon: "bullseye",
+              icon: "calendar-check",
               field: (resp) => resp.summerPlans,
               noLink: true,
             })}
