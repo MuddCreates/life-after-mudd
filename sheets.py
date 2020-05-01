@@ -110,39 +110,39 @@ def download_form_responses():
         try:
             with open("data.json") as f:
                 old_responses = json.load(f)
+            old_names = get_unprocessed(old_responses)
         except FileNotFoundError:
             print("(first fetch)", file=sys.stderr)
-        else:
-            old_names = get_unprocessed(old_responses)
-            new_names = get_unprocessed(responses)
-            added_names = sorted(new_names - old_names)
-            if added_names:
-                plural = "s" if len(added_names) != 1 else ""
-                print(
-                    f"Notifying to Messenger ID {messenger_user_id} about "
-                    f"{len(added_names)} new response{plural}",
-                    file=sys.stderr,
-                )
-                list_str = ", ".join(added_names)
-                details = ""
-                try:
-                    resp = requests.post(
-                        "https://graph.facebook.com/v2.6/me/messages",
-                        params={"access_token": messenger_key},
-                        json={
-                            "recipient": {"id": messenger_user_id},
-                            "message": {
-                                "text": f"New form response{plural}: {list_str}"
-                            },
+            old_names = set()
+        new_names = get_unprocessed(responses)
+        added_names = sorted(new_names - old_names)
+        if added_names:
+            plural = "s" if len(added_names) != 1 else ""
+            print(
+                f"Notifying to Messenger ID {messenger_user_id} about "
+                f"{len(added_names)} new response{plural}",
+                file=sys.stderr,
+            )
+            list_str = ", ".join(added_names)
+            details = ""
+            try:
+                resp = requests.post(
+                    "https://graph.facebook.com/v2.6/me/messages",
+                    params={"access_token": messenger_key},
+                    json={
+                        "recipient": {"id": messenger_user_id},
+                        "message": {
+                            "text": f"Form response{plural} need attention: {list_str}"
                         },
-                        timeout=5,
-                    )
-                    details = " " + resp.text
-                    resp.raise_for_status()
-                except requests.exceptions.RequestException as e:
-                    print(f"Notification failed: {e}{details}", file=sys.stderr)
-            else:
-                print("(no change since last time)", file=sys.stderr)
+                    },
+                    timeout=5,
+                )
+                details = " " + resp.text
+                resp.raise_for_status()
+            except requests.exceptions.RequestException as e:
+                print(f"Notification failed: {e}{details}", file=sys.stderr)
+        else:
+            print("(no change since last time)", file=sys.stderr)
     else:
         print("(no Messenger credentials, skipping notification)", file=sys.stderr)
     with open("data.json.tmp", "w") as f:
