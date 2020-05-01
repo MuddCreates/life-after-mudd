@@ -25,9 +25,11 @@ function groupPlansConfigurable(
   getSecondGroupKey,
 ) {
   const index = {};
+  const firstIconIndex = {};
+  const secondIconIndex = {};
   for (const resp of responses) {
-    const firstGroupKey = getFirstGroupKey(resp);
-    const secondGroupKey = getSecondGroupKey(resp);
+    const { key: firstGroupKey, icon: firstIcon } = getFirstGroupKey(resp);
+    const { key: secondGroupKey, icon: secondIcon } = getSecondGroupKey(resp);
 
     if (!index[firstGroupKey]) {
       index[firstGroupKey] = [];
@@ -36,15 +38,19 @@ function groupPlansConfigurable(
       index[firstGroupKey][secondGroupKey] = [];
     }
     index[firstGroupKey][secondGroupKey].push(resp);
+    firstIconIndex[firstGroupKey] = firstIcon;
+    secondIconIndex[secondGroupKey] = secondIcon;
   }
   return Object.keys(index)
     .sort()
     .map((firstKey) => ({
       firstKey,
+      firstIcon: firstIconIndex[firstKey],
       secondKeys: Object.keys(index[firstKey])
         .sort()
         .map((secondKey) => ({
           secondKey,
+          secondIcon: secondIconIndex[secondKey],
           responses: _.sortBy(index[firstKey][secondKey], "name"),
         })),
     }));
@@ -55,7 +61,7 @@ class Sidebar extends React.Component {
     store.dispatch({
       type: "SHOW_DETAILS",
       responses: this.props.index
-        .filter((resp) => searchGetter(resp) === searchValue)
+        .filter((resp) => searchGetter(resp).key === searchValue.key)
         .map((resp) => resp.idx),
       sidebarView: view,
     });
@@ -70,15 +76,13 @@ class Sidebar extends React.Component {
     secondKeyView,
     firstGroupBy,
     secondGroupBy,
-    firstIcon,
-    secondIcon,
   ) {
     const groupedData = groupPlansConfigurable(
       taggedData,
       firstGroupBy,
       secondGroupBy,
     );
-    return groupedData.map(({ firstKey, secondKeys }, idx) => (
+    return groupedData.map(({ firstKey, firstIcon, secondKeys }, idx) => (
       <Fragment key={idx}>
         <p
           style={{
@@ -108,7 +112,7 @@ class Sidebar extends React.Component {
             </a>
           </b>
         </p>
-        {secondKeys.map(({ secondKey, responses }, idx) => (
+        {secondKeys.map(({ secondKey, secondIcon, responses }, idx) => (
           <Fragment key={idx}>
             <p
               style={{
@@ -159,6 +163,9 @@ class Sidebar extends React.Component {
                           type: "SHOW_DETAILS",
                           responses: [resp.idx],
                           sidebarView: SidebarView.detailView,
+                        });
+                        store.dispatch({
+                          type: "UPDATE_MAP_VIEW_ZOOM",
                         });
                       }}
                     >
@@ -382,10 +389,11 @@ class Sidebar extends React.Component {
             taggedData,
             SidebarView.summaryView,
             SidebarView.organizationView,
-            (resp) => resp.tag.loc,
-            (resp) => resp.tag.desc,
-            "globe-americas",
-            "building",
+            (resp) => ({ key: resp.tag.loc, icon: "globe-americas" }),
+            (resp) => ({
+              key: resp.tag.desc,
+              icon: resp.path === "Graduate school" ? "university" : "building",
+            }),
           );
           break;
 
@@ -394,10 +402,11 @@ class Sidebar extends React.Component {
             taggedData,
             SidebarView.organizationView,
             SidebarView.summaryView,
-            (resp) => resp.tag.desc,
-            (resp) => resp.tag.loc,
-            "building",
-            "globe-americas",
+            (resp) => ({
+              key: resp.tag.desc,
+              icon: resp.path === "Graduate school" ? "university" : "building",
+            }),
+            (resp) => ({ key: resp.tag.loc, icon: "globe-americas" }),
           );
           break;
       }
