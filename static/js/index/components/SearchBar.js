@@ -77,8 +77,12 @@ const searchSources = [
   {
     field: (resp) => resp.tag.org,
     alias: { Facebook: "FB" },
+    view: SidebarView.organizationView,
   },
-  (resp) => resp.name,
+  {
+    field: (resp) => resp.name,
+    view: SidebarView.detailView,
+  },
 ];
 
 function getSearchIndex(responses) {
@@ -124,7 +128,11 @@ function getSearchIndex(responses) {
         }
         values.forEach(({ response: resp, val }) => {
           if (!index.has(val)) {
-            index.set(val, { priority: idx, responses: [] });
+            index.set(val, {
+              priority: idx,
+              responses: [],
+              view: source.view || SidebarView.summaryView,
+            });
           }
           index.get(val).responses.push(resp);
         });
@@ -132,17 +140,15 @@ function getSearchIndex(responses) {
     );
   index.delete("");
   return new Map(
-    Array.from(index)
-      .sort(
-        ([val1, { priority: priority1 }], [val2, { priority: priority2 }]) => {
-          if (priority1 < priority2) return -1;
-          if (priority1 > priority2) return +1;
-          if (val1 < val2) return -1;
-          if (val1 > val2) return +1;
-          return 0;
-        },
-      )
-      .map(([val, { responses }]) => [val, responses]),
+    Array.from(index).sort(
+      ([val1, { priority: priority1 }], [val2, { priority: priority2 }]) => {
+        if (priority1 < priority2) return -1;
+        if (priority1 > priority2) return +1;
+        if (val1 < val2) return -1;
+        if (val1 > val2) return +1;
+        return 0;
+      },
+    ),
   );
 }
 
@@ -156,8 +162,8 @@ function normalize(query) {
 function doSearch(query, index) {
   store.dispatch({
     type: "SHOW_DETAILS",
-    responses: index.get(query).map((resp) => resp.idx),
-    sidebarView: SidebarView.summaryView,
+    responses: index.get(query).responses.map((resp) => resp.idx),
+    sidebarView: index.get(query).view,
   });
   store.dispatch({
     type: "UPDATE_MAP_VIEW_ZOOM",
