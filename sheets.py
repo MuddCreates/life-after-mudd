@@ -118,6 +118,7 @@ def download_form_responses():
         added_names = sorted(new_names - old_names)
         if added_names:
             plural = "s" if len(added_names) != 1 else ""
+            not_plural = "" if len(added_names) != 1 else "s"
             print(
                 f"Notifying to Messenger ID {messenger_user_id} about "
                 f"{len(added_names)} new response{plural}",
@@ -132,7 +133,7 @@ def download_form_responses():
                     json={
                         "recipient": {"id": messenger_user_id},
                         "message": {
-                            "text": f"Form response{plural} need attention: {list_str}"
+                            "text": f"Form response{plural} need{not_plural} attention: {list_str}"
                         },
                         # Dumb workaround to so-called Facebook
                         # "policy", see
