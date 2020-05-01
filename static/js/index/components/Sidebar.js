@@ -95,14 +95,15 @@ class Sidebar extends React.Component {
           ></span>
           <b>
             <a
-              href="javascript:void(0)"
-              onClick={() =>
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
                 this.doSearch(
                   firstGroupBy,
                   firstGroupBy(secondKeys[0].responses[0]),
                   firstKeyView,
-                )
-              }
+                );
+              }}
             >
               {firstKey}
             </a>
@@ -123,20 +124,20 @@ class Sidebar extends React.Component {
                 }}
               ></span>
               <a
-                href="javascript:void(0)"
-                onClick={() =>
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
                   this.doSearch(
                     secondGroupBy,
                     secondGroupBy(responses[0]),
                     secondKeyView,
-                  )
-                }
+                  );
+                }}
               >
                 {secondKey}
               </a>
             </p>
             {responses.map((resp, idx) => {
-              console.log(idx, resp.name, responses.length);
               return (
                 <Fragment key={idx}>
                   <p
@@ -152,8 +153,9 @@ class Sidebar extends React.Component {
                       }}
                     ></span>
                     <a
-                      href="javascript:void(0)"
-                      onClick={() => {
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
                         store.dispatch({
                           type: "SHOW_DETAILS",
                           responses: [resp.idx],
