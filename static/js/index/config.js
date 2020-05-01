@@ -4,7 +4,7 @@ export const sidebarWidthFraction = 0.3;
 
 // Fraction of the screen height taken up by the sidebar when we are
 // in portrait mode.
-export const sidebarHeightFraction = 0.4;
+export const sidebarHeightFraction = 0.55;
 
 // Visible height of the search bar in pixels. Calculated manually by
 // inspecting the highest-level search bar wrapper element and
