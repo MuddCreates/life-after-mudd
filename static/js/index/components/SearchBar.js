@@ -230,27 +230,27 @@ class SearchBar extends React.Component {
             </svg>
             {input}
           </div>
+          <button
+            style={{
+              position: "absolute",
+              right: `${-(searchBarPadding + searchBarHeight)}px`,
+              top: `0px`,
+              width: `${searchBarHeight}px`,
+              height: `${searchBarHeight}px`,
+              backgroundColor: "white",
+              borderColor: "white",
+              padding: "0",
+              // copied from mapboxgl-ctrl-geocoder
+              boxShadow: "rgba(0, 0, 0, 0.1) 0px 0px 10px 2px",
+            }}
+            type="button"
+            className="btn btn-light"
+            data-toggle="modal"
+            data-target="#about-modal"
+          >
+            <span className="fas fa-info-circle"></span>
+          </button>
         </div>
-        <button
-          style={{
-            position: "absolute",
-            right: `${searchBarPadding}px`,
-            top: `${searchBarPadding}px`,
-            width: `${searchBarHeight}px`,
-            height: `${searchBarHeight}px`,
-            backgroundColor: "white",
-            borderColor: "white",
-            padding: "0",
-            // copied from mapboxgl-ctrl-geocoder
-            boxShadow: "rgba(0, 0, 0, 0.1) 0px 0px 10px 2px",
-          }}
-          type="button"
-          className="btn btn-light"
-          data-toggle="modal"
-          data-target="#about-modal"
-        >
-          <span className="fas fa-info-circle"></span>
-        </button>
         <div className="modal fade" tabIndex="-1" id="about-modal">
           <div className="modal-dialog">
             <div className="modal-content">
