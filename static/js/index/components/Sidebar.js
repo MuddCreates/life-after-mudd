@@ -253,6 +253,7 @@ class Sidebar extends React.Component {
       zIndex: "3",
       overflowY: "auto",
       boxShadow: "rgba(0, 0, 0, 0.1) 0px 0px 10px 2px",
+      paddingLeft: "12.5px",
     };
     if (this.props.showVertically) {
       Object.assign(style, {
