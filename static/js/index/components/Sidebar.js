@@ -6,7 +6,11 @@ import { Fragment } from "react";
 import Button from "react-bootstrap/Button";
 import { connect } from "react-redux";
 
-import { sidebarWidthFraction, sidebarHeightFraction } from "../config";
+import {
+  sidebarIndentWidth,
+  sidebarWidthFraction,
+  sidebarHeightFraction,
+} from "../config";
 import { store } from "../redux";
 import { SidebarView } from "../state";
 import { tag, tagAll } from "../tag";
@@ -67,6 +71,8 @@ class Sidebar extends React.Component {
     secondKeyView,
     firstGroupBy,
     secondGroupBy,
+    firstIcon,
+    secondIcon,
   ) {
     const groupedData = groupPlansConfigurable(
       taggedData,
@@ -75,61 +81,94 @@ class Sidebar extends React.Component {
     );
     return groupedData.map(({ firstKey, secondKeys }, idx) => (
       <Fragment key={idx}>
-        <Button
-          onClick={() =>
-            this.doSearch(
-              firstGroupBy,
-              firstGroupBy(secondKeys[0].responses[0]),
-              firstKeyView,
-            )
-          }
-          variant="primary"
-          size="lg"
+        <p
+          style={{
+            fontSize: "120%",
+            paddingTop: idx === 0 ? "0px" : "16px",
+          }}
         >
-          <h5>
-            <b>{firstKey}</b>
-          </h5>
-        </Button>
-        <ul>
-          {secondKeys.map(({ secondKey, responses }, idx) => (
-            <li key={idx}>
-              <Fragment>
-                <Button
-                  variant="outline-primary"
-                  size="sm"
-                  onClick={() =>
-                    this.doSearch(
-                      secondGroupBy,
-                      secondGroupBy(responses[0]),
-                      secondKeyView,
-                    )
-                  }
-                >
-                  <b> {secondKey}</b>
-                </Button>
-                <ul>
-                  {responses.map((resp, idx) => (
-                    <li key={idx}>
-                      <Button
-                        onClick={() => {
-                          store.dispatch({
-                            type: "SHOW_DETAILS",
-                            responses: [resp.idx],
-                            sidebarView: SidebarView.detailView,
-                          });
-                        }}
-                        variant="outline-secondary"
-                        size="sm"
-                      >
-                        {resp.name || "Anonymous"}
-                      </Button>
-                    </li>
-                  ))}
-                </ul>
-              </Fragment>
-            </li>
-          ))}
-        </ul>
+          <span
+            className={`fas fa-${firstIcon}`}
+            style={{
+              paddingRight: "10px",
+            }}
+          ></span>
+          <b>
+            <a
+              href="javascript:void(0)"
+              onClick={() =>
+                this.doSearch(
+                  firstGroupBy,
+                  firstGroupBy(secondKeys[0].responses[0]),
+                  firstKeyView,
+                )
+              }
+            >
+              {firstKey}
+            </a>
+          </b>
+        </p>
+        {secondKeys.map(({ secondKey, responses }, idx) => (
+          <Fragment key={idx}>
+            <p
+              style={{
+                marginBottom: "0px",
+              }}
+            >
+              <span
+                className={`fas fa-${secondIcon}`}
+                style={{
+                  paddingLeft: `${sidebarIndentWidth}px`,
+                  paddingRight: "10px",
+                }}
+              ></span>
+              <a
+                href="javascript:void(0)"
+                onClick={() =>
+                  this.doSearch(
+                    secondGroupBy,
+                    secondGroupBy(responses[0]),
+                    secondKeyView,
+                  )
+                }
+              >
+                {secondKey}
+              </a>
+            </p>
+            {responses.map((resp, idx) => {
+              console.log(idx, resp.name, responses.length);
+              return (
+                <Fragment key={idx}>
+                  <p
+                    style={{
+                      marginBottom: "0px",
+                    }}
+                  >
+                    <span
+                      className={`fas fa-user-graduate`}
+                      style={{
+                        paddingLeft: `${sidebarIndentWidth * 2}px`,
+                        paddingRight: "10px",
+                      }}
+                    ></span>
+                    <a
+                      href="javascript:void(0)"
+                      onClick={() => {
+                        store.dispatch({
+                          type: "SHOW_DETAILS",
+                          responses: [resp.idx],
+                          sidebarView: SidebarView.detailView,
+                        });
+                      }}
+                    >
+                      {resp.name || "Anonymous"}
+                    </a>
+                  </p>
+                </Fragment>
+              );
+            })}
+          </Fragment>
+        ))}
       </Fragment>
     ));
   }
@@ -251,7 +290,8 @@ class Sidebar extends React.Component {
             SidebarView.organizationView,
             (resp) => resp.tag.loc,
             (resp) => resp.tag.desc,
-            this.props.index,
+            "globe-americas",
+            "building",
           );
           break;
 
@@ -262,7 +302,8 @@ class Sidebar extends React.Component {
             SidebarView.summaryView,
             (resp) => resp.tag.desc,
             (resp) => resp.tag.loc,
-            this.props.index,
+            "building",
+            "globe-americas",
           );
           break;
       }
