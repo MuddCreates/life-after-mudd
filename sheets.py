@@ -134,6 +134,11 @@ def download_form_responses():
                         "message": {
                             "text": f"Form response{plural} need attention: {list_str}"
                         },
+                        # Dumb workaround to so-called Facebook
+                        # "policy", see
+                        # <https://developers.facebook.com/docs/messenger-platform/send-messages/message-tags>.
+                        "messaging_type": "MESSAGE_TAG",
+                        "tag": "CONFIRMED_EVENT_UPDATE",
                     },
                     timeout=5,
                 )
