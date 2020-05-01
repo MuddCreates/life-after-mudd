@@ -267,7 +267,10 @@ class MapView extends React.Component {
         store.dispatch({
           type: "SHOW_DETAILS",
           responses: Array.from(nearbyPoints),
-          sidebarView: SidebarView.summaryView,
+          sidebarView:
+            nearbyPoints.size > 1
+              ? SidebarView.summaryView
+              : SidebarView.detailView,
         });
       } else {
         store.dispatch({
