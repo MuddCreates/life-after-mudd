@@ -158,6 +158,12 @@ class MapView extends React.Component {
         </>
       );
     }
+    if (!allowResizingWindow()) {
+      // Don't even ask. (Fixes a bug where the map stops rendering
+      // with the correct size after you rotate the viewport multiple
+      // times on Android.)
+      setTimeout(() => this.map && this.map.resize(), 0);
+    }
     return (
       <div
         id="mapContainerContainer"
@@ -176,6 +182,12 @@ class MapView extends React.Component {
             this.map = map;
           }}
           containerStyle={{
+            position: "absolute",
+            left: "0px",
+            top: "0px",
+            width: allowResizingWindow()
+              ? "100vw"
+              : this.props.cachedWindowWidth + "px",
             height: allowResizingWindow()
               ? "100vh"
               : this.props.cachedWindowHeight + "px",
