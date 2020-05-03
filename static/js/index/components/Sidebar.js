@@ -254,7 +254,16 @@ class Sidebar extends React.Component {
     );
   }
 
-  detailItem({ resp, icon, field, match, matchSummer, separator, noLink }) {
+  detailItem({
+    resp,
+    icon,
+    field,
+    match,
+    matchSummer,
+    separator,
+    noLink,
+    sidebarView,
+  }) {
     const arrayify = (fn) => (resp) => {
       let vals = fn(resp);
       if (!vals) {
@@ -313,7 +322,7 @@ class Sidebar extends React.Component {
                           }
                         })
                         .filter((x) => x),
-                      sidebarView: SidebarView.summaryView,
+                      sidebarView: sidebarView || SidebarView.summaryView,
                     });
                     store.dispatch({
                       type: "UPDATE_MAP_VIEW_ZOOM",
@@ -358,6 +367,7 @@ class Sidebar extends React.Component {
           icon: resp.path === "Graduate school" ? "university" : "building",
           field: (resp) => resp.org,
           matchSummer: (resp) => resp.summerOrg,
+          sidebarView: SidebarView.organizationView,
         })}
         {(resp.summerPlans ||
           resp.summerCity ||
@@ -402,39 +412,40 @@ class Sidebar extends React.Component {
               field: (resp) => resp.summerOrg,
               match: (resp) => resp.org,
               matchSummer: (resp) => resp.summerOrg,
+              sidebarView: SidebarView.organizationView,
             })}
-            {resp.comments && (
-              <p
+          </>
+        )}
+        {resp.comments && (
+          <p
+            style={{
+              marginTop: "55px",
+            }}
+          >
+            <span
+              style={{
+                position: "absolute",
+              }}
+            >
+              <span
                 style={{
-                  marginTop: "55px",
+                  color: "#ccc",
+                  fontSize: "400%",
+                  position: "absolute",
+                  top: "-45px",
                 }}
               >
-                <span
-                  style={{
-                    position: "absolute",
-                  }}
-                >
-                  <span
-                    style={{
-                      color: "#ccc",
-                      fontSize: "400%",
-                      position: "absolute",
-                      top: "-45px",
-                    }}
-                  >
-                    &ldquo;
-                  </span>
-                </span>
-                <span
-                  style={{
-                    marginLeft: "5px",
-                  }}
-                >
-                  {resp.comments}
-                </span>
-              </p>
-            )}
-          </>
+                &ldquo;
+              </span>
+            </span>
+            <span
+              style={{
+                marginLeft: "5px",
+              }}
+            >
+              {resp.comments}
+            </span>
+          </p>
         )}
       </div>
     );
