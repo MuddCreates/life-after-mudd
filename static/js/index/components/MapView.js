@@ -1,6 +1,7 @@
 "use strict";
 
 import React from "react";
+import { Fragment } from "react";
 import ReactMapboxGl from "react-mapbox-gl";
 import { Feature, Layer } from "react-mapbox-gl";
 import { connect } from "react-redux";
@@ -11,9 +12,8 @@ import {
   sidebarWidthFraction,
   sidebarHeightFraction,
 } from "../config";
-import { tagAll } from "../tag";
 import { store } from "../redux";
-import { GeotagView, SidebarView } from "../state";
+import { SidebarView } from "../state";
 import {
   allowResizingWindow,
   originalWindowHeight,
@@ -24,7 +24,7 @@ const CIRCLE_RADIUS = 10;
 const HIGHLIGHT_BBOX_RADIUS = 10;
 const POINT_PADDING = searchBarOcclusion + 30;
 
-const Map = ReactMapboxGl({
+const MapGl = ReactMapboxGl({
   accessToken: mapboxAccessToken,
 });
 
@@ -44,45 +44,122 @@ class MapView extends React.Component {
     ];
     this.lastSerial = this.props.serial;
   }
-  render() {
+  render = () => {
     let layer = null;
+    this.longTermIds = new Map();
+    this.summerIds = new Map();
     if (this.props.responses !== null) {
+      let longTermId = 0;
+      let summerId = 0;
       layer = (
-        <Layer
-          id="people"
-          type="circle"
-          geoJSONSourceOptions={{ generateId: true }}
-          paint={{
-            "circle-color": [
-              "case",
+        <>
+          <Layer
+            id="summer"
+            type="circle"
+            geoJSONSourceOptions={{ generateId: true }}
+            paint={{
               // https://blog.mapbox.com/visualizing-election-data-a-guide-to-mapbox-gl-expressions-92cc469b8dfd
               // https://blog.mapbox.com/going-live-with-electoral-maps-a-guide-to-feature-state-b520e91a22d
-              ["boolean", ["feature-state", "hover"], false],
-              "#000000",
-              "#eaaa00", // HMC yellow
-            ],
-            "circle-radius": CIRCLE_RADIUS,
-            "circle-stroke-color": "black",
-            "circle-stroke-width": [
-              "case",
-              ["boolean", ["get", "displayed"], false],
-              3,
-              1,
-            ],
-          }}
-        >
-          {this.props.responses.map((resp) => (
-            <Feature
-              coordinates={[resp.tag.latLong.lng, resp.tag.latLong.lat]}
-              key={resp.idx}
-              properties={{
-                displayed:
-                  this.props.displayedResponses &&
-                  this.props.displayedResponses.has(resp.idx),
-              }}
-            />
-          ))}
-        </Layer>
+              // https://docs.mapbox.com/mapbox-gl-js/style-spec/expressions/#case
+              // https://docs.mapbox.com/mapbox-gl-js/style-spec/expressions/#types-boolean
+              //
+              // Be warned, the docs are really bad.
+              "circle-color": [
+                "case",
+                ["boolean", ["feature-state", "hover"], false],
+                "#000000",
+                // https://www.hmc.edu/communications/visual-identity-guidelines/
+                "#00c1d5",
+              ],
+              "circle-radius": CIRCLE_RADIUS,
+              "circle-stroke-color": "black",
+              "circle-stroke-width": [
+                "case",
+                ["boolean", ["get", "displayed"], false],
+                3,
+                1,
+              ],
+            }}
+          >
+            {this.props.responses
+              .map((resp) => {
+                const latLong = resp.summerOrgLatLong || resp.summerCityLatLong;
+                if (latLong) {
+                  this.summerIds.set(summerId++, resp.idx);
+                  return (
+                    latLong && (
+                      <Feature
+                        coordinates={[latLong.lng, latLong.lat]}
+                        properties={{
+                          displayed:
+                            this.props.displayedSummerIndices &&
+                            this.props.displayedSummerIndices.has(resp.idx),
+                          summer: true,
+                        }}
+                        key={resp.idx * 2 + 1}
+                      />
+                    )
+                  );
+                } else {
+                  return null;
+                }
+              })
+              .filter((x) => x)}
+          </Layer>
+          <Layer
+            id="longTerm"
+            type="circle"
+            geoJSONSourceOptions={{ generateId: true }}
+            paint={{
+              // https://blog.mapbox.com/visualizing-election-data-a-guide-to-mapbox-gl-expressions-92cc469b8dfd
+              // https://blog.mapbox.com/going-live-with-electoral-maps-a-guide-to-feature-state-b520e91a22d
+              // https://docs.mapbox.com/mapbox-gl-js/style-spec/expressions/#case
+              // https://docs.mapbox.com/mapbox-gl-js/style-spec/expressions/#types-boolean
+              //
+              // Be warned, the docs are really bad.
+              "circle-color": [
+                "case",
+                ["boolean", ["feature-state", "hover"], false],
+                "#000000",
+                // https://www.hmc.edu/communications/visual-identity-guidelines/
+                "#eaaa00",
+              ],
+              "circle-radius": CIRCLE_RADIUS,
+              "circle-stroke-color": "black",
+              "circle-stroke-width": [
+                "case",
+                ["boolean", ["get", "displayed"], false],
+                3,
+                1,
+              ],
+            }}
+          >
+            {this.props.responses
+              .map((resp) => {
+                const latLong = resp.orgLatLong || resp.cityLatLong;
+                if (latLong) {
+                  this.longTermIds.set(longTermId++, resp.idx);
+                  return (
+                    latLong && (
+                      <Feature
+                        coordinates={[latLong.lng, latLong.lat]}
+                        properties={{
+                          displayed:
+                            this.props.displayedLongTermIndices &&
+                            this.props.displayedLongTermIndices.has(resp.idx),
+                          summer: false,
+                        }}
+                        key={resp.idx * 2}
+                      />
+                    )
+                  );
+                } else {
+                  return null;
+                }
+              })
+              .filter((x) => x)}
+          </Layer>
+        </>
       );
     }
     return (
@@ -93,7 +170,7 @@ class MapView extends React.Component {
         onMouseMove={this.onMouseEvent}
         onMouseUp={this.onMouseEvent}
       >
-        <Map
+        <MapGl
           style="mapbox://styles/raxod502/ck6nxepcj03jv1jqe6a7p8om4"
           fitBounds={this.initialBounds}
           fitBoundsOptions={{ duration: 0 }}
@@ -109,10 +186,10 @@ class MapView extends React.Component {
           }}
         >
           {layer}
-        </Map>
+        </MapGl>
       </div>
     );
-  }
+  };
   componentDidUpdate() {
     if (!this.map) {
       // Shouldn't happen but who knows :/
@@ -122,7 +199,10 @@ class MapView extends React.Component {
       return;
     }
     this.lastSerial = this.props.serial;
-    if (this.props.displayedResponses.size === 0) {
+    if (
+      this.props.displayedLongTermIndices.size === 0 &&
+      this.props.displayedSummerIndices.size === 0
+    ) {
       return;
     }
     // OK. This long sequence of geometry code is basically
@@ -132,15 +212,32 @@ class MapView extends React.Component {
     let mapRight = -Infinity;
     let mapTop = -Infinity;
     let mapBottom = Infinity;
-    this.props.responses
-      .filter((resp) => this.props.displayedResponses.has(resp.idx))
-      .forEach((resp) => {
-        mapLeft = Math.min(mapLeft, resp.tag.latLong.lng);
-        mapRight = Math.max(mapRight, resp.tag.latLong.lng);
-        mapBottom = Math.min(mapBottom, resp.tag.latLong.lat);
-        mapTop = Math.max(mapTop, resp.tag.latLong.lat);
-      });
-    const zoomLimit = 0.2;
+    const allGeotags = [].concat.apply(
+      [],
+      this.props.displayedResponses.map((resp) => {
+        const geotags = [];
+        if (!resp.hasOwnProperty("showLongTerm") || resp["showLongTerm"]) {
+          const geotag = resp.orgLatLong || resp.cityLatLong;
+          if (geotag) {
+            geotags.push(geotag);
+          }
+        }
+        if (!resp.hasOwnProperty("showSummer") || resp["showSummer"]) {
+          const geotag = resp.summerOrgLatLong || resp.summerCityLatLong;
+          if (geotag) {
+            geotags.push(geotag);
+          }
+        }
+        return geotags;
+      }),
+    );
+    allGeotags.forEach((geotag) => {
+      mapLeft = Math.min(mapLeft, geotag.lng);
+      mapRight = Math.max(mapRight, geotag.lng);
+      mapBottom = Math.min(mapBottom, geotag.lat);
+      mapTop = Math.max(mapTop, geotag.lat);
+    });
+    const zoomLimit = 0.1;
     if (mapRight - mapLeft < zoomLimit) {
       const offset = (zoomLimit - (mapRight - mapLeft)) / 2;
       mapLeft -= offset;
@@ -223,16 +320,26 @@ class MapView extends React.Component {
       [point.x - HIGHLIGHT_BBOX_RADIUS, point.y - HIGHLIGHT_BBOX_RADIUS],
       [point.x + HIGHLIGHT_BBOX_RADIUS, point.y + HIGHLIGHT_BBOX_RADIUS],
     ];
-    const nearbyPoints = new Set();
+    const longTerm = new Set();
     for (const feature of map.queryRenderedFeatures(bbox, {
-      layers: ["people"],
+      layers: ["longTerm"],
     })) {
-      nearbyPoints.add(feature.id);
+      longTerm.add(this.longTermIds.get(feature.id));
     }
-    return nearbyPoints;
+    const summer = new Set();
+    for (const feature of map.queryRenderedFeatures(bbox, {
+      layers: ["summer"],
+    })) {
+      summer.add(this.summerIds.get(feature.id));
+    }
+    return [longTerm, summer];
   };
   onMouseEvent = (e) => {
-    if (!this.map || !this.map.getLayer("people")) {
+    if (
+      !this.map ||
+      !this.map.getLayer("longTerm") ||
+      !this.map.getLayer("summer")
+    ) {
       // Map not fully loaded yet, refrain from messing with it to
       // avoid errors.
       return;
@@ -244,31 +351,53 @@ class MapView extends React.Component {
     } else if (e.type === "mousemove" && this.mouseState !== "up") {
       this.mouseState = "drag";
     }
-    const nearbyPoints = this.getNearbyPoints(this.map, {
+    const [nearbyLongTerm, nearbySummer] = this.getNearbyPoints(this.map, {
       x: e.clientX,
       y: e.clientY,
     });
+    const pointsSelected = nearbyLongTerm.size > 0 || nearbySummer.size > 0;
     // This follows the conventions set by Google Maps.
     if (this.mouseState === "drag") {
       this.map.getCanvas().style.cursor = "move";
-    } else if (nearbyPoints.size > 0) {
+    } else if (pointsSelected) {
       this.map.getCanvas().style.cursor = "pointer";
     } else {
       this.map.getCanvas().style.cursor = "default";
     }
-    this.props.responses.forEach((resp) => {
+    for (const id of this.longTermIds.keys()) {
       this.map.setFeatureState(
-        { source: "people", id: resp.idx },
-        { hover: nearbyPoints.has(resp.idx) },
+        { source: "longTerm", id },
+        { hover: nearbyLongTerm.has(id) },
       );
-    });
+    }
+    for (const id of this.summerIds.keys()) {
+      this.map.setFeatureState(
+        { source: "summer", id },
+        { hover: nearbySummer.has(id) },
+      );
+    }
     if (e.type === "click") {
-      if (nearbyPoints.size > 0) {
+      if (pointsSelected) {
+        const longTermIndices = new Set();
+        for (const id of nearbyLongTerm) {
+          longTermIndices.add(this.longTermIds.get(id));
+        }
+        const summerIndices = new Set();
+        for (const id of nearbySummer) {
+          summerIndices.add(this.summerIds.get(id));
+        }
+        const responses = this.props.responses
+          .map((resp) => ({
+            ...resp,
+            showLongTerm: longTermIndices.has(resp.idx),
+            showSummer: summerIndices.has(resp.idx),
+          }))
+          .filter((resp) => resp.showLongTerm || resp.showSummer);
         store.dispatch({
           type: "SHOW_DETAILS",
-          responses: Array.from(nearbyPoints),
+          responses,
           sidebarView:
-            nearbyPoints.size > 1
+            responses.length > 1
               ? SidebarView.summaryView
               : SidebarView.detailView,
         });
@@ -282,12 +411,24 @@ class MapView extends React.Component {
 }
 
 export default connect((state) => ({
-  responses:
-    state.responses &&
-    tagAll(state.responses, state.geotagView).filter(
-      (resp) => resp.tag.latLong,
+  responses: state.responses,
+  displayedLongTermIndices:
+    state.displayedResponses &&
+    new Set(
+      state.displayedResponses
+        .filter(
+          (resp) => !resp.hasOwnProperty("showLongTerm") || resp.showLongTerm,
+        )
+        .map((resp) => resp.idx),
     ),
-  displayedResponses: new Set(state.displayedResponses),
+  displayedSummerIndices:
+    state.displayedResponses &&
+    new Set(
+      state.displayedResponses
+        .filter((resp) => !resp.hasOwnProperty("showSummer") || resp.showSummer)
+        .map((resp) => resp.idx),
+    ),
+  displayedResponses: state.displayedResponses,
   serial: state.mapViewSerial,
   sidebarVertical: state.landscape,
 }))(MapView);

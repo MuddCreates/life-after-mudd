@@ -12,46 +12,97 @@ import {
 } from "../config";
 import { store } from "../redux";
 import { SidebarView } from "../state";
-import { formatCity, tag, tagAll } from "../tag";
+import { formatCity, formatPlan } from "../tag";
 import {
   allowResizingWindow,
   originalWindowWidth,
   originalWindowHeight,
 } from "../util";
 
-function groupPlansConfigurable(
-  responses,
-  getFirstGroupKey,
-  getSecondGroupKey,
-) {
+function groupData(responses, getFirstKey, getSecondKey) {
   const index = {};
   const firstIconIndex = {};
   const secondIconIndex = {};
   for (const resp of responses) {
-    const { key: firstGroupKey, icon: firstIcon } = getFirstGroupKey(resp);
-    const { key: secondGroupKey, icon: secondIcon } = getSecondGroupKey(resp);
+    const {
+      key: theFirstKey,
+      summerKey: firstSummerKey,
+      icon: theFirstIcon,
+      summerIcon: firstSummerIcon,
+      noLinkForSummer: noLinkForSummerFirst,
+    } = getFirstKey(resp);
+    const {
+      key: theSecondKey,
+      summerKey: secondSummerKey,
+      icon: theSecondIcon,
+      summerIcon: secondSummerIcon,
+      noLinkForSummer: noLinkForSummerSecond,
+    } = getSecondKey(resp);
 
-    if (!index[firstGroupKey]) {
-      index[firstGroupKey] = [];
+    for (const [
+      firstKey,
+      secondKey,
+      firstIcon,
+      secondIcon,
+      noLinkFirst,
+      noLinkSecond,
+      summer,
+    ] of [
+      [
+        theFirstKey,
+        theSecondKey,
+        theFirstIcon,
+        theSecondIcon,
+        false,
+        false,
+        false,
+      ],
+      [
+        firstSummerKey,
+        secondSummerKey,
+        firstSummerIcon,
+        secondSummerIcon,
+        noLinkForSummerFirst,
+        noLinkForSummerSecond,
+        true,
+      ],
+    ]) {
+      if (!(firstKey && secondKey)) {
+        continue;
+      }
+      if (
+        (!summer &&
+          (!resp.hasOwnProperty("showLongTerm") || resp.showLongTerm)) ||
+        (summer && (!resp.hasOwnProperty("showSummer") || resp.showSummer))
+      ) {
+        if (!index[firstKey]) {
+          index[firstKey] = [];
+        }
+        if (!index[firstKey][secondKey]) {
+          index[firstKey][secondKey] = [];
+        }
+        index[firstKey][secondKey].push({ resp, summer });
+        firstIconIndex[firstKey] = { icon: firstIcon, noLink: noLinkFirst };
+        secondIconIndex[secondKey] = { icon: secondIcon, noLink: noLinkSecond };
+      }
     }
-    if (!index[firstGroupKey][secondGroupKey]) {
-      index[firstGroupKey][secondGroupKey] = [];
-    }
-    index[firstGroupKey][secondGroupKey].push(resp);
-    firstIconIndex[firstGroupKey] = firstIcon;
-    secondIconIndex[secondGroupKey] = secondIcon;
   }
   return Object.keys(index)
     .sort()
     .map((firstKey) => ({
       firstKey,
-      firstIcon: firstIconIndex[firstKey],
+      firstIcon: firstIconIndex[firstKey].icon,
+      noLinkFirst: firstIconIndex[firstKey].noLink,
       secondKeys: Object.keys(index[firstKey])
         .sort()
         .map((secondKey) => ({
           secondKey,
-          secondIcon: secondIconIndex[secondKey],
-          responses: _.sortBy(index[firstKey][secondKey], "name"),
+          secondIcon: secondIconIndex[secondKey].icon,
+          noLinkSecond: secondIconIndex[secondKey].noLink,
+          responses: _.sortBy(
+            index[firstKey][secondKey],
+            ({ resp }) => resp.name,
+          ),
         })),
     }));
 }
@@ -60,9 +111,17 @@ class Sidebar extends React.Component {
   doSimpleSearch(searchGetter, searchValue, view) {
     store.dispatch({
       type: "SHOW_DETAILS",
-      responses: this.props.index
-        .filter((resp) => searchGetter(resp).key === searchValue.key)
-        .map((resp) => resp.idx),
+      responses: this.props.allResponses
+        .map((resp) => {
+          const showLongTerm = searchGetter(resp).key === searchValue;
+          const showSummer = searchGetter(resp).summerKey === searchValue;
+          if (showLongTerm || showSummer) {
+            return { ...resp, showLongTerm, showSummer };
+          } else {
+            return null;
+          }
+        })
+        .filter((x) => x),
       sidebarView: view,
     });
     store.dispatch({
@@ -71,119 +130,133 @@ class Sidebar extends React.Component {
   }
 
   createTwoLevelViewJSX(
-    taggedData,
     firstKeyView,
     secondKeyView,
     firstGroupBy,
     secondGroupBy,
   ) {
-    const groupedData = groupPlansConfigurable(
-      taggedData,
+    const groupedData = groupData(
+      this.props.responses,
       firstGroupBy,
       secondGroupBy,
     );
-    return groupedData.map(({ firstKey, firstIcon, secondKeys }, idx) => (
-      <Fragment key={idx}>
-        <p
-          style={{
-            fontSize: "120%",
-            paddingTop: idx === 0 ? "0px" : "16px",
-          }}
-        >
-          <span
-            className={`fas fa-${firstIcon}`}
+    return groupedData.map(
+      ({ firstKey, firstIcon, noLinkFirst, secondKeys }, idx) => (
+        <Fragment key={idx}>
+          <p
             style={{
-              paddingRight: "10px",
+              fontSize: "120%",
+              paddingTop: idx === 0 ? "0px" : "16px",
             }}
-          ></span>
-          <b>
-            <a
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                this.doSimpleSearch(
-                  firstGroupBy,
-                  firstGroupBy(secondKeys[0].responses[0]),
-                  firstKeyView,
-                );
-              }}
-            >
-              {firstKey}
-            </a>
-          </b>
-        </p>
-        {secondKeys.map(({ secondKey, secondIcon, responses }, idx) => (
-          <Fragment key={idx}>
-            <p
+          >
+            <span
+              className={`fas fa-${firstIcon}`}
               style={{
-                marginBottom: "0px",
+                paddingRight: "10px",
               }}
-            >
-              <span
-                className={`fas fa-${secondIcon}`}
-                style={{
-                  paddingLeft: `${sidebarIndentWidth}px`,
-                  paddingRight: "10px",
-                }}
-              ></span>
-              <a
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  this.doSimpleSearch(
-                    secondGroupBy,
-                    secondGroupBy(responses[0]),
-                    secondKeyView,
-                  );
-                }}
-              >
-                {secondKey}
-              </a>
-            </p>
-            {responses.map((resp, idx) => {
-              return (
-                <Fragment key={idx}>
-                  <p
+            ></span>
+            <b>
+              {noLinkFirst ? (
+                firstKey
+              ) : (
+                <a
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    this.doSimpleSearch(firstGroupBy, firstKey, firstKeyView);
+                  }}
+                >
+                  {firstKey}
+                </a>
+              )}
+            </b>
+          </p>
+          {secondKeys.map(
+            ({ secondKey, secondIcon, noLinkSecond, responses }, idx) => (
+              <Fragment key={idx}>
+                <p
+                  style={{
+                    marginBottom: "0px",
+                  }}
+                >
+                  <span
+                    className={`fas fa-${secondIcon}`}
                     style={{
-                      marginBottom: "0px",
+                      paddingLeft: `${sidebarIndentWidth}px`,
+                      paddingRight: "10px",
                     }}
-                  >
-                    <span
-                      className={`fas fa-user-graduate`}
-                      style={{
-                        paddingLeft: `${sidebarIndentWidth * 2}px`,
-                        paddingRight: "10px",
-                      }}
-                    ></span>
+                  ></span>
+                  {noLinkSecond ? (
+                    secondKey
+                  ) : (
                     <a
                       href="#"
                       onClick={(e) => {
                         e.preventDefault();
-                        store.dispatch({
-                          type: "SHOW_DETAILS",
-                          responses: [resp.idx],
-                          sidebarView: SidebarView.detailView,
-                        });
-                        store.dispatch({
-                          type: "UPDATE_MAP_VIEW_ZOOM",
-                        });
+                        this.doSimpleSearch(
+                          secondGroupBy,
+                          secondKey,
+                          secondKeyView,
+                        );
                       }}
                     >
-                      {resp.name || "Anonymous"}
+                      {secondKey}
                     </a>
-                  </p>
-                </Fragment>
-              );
-            })}
-          </Fragment>
-        ))}
-      </Fragment>
-    ));
+                  )}
+                </p>
+                {responses.map(({ resp, summer }, idx) => {
+                  return (
+                    <Fragment key={idx}>
+                      <p
+                        style={{
+                          marginBottom: "0px",
+                        }}
+                      >
+                        <span
+                          className={`fas fa-user-graduate`}
+                          style={{
+                            paddingLeft: `${sidebarIndentWidth * 2}px`,
+                            paddingRight: "10px",
+                          }}
+                        ></span>
+                        <a
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            store.dispatch({
+                              type: "SHOW_DETAILS",
+                              responses: [resp],
+                              sidebarView: SidebarView.detailView,
+                            });
+                            store.dispatch({
+                              type: "UPDATE_MAP_VIEW_ZOOM",
+                            });
+                          }}
+                        >
+                          {resp.name || "Anonymous"}
+                        </a>
+                        <i
+                          style={{
+                            fontSize: "75%",
+                          }}
+                        >
+                          {summer && " (for the summer)"}
+                        </i>
+                      </p>
+                    </Fragment>
+                  );
+                })}
+              </Fragment>
+            ),
+          )}
+        </Fragment>
+      ),
+    );
   }
 
-  detailItem({ resp, icon, field, separator, noLink }) {
-    const fields = (resp) => {
-      let vals = field(resp);
+  detailItem({ resp, icon, field, match, matchSummer, separator, noLink }) {
+    const arrayify = (fn) => (resp) => {
+      let vals = fn(resp);
       if (!vals) {
         return null;
       }
@@ -195,6 +268,9 @@ class Sidebar extends React.Component {
       }
       return vals;
     };
+    const fields = arrayify(field);
+    const matches = arrayify(match || field);
+    const matchesSummer = matchSummer && arrayify(matchSummer);
     return (
       fields(resp) && (
         <p
@@ -222,11 +298,21 @@ class Sidebar extends React.Component {
                     e.preventDefault();
                     store.dispatch({
                       type: "SHOW_DETAILS",
-                      responses: this.props.index
-                        .filter(
-                          (resp) => fields(resp) && fields(resp).includes(val),
-                        )
-                        .map((resp) => resp.idx),
+                      responses: this.props.allResponses
+                        .map((resp) => {
+                          const showLongTerm =
+                            matches(resp) && matches(resp).includes(val);
+                          const showSummer =
+                            matchesSummer &&
+                            matchesSummer(resp) &&
+                            matchesSummer(resp).includes(val);
+                          if (showLongTerm || showSummer) {
+                            return { ...resp, showLongTerm, showSummer };
+                          } else {
+                            return null;
+                          }
+                        })
+                        .filter((x) => x),
                       sidebarView: SidebarView.summaryView,
                     });
                     store.dispatch({
@@ -264,11 +350,14 @@ class Sidebar extends React.Component {
           resp,
           icon: "globe-americas",
           field: (resp) => formatCity(resp.city, resp.state, resp.country),
+          matchSummer: (resp) =>
+            formatCity(resp.summerCity, resp.summerState, resp.summerCountry),
         })}
         {this.detailItem({
           resp,
           icon: resp.path === "Graduate school" ? "university" : "building",
           field: (resp) => resp.org,
+          matchSummer: (resp) => resp.summerOrg,
         })}
         {(resp.summerPlans ||
           resp.summerCity ||
@@ -299,11 +388,20 @@ class Sidebar extends React.Component {
                   resp.summerState,
                   resp.summerCountry,
                 ),
+              match: (resp) => formatCity(resp.city, resp.state, resp.country),
+              matchSummer: (resp) =>
+                formatCity(
+                  resp.summerCity,
+                  resp.summerState,
+                  resp.summerCountry,
+                ),
             })}
             {this.detailItem({
               resp,
               icon: "building",
               field: (resp) => resp.summerOrg,
+              match: (resp) => resp.org,
+              matchSummer: (resp) => resp.summerOrg,
             })}
             {resp.comments && (
               <p
@@ -343,7 +441,6 @@ class Sidebar extends React.Component {
   }
 
   render() {
-    const taggedData = tagAll(this.props.responses, this.props.geotagView);
     const style = {
       position: "absolute",
       padding: "10px",
@@ -378,53 +475,58 @@ class Sidebar extends React.Component {
     }
 
     let sidebarBody = null;
-    if (this.props.sidebarView === SidebarView.detailView) {
-      const subject = tag(this.props.responses[0], this.props.geotagView);
-      sidebarBody = this.detailView(subject);
-    } else {
-      // for all view made with createTwoLevelViewJSX
-      switch (this.props.sidebarView) {
-        case SidebarView.summaryView:
-          sidebarBody = this.createTwoLevelViewJSX(
-            taggedData,
-            SidebarView.summaryView,
-            SidebarView.organizationView,
-            (resp) => ({ key: resp.tag.loc, icon: "globe-americas" }),
-            (resp) => ({
-              key: resp.tag.desc,
-              icon: resp.path === "Graduate school" ? "university" : "building",
-            }),
-          );
-          break;
+    const locationGroupBy = (resp) => ({
+      key: formatCity(resp.city, resp.state, resp.country),
+      summerKey: formatCity(
+        resp.summerCity,
+        resp.summerState,
+        resp.summerCountry,
+      ),
+      icon: "globe-americas",
+      summerIcon: "globe-americas",
+      noLinkForSummer: false,
+    });
+    const orgGroupBy = (resp) => ({
+      key: formatPlan(resp),
+      summerKey: resp.summerPlans,
+      icon: resp.path === "Graduate school" ? "university" : "building",
+      summerIcon: "calendar-check",
+      noLinkForSummer: true,
+    });
 
-        case SidebarView.organizationView:
-          sidebarBody = this.createTwoLevelViewJSX(
-            taggedData,
-            SidebarView.organizationView,
-            SidebarView.summaryView,
-            (resp) => ({
-              key: resp.tag.desc,
-              icon: resp.path === "Graduate school" ? "university" : "building",
-            }),
-            (resp) => ({ key: resp.tag.loc, icon: "globe-americas" }),
-          );
-          break;
-      }
+    switch (this.props.sidebarView) {
+      case SidebarView.detailView:
+        sidebarBody = this.props.responses.map((resp) => (
+          <Fragment key={resp.idx}>{this.detailView(resp)}</Fragment>
+        ));
+        break;
+
+      case SidebarView.summaryView:
+        sidebarBody = this.createTwoLevelViewJSX(
+          SidebarView.summaryView,
+          SidebarView.organizationView,
+          locationGroupBy,
+          orgGroupBy,
+        );
+        break;
+
+      case SidebarView.organizationView:
+        sidebarBody = this.createTwoLevelViewJSX(
+          SidebarView.organizationView,
+          SidebarView.summaryView,
+          orgGroupBy,
+          locationGroupBy,
+        );
+        break;
     }
     return <div style={style}>{sidebarBody}</div>;
   }
 }
 
-export default connect((state) => {
-  const displayedResponses = new Set(state.displayedResponses);
-  const responses = state.responses.filter((resp) =>
-    displayedResponses.has(resp.idx),
-  );
-  return {
-    responses: responses,
-    geotagView: state.geotagView,
-    sidebarView: state.sidebarView,
-    showVertically: state.landscape,
-    index: responses && tagAll(state.responses, state.geotagView),
-  };
-})(Sidebar);
+export default connect((state) => ({
+  responses: state.displayedResponses,
+  geotagView: state.geotagView,
+  sidebarView: state.sidebarView,
+  showVertically: state.landscape,
+  allResponses: state.responses,
+}))(Sidebar);

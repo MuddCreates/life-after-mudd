@@ -17,7 +17,6 @@ import "@fortawesome/fontawesome-free/css/all.css";
 
 import { searchBarHeight, searchBarPadding, searchBarWidth } from "../config";
 import { failHard } from "../error";
-import { tagAll } from "../tag";
 import { store } from "../redux";
 import { SidebarView } from "../state";
 
@@ -26,6 +25,26 @@ const statesByAbbr = {};
 for (const state of new UsaStates().states) {
   statesByName[state.name] = state;
   statesByAbbr[state.abbreviation] = state;
+}
+
+function inBayArea(latLong) {
+  return (
+    latLong &&
+    latLong.lat > 36.878 &&
+    latLong.lat < 38.859 &&
+    latLong.lng > -123.569 &&
+    latLong.lng < -121.199
+  );
+}
+
+function inSeattleArea(latLong) {
+  return (
+    latLong &&
+    latLong.lat > 46.724 &&
+    latLong.lat < 48.309 &&
+    latLong.lng > -122.725 &&
+    latLong.lng < -120.877
+  );
 }
 
 const searchSources = [
@@ -37,14 +56,20 @@ const searchSources = [
   },
   (resp) => resp.major.split(" + "),
   {
-    field: (resp) => resp.tag.city,
+    field: (resp) => [resp.city, { val: resp.summerCity, summer: true }],
     alias: {
       "New York City": "NYC",
       "San Francisco": "SF",
     },
   },
   {
-    field: (resp) => (statesByAbbr[resp.tag.state] || {}).name,
+    field: (resp) => [
+      (statesByAbbr[resp.state] || { name: "" }).name,
+      {
+        val: (statesByAbbr[resp.summerState] || { name: "" }).name,
+        summer: true,
+      },
+    ],
     alias: Object.fromEntries(
       Object.entries(statesByName).map(([name, state]) => [
         name,
@@ -55,27 +80,23 @@ const searchSources = [
   [
     {
       name: "San Francisco (SF) Bay Area",
-      filter: (resp) =>
-        resp.tag.latLong.lat > 36.878 &&
-        resp.tag.latLong.lat < 38.859 &&
-        resp.tag.latLong.lng > -123.569 &&
-        resp.tag.latLong.lng < -121.199,
+      filter: (resp) => inBayArea(resp.orgLatLong || resp.cityLatLong),
+      summerFilter: (resp) =>
+        inBayArea(resp.summerOrgLatLong || resp.citySummerLatLong),
     },
     {
       name: "Seattle Area",
-      filter: (resp) =>
-        resp.tag.latLong.lat > 46.724 &&
-        resp.tag.latLong.lat < 48.309 &&
-        resp.tag.latLong.lng > -122.725 &&
-        resp.tag.latLong.lng < -120.877,
+      filter: (resp) => inSeattleArea(resp.orgLatLong || resp.cityLatLong),
+      summerFilter: (resp) =>
+        inSeattleArea(resp.summerOrgLatLong || resp.citySummerLatLong),
     },
   ],
   {
-    field: (resp) => resp.tag.country,
+    field: (resp) => [resp.country, { val: resp.summerCountry, summer: true }],
     alias: { "United States": "USA" },
   },
   {
-    field: (resp) => resp.tag.org,
+    field: (resp) => [resp.org, { val: resp.summerOrg, summer: true }],
     alias: { Facebook: "FB" },
     view: SidebarView.organizationView,
   },
@@ -100,7 +121,10 @@ function getSearchIndex(responses) {
     .forEach((sources, idx) =>
       sources.forEach((source) => {
         let values;
-        if (source.field && !source.name) {
+        if (
+          source.field &&
+          !(source.name || source.filter || source.summerFilter)
+        ) {
           values = [].concat.apply(
             [],
             responses.map((resp) => {
@@ -109,6 +133,12 @@ function getSearchIndex(responses) {
                 vals = [vals];
               }
               return vals.map((val) => {
+                if (val.summer) {
+                  val = val.val;
+                  resp = { ...resp, showLongTerm: false, showSummer: true };
+                } else {
+                  resp = { ...resp, showLongTerm: true, showSummer: false };
+                }
                 if (source.rename && source.rename[val]) {
                   val = source.rename[val];
                 }
@@ -119,10 +149,29 @@ function getSearchIndex(responses) {
               });
             }),
           );
-        } else if (source.name && source.filter && !source.field) {
-          values = responses
-            .filter((resp) => source.filter(resp))
-            .map((resp) => ({ response: resp, val: source.name }));
+        } else if (
+          source.name &&
+          (source.filter || source.summerFilter) &&
+          !source.field
+        ) {
+          values = [];
+          for (const [fn, summer] of [
+            [source.filter, false],
+            [source.summerFilter, true],
+          ]) {
+            if (fn) {
+              values = values.concat(
+                responses.filter(fn).map((resp) => ({
+                  response: {
+                    ...resp,
+                    showLongTerm: !summer,
+                    showSummer: summer,
+                  },
+                  val: source.name,
+                })),
+              );
+            }
+          }
         } else {
           failHard(`Malformed search source: ${JSON.stringify(source)}`);
         }
@@ -134,7 +183,19 @@ function getSearchIndex(responses) {
               view: source.view || SidebarView.summaryView,
             });
           }
-          index.get(val).responses.push(resp);
+          let alreadyPresent = false;
+          for (const existing of index.get(val).responses) {
+            if (existing.idx != resp.idx) {
+              continue;
+            }
+            existing.showLongTerm = existing.showLongTerm || resp.showLongTerm;
+            existing.showSummer = existing.showSummer || resp.showSummer;
+            alreadyPresent = true;
+            break;
+          }
+          if (!alreadyPresent) {
+            index.get(val).responses.push(resp);
+          }
         });
       }),
     );
@@ -162,7 +223,7 @@ function normalize(query) {
 function doSearch(query, index) {
   store.dispatch({
     type: "SHOW_DETAILS",
-    responses: index.get(query).responses.map((resp) => resp.idx),
+    responses: index.get(query).responses,
     sidebarView: index.get(query).view,
   });
   store.dispatch({
@@ -407,9 +468,8 @@ class SearchBar extends React.Component {
 }
 
 export default connect((state) => {
-  const responses = tagAll(state.responses, state.geotagView);
   return {
-    responses: responses,
-    index: responses && getSearchIndex(responses),
+    responses: state.responses,
+    index: state.responses && getSearchIndex(state.responses),
   };
 })(SearchBar);

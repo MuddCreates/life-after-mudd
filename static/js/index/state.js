@@ -13,14 +13,6 @@ export const LoadingStatus = Object.freeze({
   fetchingData: "fetchingData",
 });
 
-// Enum for what geotags are displayed on the map.
-export const GeotagView = Object.freeze({
-  // org || city || summerOrg || summerCity
-  standard: "standard",
-  // summerOrg || summerCity || org || city
-  summer: "summer",
-});
-
 export const SidebarView = Object.freeze({
   // Show results grouped by location, then organization
   summaryView: "summaryView",
@@ -45,10 +37,10 @@ export const initialState = {
   responses: null,
   // What info is shown in the sidebar
   sidebarView: SidebarView.summaryView,
-  // Whether to give precedence to summer plans or next-year plans in
-  // map and detail views.
-  geotagView: GeotagView.standard,
-  // Set of idx keys for the responses that are displayed.
+  // List of responses that are displayed. They can optionally be
+  // augmented with keys 'showLongTerm' and 'showSummer' which, if
+  // present, control whether the long-term and summer plans
+  // respectively are shown. By default both are shown.
   displayedResponses: null,
   // Incremented when we want to the map view to adjust its zoom
   // position (happens when we do a search).
