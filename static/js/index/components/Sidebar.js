@@ -23,6 +23,8 @@ function groupData(responses, getFirstKey, getSecondKey) {
   const index = {};
   const firstIconIndex = {};
   const secondIconIndex = {};
+  const firstSortIndex = {};
+  const secondSortIndex = {};
   for (const resp of responses) {
     const {
       key: theFirstKey,
@@ -30,6 +32,7 @@ function groupData(responses, getFirstKey, getSecondKey) {
       icon: theFirstIcon,
       summerIcon: firstSummerIcon,
       noLinkForSummer: noLinkForSummerFirst,
+      sortAs: firstSortAs,
     } = getFirstKey(resp);
     const {
       key: theSecondKey,
@@ -37,6 +40,7 @@ function groupData(responses, getFirstKey, getSecondKey) {
       icon: theSecondIcon,
       summerIcon: secondSummerIcon,
       noLinkForSummer: noLinkForSummerSecond,
+      sortAs: secondSortAs,
     } = getSecondKey(resp);
 
     for (const [
@@ -84,27 +88,34 @@ function groupData(responses, getFirstKey, getSecondKey) {
         index[firstKey][secondKey].push({ resp, summer });
         firstIconIndex[firstKey] = { icon: firstIcon, noLink: noLinkFirst };
         secondIconIndex[secondKey] = { icon: secondIcon, noLink: noLinkSecond };
+        firstSortIndex[firstKey] = firstSortAs
+          ? firstSortAs(firstKey)
+          : firstKey;
+        secondSortIndex[secondKey] = secondSortAs
+          ? secondSortAs(secondKey)
+          : secondKey;
       }
     }
   }
-  return Object.keys(index)
-    .sort()
-    .map((firstKey) => ({
+  return _.sortBy(Object.keys(index), (val) => firstSortIndex[val]).map(
+    (firstKey) => ({
       firstKey,
       firstIcon: firstIconIndex[firstKey].icon,
       noLinkFirst: firstIconIndex[firstKey].noLink,
-      secondKeys: Object.keys(index[firstKey])
-        .sort()
-        .map((secondKey) => ({
-          secondKey,
-          secondIcon: secondIconIndex[secondKey].icon,
-          noLinkSecond: secondIconIndex[secondKey].noLink,
-          responses: _.sortBy(
-            index[firstKey][secondKey],
-            ({ resp }) => resp.name,
-          ),
-        })),
-    }));
+      secondKeys: _.sortBy(
+        Object.keys(index[firstKey]),
+        (val) => secondSortIndex[val],
+      ).map((secondKey) => ({
+        secondKey,
+        secondIcon: secondIconIndex[secondKey].icon,
+        noLinkSecond: secondIconIndex[secondKey].noLink,
+        responses: _.sortBy(
+          index[firstKey][secondKey],
+          ({ resp }) => resp.name,
+        ),
+      })),
+    }),
+  );
 }
 
 class Sidebar extends React.Component {
@@ -496,6 +507,7 @@ class Sidebar extends React.Component {
       icon: "globe-americas",
       summerIcon: "globe-americas",
       noLinkForSummer: false,
+      sortAs: (val) => val.split(", ").reverse(),
     });
     const orgGroupBy = (resp) => ({
       key: formatPlan(resp),
@@ -503,6 +515,13 @@ class Sidebar extends React.Component {
       icon: resp.path === "Graduate school" ? "university" : "building",
       summerIcon: "calendar-check",
       noLinkForSummer: true,
+      sortAs: (val) => [
+        resp.path !== "Job",
+        resp.path !== "Graduate school",
+        resp.path !== "Gap year",
+        resp.path,
+        val,
+      ],
     });
 
     switch (this.props.sidebarView) {
