@@ -375,13 +375,13 @@ class MapView extends React.Component {
     for (const id of this.longTermIds.keys()) {
       this.map.setFeatureState(
         { source: "longTerm", id },
-        { hover: nearbyLongTerm.has(id) },
+        { hover: e.type !== "click" && nearbyLongTerm.has(id) },
       );
     }
     for (const id of this.summerIds.keys()) {
       this.map.setFeatureState(
         { source: "summer", id },
-        { hover: nearbySummer.has(id) },
+        { hover: e.type !== "click" && nearbySummer.has(id) },
       );
     }
     if (e.type === "click") {
