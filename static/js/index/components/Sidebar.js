@@ -445,13 +445,7 @@ class Sidebar extends React.Component {
                 &ldquo;
               </span>
             </span>
-            <span
-              style={{
-                marginLeft: "5px",
-              }}
-            >
-              {resp.comments}
-            </span>
+            <span>{resp.comments}</span>
           </p>
         )}
       </div>
