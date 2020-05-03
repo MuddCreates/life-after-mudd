@@ -14,11 +14,7 @@ import {
 } from "../config";
 import { store } from "../redux";
 import { SidebarView } from "../state";
-import {
-  allowResizingWindow,
-  originalWindowHeight,
-  originalWindowWidth,
-} from "../util";
+import { allowResizingWindow } from "../util";
 
 const CIRCLE_RADIUS = 10;
 const HIGHLIGHT_BBOX_RADIUS = 10;
@@ -182,7 +178,7 @@ class MapView extends React.Component {
           containerStyle={{
             height: allowResizingWindow()
               ? "100vh"
-              : originalWindowHeight + "px",
+              : this.props.cachedWindowHeight + "px",
           }}
         >
           {layer}
@@ -256,13 +252,13 @@ class MapView extends React.Component {
     const screenWidth = screenRight - screenLeft;
     const screenHeight = screenBottom - screenTop;
     let viewportLeft = 0;
-    let viewportRight = originalWindowWidth;
+    let viewportRight = this.props.cachedWindowWidth;
     let viewportTop = 0;
-    let viewportBottom = originalWindowHeight;
+    let viewportBottom = this.props.cachedWindowHeight;
     if (this.props.sidebarVertical) {
-      viewportRight -= sidebarWidthFraction * originalWindowWidth;
+      viewportRight -= sidebarWidthFraction * this.props.cachedWindowWidth;
     } else {
-      viewportBottom -= sidebarHeightFraction * originalWindowHeight;
+      viewportBottom -= sidebarHeightFraction * this.props.cachedWindowHeight;
     }
     viewportLeft += POINT_PADDING;
     viewportRight -= POINT_PADDING;
@@ -289,7 +285,7 @@ class MapView extends React.Component {
     const revisedScreenRight =
       screenRight +
       ((screenRight - screenLeft) / (scaledRight - scaledLeft)) *
-        (originalWindowWidth - scaledRight);
+        (this.props.cachedWindowWidth - scaledRight);
     const revisedScreenTop =
       screenTop -
       ((screenBottom - screenTop) / (scaledBottom - scaledTop)) *
@@ -297,7 +293,7 @@ class MapView extends React.Component {
     const revisedScreenBottom =
       screenBottom +
       ((screenBottom - screenTop) / (scaledBottom - scaledTop)) *
-        (originalWindowHeight - scaledBottom);
+        (this.props.cachedWindowHeight - scaledBottom);
     ({ lng: mapLeft, lat: mapBottom } = this.map.unproject([
       revisedScreenLeft,
       revisedScreenBottom,
@@ -431,4 +427,6 @@ export default connect((state) => ({
   displayedResponses: state.displayedResponses,
   serial: state.mapViewSerial,
   sidebarVertical: state.landscape,
+  cachedWindowWidth: state.cachedWindowWidth,
+  cachedWindowHeight: state.cachedWindowHeight,
 }))(MapView);

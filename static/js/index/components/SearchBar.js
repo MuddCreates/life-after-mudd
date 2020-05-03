@@ -252,6 +252,7 @@ class SearchBar extends React.Component {
         type="text"
         placeholder="person, company, area..."
         ref={this.input}
+        id="searchInput"
         style={{ height: "36px", fontSize: "15px", padding: "6px 35px" }}
       />
     );

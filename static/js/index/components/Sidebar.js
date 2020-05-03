@@ -13,11 +13,7 @@ import {
 import { store } from "../redux";
 import { SidebarView } from "../state";
 import { formatCity, formatPlan } from "../tag";
-import {
-  allowResizingWindow,
-  originalWindowWidth,
-  originalWindowHeight,
-} from "../util";
+import { allowResizingWindow } from "../util";
 
 function groupData(responses, getFirstKey, getSecondKey) {
   const index = {};
@@ -463,6 +459,8 @@ class Sidebar extends React.Component {
   }
 
   render() {
+    const cachedWindowWidth = this.props.cachedWindowWidth;
+    const cachedWindowHeight = this.props.cachedWindowHeight;
     const style = {
       position: "absolute",
       padding: "10px",
@@ -476,23 +474,23 @@ class Sidebar extends React.Component {
       Object.assign(style, {
         left: allowResizingWindow()
           ? `${(1 - sidebarWidthFraction) * 100}%`
-          : `${(1 - sidebarWidthFraction) * originalWindowWidth}px`,
+          : `${(1 - sidebarWidthFraction) * cachedWindowWidth}px`,
         top: "0",
         width: allowResizingWindow()
           ? `${sidebarWidthFraction * 100}%`
-          : `${sidebarWidthFraction * originalWindowWidth}px`,
-        height: allowResizingWindow() ? "100%" : `${originalWindowHeight}px`,
+          : `${sidebarWidthFraction * cachedWindowWidth}px`,
+        height: allowResizingWindow() ? "100%" : `${cachedWindowHeight}px`,
       });
     } else {
       Object.assign(style, {
         left: "0",
         top: allowResizingWindow()
           ? `${(1 - sidebarHeightFraction) * 100}%`
-          : `${(1 - sidebarHeightFraction) * originalWindowHeight}px`,
-        width: allowResizingWindow() ? "100%" : `${originalWindowWidth}px`,
+          : `${(1 - sidebarHeightFraction) * cachedWindowHeight}px`,
+        width: allowResizingWindow() ? "100%" : `${cachedWindowWidth}px`,
         height: allowResizingWindow()
           ? `${sidebarHeightFraction * 100}%`
-          : `${sidebarHeightFraction * originalWindowHeight}px`,
+          : `${sidebarHeightFraction * cachedWindowHeight}px`,
       });
     }
 
@@ -559,4 +557,6 @@ export default connect((state) => ({
   sidebarView: state.sidebarView,
   showVertically: state.landscape,
   allResponses: state.responses,
+  cachedWindowWidth: state.cachedWindowWidth,
+  cachedWindowHeight: state.cachedWindowHeight,
 }))(Sidebar);

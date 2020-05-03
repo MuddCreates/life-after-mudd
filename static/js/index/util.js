@@ -29,9 +29,6 @@ export function inLandscapeMode() {
   );
 }
 
-export const originalWindowWidth = window.innerWidth;
-export const originalWindowHeight = window.innerHeight;
-
 // XXX: Horrifying hack. On Android there is a bug that affects at
 // least Chrome and Firefox where the viewport gets resized when
 // the on-screen keyboard comes up (which happens when you focus
