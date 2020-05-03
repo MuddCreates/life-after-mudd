@@ -92,7 +92,7 @@ class MapView extends React.Component {
                             this.props.displayedSummerIndices.has(resp.idx),
                           summer: true,
                         }}
-                        key={resp.idx * 2 + 1}
+                        key={resp.idx * 2}
                       />
                     )
                   );
@@ -145,7 +145,7 @@ class MapView extends React.Component {
                             this.props.displayedLongTermIndices.has(resp.idx),
                           summer: false,
                         }}
-                        key={resp.idx * 2}
+                        key={resp.idx * 2 + 1}
                       />
                     )
                   );
@@ -332,13 +332,13 @@ class MapView extends React.Component {
     for (const feature of map.queryRenderedFeatures(bbox, {
       layers: ["longTerm"],
     })) {
-      longTerm.add(this.longTermIds.get(feature.id));
+      longTerm.add(feature.id);
     }
     const summer = new Set();
     for (const feature of map.queryRenderedFeatures(bbox, {
       layers: ["summer"],
     })) {
-      summer.add(this.summerIds.get(feature.id));
+      summer.add(feature.id);
     }
     return [longTerm, summer];
   };
