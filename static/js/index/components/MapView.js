@@ -36,7 +36,7 @@ class MapView extends React.Component {
     // while otherwise not messing with it.
     this.initialBounds = [
       [-126, 24],
-      [-66, 50],
+      [-66, 52],
     ];
     this.lastSerial = this.props.serial;
   }
