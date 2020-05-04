@@ -1,7 +1,6 @@
 "use strict";
 
 import React from "react";
-import { Fragment } from "react";
 import ReactMapboxGl from "react-mapbox-gl";
 import { Feature, Layer } from "react-mapbox-gl";
 import { connect } from "react-redux";
@@ -165,6 +164,8 @@ class MapView extends React.Component {
       // times on Android.)
       setTimeout(() => this.map && this.map.resize(), 0);
     }
+    // Legend:
+    // <https://docs.mapbox.com/help/tutorials/choropleth-studio-gl-pt-2/>
     return (
       <div
         id="mapContainerContainer"
@@ -196,6 +197,50 @@ class MapView extends React.Component {
         >
           {layer}
         </MapGl>
+        <div
+          style={{
+            position: "absolute",
+            bottom: "0",
+            right: "0",
+            background: "rgba(255, 255, 255, 0.9)",
+            marginRight: "20px",
+            fontFamily: "Arial, sans-serif",
+            overflow: "auto",
+            borderRadius: "3px",
+            padding: "15px",
+            boxShadow: "0 1px 2px rgba(0, 0, 0, 0.1)",
+            lineHeight: "23px",
+            marginBottom: "45px",
+          }}
+        >
+          {[
+            ["Long-term", longTermColor],
+            ["Summer", summerColor],
+          ].map(([name, color], idx) => (
+            <div
+              key={idx}
+              style={{
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <span
+                style={{
+                  backgroundColor: color,
+                  display: "inline-block",
+                  borderRadius: "20%",
+                  width: "15px",
+                  height: "15px",
+                  marginRight: "8px",
+                  borderWidth: "1px",
+                  borderColor: "black",
+                  borderStyle: "solid",
+                }}
+              ></span>
+              <span>{name}</span>
+            </div>
+          ))}
+        </div>
       </div>
     );
   };
