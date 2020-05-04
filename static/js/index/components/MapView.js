@@ -18,6 +18,7 @@ import { allowResizingWindow } from "../util";
 const CIRCLE_RADIUS = 10;
 const HIGHLIGHT_BBOX_RADIUS = 10;
 const POINT_PADDING = searchBarOcclusion + 30;
+const LEGEND_MARGIN = 45;
 
 const MapGl = ReactMapboxGl({
   accessToken: mapboxAccessToken,
@@ -203,7 +204,6 @@ class MapView extends React.Component {
         <div
           style={{
             position: "absolute",
-            bottom: "0",
             right: "0",
             background: "rgba(255, 255, 255, 0.9)",
             marginRight: "20px",
@@ -213,7 +213,13 @@ class MapView extends React.Component {
             padding: "15px",
             boxShadow: "0 1px 2px rgba(0, 0, 0, 0.1)",
             lineHeight: "23px",
-            marginBottom: "45px",
+            marginBottom: `${LEGEND_MARGIN}px`,
+            ...(allowResizingWindow()
+              ? { bottom: "0" }
+              : {
+                  top: this.props.cachedWindowHeight + "px",
+                  transform: `translateY(calc(-100% - ${LEGEND_MARGIN}px))`,
+                }),
           }}
         >
           {[
