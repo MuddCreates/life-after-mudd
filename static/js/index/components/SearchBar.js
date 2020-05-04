@@ -49,6 +49,10 @@ function inSeattleArea(latLong) {
 
 const searchSources = [
   {
+    name: "Show all",
+    filter: (_) => true,
+  },
+  {
     field: (resp) => resp.path,
     rename: {
       Job: "Job/Internship/Working",
@@ -250,7 +254,7 @@ class SearchBar extends React.Component {
       <input
         className="mapboxgl-ctrl-geocoder--input"
         type="text"
-        placeholder="person, company, area..."
+        placeholder="Search for anything"
         ref={this.input}
         id="searchInput"
         style={{ height: "36px", fontSize: "15px", padding: "6px 35px" }}
@@ -448,22 +452,35 @@ class SearchBar extends React.Component {
       resolver: "custom",
       events: {
         search: (query, callback) => {
-          const normQuery = normalize(query)
-            .split(" ")
-            .filter((x) => x);
-          const results = [];
-          this.props.index.forEach((_, item) => {
-            const normItem = normalize(item);
-            for (const part of normQuery) {
-              if (!normItem.includes(part)) {
-                return;
+          let results = [];
+          if (query) {
+            const normQuery = normalize(query)
+              .split(" ")
+              .filter((x) => x);
+            this.props.index.forEach((_, item) => {
+              const normItem = normalize(item);
+              for (const part of normQuery) {
+                if (!normItem.includes(part)) {
+                  return;
+                }
+              }
+              if (results.length < 5) {
+                results.push({ text: item });
+              }
+            });
+          } else {
+            for (const example of [
+              "Show all",
+              "Graduate school",
+              "Seattle Area",
+              "Joint CS/Math",
+              "Facebook (FB)",
+            ]) {
+              if (this.props.index.has(example)) {
+                results.push({ text: example });
               }
             }
-            // Limit to 10 results, like Google.
-            if (results.length < 10) {
-              results.push({ text: item });
-            }
-          });
+          }
           callback(results);
         },
       },
