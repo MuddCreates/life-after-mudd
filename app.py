@@ -130,7 +130,10 @@ def get_data():
             responses = json.load(f)
         return flask.jsonify(
             [
-                {key: r.get(key, "") for key in PUBLIC_KEYS}
+                {
+                    "postGradEmail": r.get("postGradEmail", "") or r.get("email", ""),
+                    **{key: r.get(key, "") for key in PUBLIC_KEYS},
+                }
                 for r in responses
                 if r["processed"] == r["timestamp"]
             ]
