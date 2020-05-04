@@ -326,6 +326,8 @@ function resetMap(map) {
   map.data("map").fitBounds(map.data("origBounds"), { duration: 0 });
 }
 
+let firstTime = true;
+
 function initPage() {
   const responses = $("body").data("responses");
   $("#response-dropdown").find("option").remove();
@@ -337,6 +339,11 @@ function initPage() {
       }),
     );
   });
+  if (!firstTime) {
+    return;
+  } else {
+    firstTime = false;
+  }
   $("#response-dropdown").on("change", () => {
     const idx = parseInt($("#response-dropdown").val());
     $("body").data("idx", idx);
@@ -393,6 +400,7 @@ function initPage() {
     };
     setButton.on("click", () => setCoords());
     map.data("search").on("result", (response) => {
+      const responses = $("body").data("responses");
       const idx = $("body").data("idx");
       const [longitude, latitude] = response.result.center;
       map.data("search").setProximity({ latitude, longitude });
