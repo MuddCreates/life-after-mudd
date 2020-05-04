@@ -143,6 +143,9 @@ function fillDefaults(responses) {
       r.summerCountry = r.summerCountry || csc.country;
     }
     r.comments = clean(r.comments || r.rawComments);
+    r.postGradEmail = clean(
+      r.postGradEmail || r.rawPostGradEmail.replace("g.hmc.edu", "hmc.edu"),
+    );
     return r;
   });
 }
@@ -229,6 +232,7 @@ function saveFormData() {
     r.summerOrgLong = "";
   }
   r.comments = $("#comments-input").val();
+  r.postGradEmail = $("#post-grad-email-input").val();
   r.processed = r.timestamp;
 }
 
@@ -409,6 +413,7 @@ function populateForm() {
   $("#summer-plans-raw-input").val(r.rawSummerPlans);
   $("#summer-org-raw-input").val(r.rawSummerOrg);
   $("#summer-city-state-raw-input").val(r.rawSummerCityState);
+  $("#post-grad-email-raw-input").val(r.rawPostGradEmail);
   $("#name-input").val(r.name);
   $("#email-input").val(r.email);
   $("#major-input").val(r.major);
@@ -424,6 +429,7 @@ function populateForm() {
   $("#summer-country-input").val(r.summerCountry);
   $("#comments-raw-input").val(r.rawComments);
   $("#comments-input").val(r.comments);
+  $("#post-grad-email-input").val(r.postGradEmail);
   if (r.cityLat && r.cityLong) {
     $("#city-coords-input").val(`${r.cityLat}, ${r.cityLong}`);
   } else {

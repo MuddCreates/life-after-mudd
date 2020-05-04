@@ -21,3 +21,7 @@ body {
 .mapboxgl-ctrl-geocoder {
   width: 420px;
 }
+
+.form-group-tight {
+  margin-bottom: 0px !important;
+}
