@@ -244,6 +244,35 @@ function submitForm() {
   populateForm();
 }
 
+async function download() {
+  try {
+    const resp = await fetch("/api/v1/admin/download", {
+      method: "post",
+    });
+    if (!resp.ok) {
+      throw new Error(`HTTP status ${resp.status}`);
+    }
+  } catch (err) {
+    alert(`Failed to download: ${err}`);
+    return;
+  }
+  setup(await getData());
+}
+
+async function upload() {
+  try {
+    const resp = await fetch("/api/v1/admin/upload", {
+      method: "post",
+    });
+    if (!resp.ok) {
+      throw new Error(`HTTP status ${resp.status}`);
+    }
+  } catch (err) {
+    alert(`Failed to upload: ${err}`);
+    return;
+  }
+}
+
 function locateCity({ processed, summer }) {
   const cityInput = summer ? $("#summer-city-input") : $("#city-input");
   const stateInput = summer ? $("#summer-state-input") : $("#state-input");
@@ -315,6 +344,8 @@ function initPage() {
   });
   $("#next-button").on("click", submitForm);
   $("#response-form").on("submit", submitForm);
+  $("#download-button").on("click", download);
+  $("#upload-button").on("click", upload);
   $("#major-dropdown a").on("click", function () {
     const value = $(this).text();
     $("#major-input").val(value);
@@ -460,13 +491,16 @@ function populateForm() {
   locateCity({ processed: r.processed === r.timestamp, summer: true });
 }
 
-async function main() {
-  let responses = await getData();
+function setup(responses) {
   responses = fillDefaults(responses);
   $("body").data("responses", responses);
   $("body").data("idx", getDefaultIndex(responses));
   initPage();
   populateForm();
+}
+
+async function main() {
+  setup(await getData());
 }
 
 main().catch(console.error);

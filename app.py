@@ -67,6 +67,30 @@ def set_admin_data():
         return "Admin dashboard not enabled", 403
 
 
+@app.route("/api/v1/admin/download", methods=["POST"])
+def admin_download():
+    if ADMIN_ENABLED:
+        try:
+            sheets.download_form_responses()
+            return "Downloaded data successfully", 200
+        except Exception as e:
+            return f"Failed to download data: {e}", 500
+    else:
+        return "Admin dashboard not enabled", 403
+
+
+@app.route("/api/v1/admin/upload", methods=["POST"])
+def admin_upload():
+    if ADMIN_ENABLED:
+        try:
+            sheets.upload_form_responses()
+            return "Uploaded data successfully", 200
+        except Exception as e:
+            return f"Failed to upload data: {e}", 500
+    else:
+        return "Admin dashboard not enabled", 403
+
+
 PUBLIC_KEYS = {
     "city",
     "cityLat",
