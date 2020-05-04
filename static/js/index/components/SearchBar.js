@@ -274,7 +274,12 @@ class SearchBar extends React.Component {
         >
           <div
             className="mapboxgl-ctrl-geocoder mapboxgl-ctrl"
-            style={{ width: "100%", maxWidth: "100%" }}
+            style={{
+              width: "100%",
+              maxWidth: "100%",
+              position: "absolute",
+              left: `${searchBarHeight + searchBarPadding}px`,
+            }}
           >
             <svg
               className="mapboxgl-ctrl-geocoder--icon mapboxgl-ctrl-geocoder--icon-search"
@@ -295,7 +300,7 @@ class SearchBar extends React.Component {
           <button
             style={{
               position: "absolute",
-              right: `${-(searchBarPadding + searchBarHeight)}px`,
+              left: `0px`,
               top: `0px`,
               width: `${searchBarHeight}px`,
               height: `${searchBarHeight}px`,
@@ -315,7 +320,7 @@ class SearchBar extends React.Component {
           <div
             style={{
               position: "absolute",
-              right: `${-(searchBarPadding + searchBarHeight)}px`,
+              left: `0px`,
               top: `${searchBarHeight + searchBarPadding}px`,
               width: `${searchBarHeight}px`,
               height: `${searchBarHeight * 2}px`,
@@ -328,7 +333,7 @@ class SearchBar extends React.Component {
           <button
             style={{
               position: "absolute",
-              right: `${-(searchBarPadding + searchBarHeight)}px`,
+              left: `0px`,
               top: `${searchBarHeight + searchBarPadding}px`,
               width: `${searchBarHeight}px`,
               height: `${searchBarHeight}px`,
@@ -348,7 +353,7 @@ class SearchBar extends React.Component {
           <button
             style={{
               position: "absolute",
-              right: `${-(searchBarPadding + searchBarHeight)}px`,
+              left: `0px`,
               top: `${2 * searchBarHeight + searchBarPadding}px`,
               width: `${searchBarHeight}px`,
               height: `${searchBarHeight}px`,
