@@ -358,6 +358,11 @@ class Sidebar extends React.Component {
         </h5>
         {this.detailItem({
           resp,
+          icon: "inbox",
+          field: (resp) => resp.postGradEmail,
+        })}
+        {this.detailItem({
+          resp,
           icon: "graduation-cap",
           field: (resp) => resp.major && resp.major.split(" + "),
           separator: " + ",
