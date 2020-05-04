@@ -312,6 +312,72 @@ class SearchBar extends React.Component {
           >
             <span className="fas fa-info-circle"></span>
           </button>
+          <div
+            style={{
+              position: "absolute",
+              right: `${-(searchBarPadding + searchBarHeight)}px`,
+              top: `${searchBarHeight + searchBarPadding}px`,
+              width: `${searchBarHeight}px`,
+              height: `${searchBarHeight * 2}px`,
+              padding: "0",
+              // copied from mapboxgl-ctrl-geocoder
+              boxShadow: "rgba(0, 0, 0, 0.1) 0px 0px 10px 2px",
+              borderRadius: "4px",
+            }}
+          ></div>
+          <button
+            style={{
+              position: "absolute",
+              right: `${-(searchBarPadding + searchBarHeight)}px`,
+              top: `${searchBarHeight + searchBarPadding}px`,
+              width: `${searchBarHeight}px`,
+              height: `${searchBarHeight}px`,
+              backgroundColor: "white",
+              borderColor: "white",
+              padding: "0",
+              // hacks
+              borderBottomLeftRadius: "0",
+              borderBottomRightRadius: "0",
+            }}
+            type="button"
+            className="btn btn-light"
+            onClick={() => window.map && window.map.zoomIn()}
+          >
+            <span className="fas fa-plus"></span>
+          </button>
+          <button
+            style={{
+              position: "absolute",
+              right: `${-(searchBarPadding + searchBarHeight)}px`,
+              top: `${2 * searchBarHeight + searchBarPadding}px`,
+              width: `${searchBarHeight}px`,
+              height: `${searchBarHeight}px`,
+              backgroundColor: "white",
+              borderColor: "white",
+              padding: "0",
+              // hacks
+              borderTopLeftRadius: "0",
+              borderTopRightRadius: "0",
+            }}
+            type="button"
+            className="btn btn-light"
+            onClick={() => window.map && window.map.zoomOut()}
+          >
+            <span className="fas fa-minus"></span>
+          </button>
+          <div
+            style={{
+              position: "absolute",
+              right: `${
+                -(searchBarPadding + searchBarHeight) + searchBarHeight * 0.125
+              }px`,
+              top: `${searchBarHeight * 2 + searchBarPadding - 0.5}px`,
+              width: `${searchBarHeight * 0.75}px`,
+              height: `1px`,
+              // stolen from Google Maps
+              backgroundColor: "#e6e6e6",
+            }}
+          ></div>
         </div>
         <div className="modal fade" tabIndex="-1" id="about-modal">
           <div className="modal-dialog">

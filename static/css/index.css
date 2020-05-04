@@ -5,3 +5,13 @@
  * for our own search bar.
  */
 @import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
+
+/**
+ * https://stackoverflow.com/a/21201135/3538165
+ * https://stackoverflow.com/a/28196392/3538165
+ */
+.btn:focus,
+.btn:active,
+.btn:active:focus {
+  box-shadow: none !important;
+}

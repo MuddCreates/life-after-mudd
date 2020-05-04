@@ -182,6 +182,9 @@ class MapView extends React.Component {
             // Need to extract the actual Mapbox map so we can use it
             // from componentDidUpdate.
             this.map = map;
+            // Yes I know. It was the easy solution, not the right
+            // one.
+            window.map = map;
           }}
           containerStyle={{
             position: "absolute",
