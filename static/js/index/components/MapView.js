@@ -404,10 +404,7 @@ class MapView extends React.Component {
         store.dispatch({
           type: "SHOW_DETAILS",
           responses,
-          sidebarView:
-            responses.length > 1
-              ? SidebarView.summaryView
-              : SidebarView.detailView,
+          sidebarView: SidebarView.summaryView,
         });
       } else {
         store.dispatch({
