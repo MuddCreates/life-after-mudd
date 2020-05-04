@@ -470,11 +470,11 @@ class Sidebar extends React.Component {
     const style = {
       position: "absolute",
       padding: "10px",
-      background: "white",
       zIndex: "3",
-      overflowY: "auto",
+      overflowY: "scroll",
       boxShadow: "rgba(0, 0, 0, 0.1) 0px 0px 10px 2px",
       paddingLeft: "12.5px",
+      paddingBottom: "0",
     };
     if (this.props.showVertically) {
       Object.assign(style, {
@@ -553,7 +553,14 @@ class Sidebar extends React.Component {
         );
         break;
     }
-    return <div style={style}>{sidebarBody}</div>;
+    // The div after the body is a hack because padding-bottom doesn't
+    // seem to be respected on Android(??).
+    return (
+      <div style={style} className="hint-scrollable">
+        {sidebarBody}
+        <div style={{ height: "10px" }}></div>
+      </div>
+    );
   }
 }
 
