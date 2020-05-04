@@ -270,6 +270,7 @@ class Sidebar extends React.Component {
     separator,
     noLink,
     sidebarView,
+    href,
   }) {
     const arrayify = (fn) => (resp) => {
       let vals = fn(resp);
@@ -309,32 +310,37 @@ class Sidebar extends React.Component {
                 val
               ) : (
                 <a
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    store.dispatch({
-                      type: "SHOW_DETAILS",
-                      responses: this.props.allResponses
-                        .map((resp) => {
-                          const showLongTerm =
-                            matches(resp) && matches(resp).includes(val);
-                          const showSummer =
-                            matchesSummer &&
-                            matchesSummer(resp) &&
-                            matchesSummer(resp).includes(val);
-                          if (showLongTerm || showSummer) {
-                            return { ...resp, showLongTerm, showSummer };
-                          } else {
-                            return null;
-                          }
-                        })
-                        .filter((x) => x),
-                      sidebarView: sidebarView || SidebarView.summaryView,
-                    });
-                    store.dispatch({
-                      type: "UPDATE_MAP_VIEW_ZOOM",
-                    });
-                  }}
+                  href={href || "#"}
+                  target={href ? "_blank" : null}
+                  onClick={
+                    href
+                      ? null
+                      : (e) => {
+                          e.preventDefault();
+                          store.dispatch({
+                            type: "SHOW_DETAILS",
+                            responses: this.props.allResponses
+                              .map((resp) => {
+                                const showLongTerm =
+                                  matches(resp) && matches(resp).includes(val);
+                                const showSummer =
+                                  matchesSummer &&
+                                  matchesSummer(resp) &&
+                                  matchesSummer(resp).includes(val);
+                                if (showLongTerm || showSummer) {
+                                  return { ...resp, showLongTerm, showSummer };
+                                } else {
+                                  return null;
+                                }
+                              })
+                              .filter((x) => x),
+                            sidebarView: sidebarView || SidebarView.summaryView,
+                          });
+                          store.dispatch({
+                            type: "UPDATE_MAP_VIEW_ZOOM",
+                          });
+                        }
+                  }
                 >
                   {val}
                 </a>
@@ -360,6 +366,7 @@ class Sidebar extends React.Component {
           resp,
           icon: "inbox",
           field: (resp) => resp.postGradEmail,
+          href: `mailto:${resp.postGradEmail}`,
         })}
         {this.detailItem({
           resp,
