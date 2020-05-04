@@ -392,8 +392,8 @@ class SearchBar extends React.Component {
                 <p>
                   Created by Radon Rosborough.{" "}
                   <a href="mailto:rrosborough@hmc.edu">Email me</a> if you have
-                  questions or feedback, or if you find any wrong data. I want
-                  to make this app as good as it can be!
+                  questions or feedback, if you find any wrong data, or if you
+                  would like to be removed from the map.
                 </p>
                 <p>
                   Source code is available{" "}
