@@ -21,6 +21,7 @@ COLUMNS = (
     ("What will you be doing?", "rawSummerPlans"),
     ("At what company, school, or organization?", "rawSummerOrg",),
     ("In what city and state?", "rawSummerCityState"),
+    ("Post-graduation email address", "rawPostGradEmail"),
     ("Anything else you want to share?", "rawComments"),
     ("", "blank"),
     ("Processed", "processed"),
