@@ -24,6 +24,9 @@ const MapGl = ReactMapboxGl({
   accessToken: mapboxAccessToken,
 });
 
+const summerColor = "#FDFFA8";
+const longTermColor = "#EAAA00";
+
 class MapView extends React.Component {
   constructor(props) {
     super(props);
@@ -64,8 +67,7 @@ class MapView extends React.Component {
                 "case",
                 ["boolean", ["feature-state", "hover"], false],
                 "#000000",
-                // https://www.hmc.edu/communications/visual-identity-guidelines/
-                "#00c1d5",
+                summerColor,
               ],
               "circle-radius": CIRCLE_RADIUS,
               "circle-stroke-color": "black",
@@ -117,8 +119,7 @@ class MapView extends React.Component {
                 "case",
                 ["boolean", ["feature-state", "hover"], false],
                 "#000000",
-                // https://www.hmc.edu/communications/visual-identity-guidelines/
-                "#eaaa00",
+                longTermColor,
               ],
               "circle-radius": CIRCLE_RADIUS,
               "circle-stroke-color": "black",
