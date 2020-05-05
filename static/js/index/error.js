@@ -38,31 +38,7 @@ export function failHard(error) {
   console.error("Crashing app due to error:", error);
   try {
     const msg = getErrorMessage(error);
-    const elt = MessageScreen(
-      <p>
-        Sorry, there was a totally unexpected error.{" "}
-        {msg ? (
-          <span>Here's what we got:</span>
-        ) : (
-          <span>
-            Unfortunately, we don't have any further information. There might be
-            some information in your browser's JavaScript console, though.
-          </span>
-        )}
-      </p>,
-      msg ? (
-        <p>
-          <b>{msg}</b>
-        </p>
-      ) : null,
-      msg ? (
-        <p>
-          <span>
-            There might be more information in your browser's JavaScript
-            console, as well.
-          </span>
-        </p>
-      ) : null,
+    const tips = (
       <div style={{ textAlign: "left" }}>
         You can try:
         <ul>
@@ -80,8 +56,65 @@ export function failHard(error) {
             <a href="mailto:rrosborough@hmc.edu">emailing the author</a>
           </li>
         </ul>
-      </div>,
+      </div>
     );
+    let elt;
+    if (msg === "Failed to initialize WebGL.") {
+      elt = MessageScreen(
+        <div style={{ textAlign: "left" }}>
+          <p>
+            Sorry, but we couldn't initialize the map because your browser is
+            not handling WebGL correctly. If you are running Firefox on a
+            recently updated Arch-based Linux distribution, then this is
+            probably because of a bug that was recently introduced into Firefox.
+            You can work around the issue either by switching to a different
+            browser or by following these steps:
+          </p>
+          <ul>
+            <li>Type "about:config" into the URL bar</li>
+            <li>Click "Accept the Risk and Continue"</li>
+            <li>Search for "security.sandbox.content.read_path_whitelist"</li>
+            <li>Type in "/sys/" to the value box</li>
+            <li>Restart Firefox</li>
+          </ul>
+          <p>
+            For more information on the bug, see{" "}
+            <a href="https://bbs.archlinux.org/viewtopic.php?pid=1801935#p1801935">
+              this forum post
+            </a>
+            .
+          </p>
+        </div>,
+      );
+    } else {
+      elt = MessageScreen(
+        <p>
+          Sorry, there was an unexpected error.{" "}
+          {msg ? (
+            <span>Here's what we got:</span>
+          ) : (
+            <span>
+              Unfortunately, we don't have any further information. There might
+              be some information in your browser's JavaScript console, though.
+            </span>
+          )}
+        </p>,
+        msg ? (
+          <p>
+            <b>{msg}</b>
+          </p>
+        ) : null,
+        msg ? (
+          <p>
+            <span>
+              There might be more information in your browser's JavaScript
+              console, as well.
+            </span>
+          </p>
+        ) : null,
+        tips,
+      );
+    }
     try {
       document.getElementById("app").remove();
     } catch (_) {
