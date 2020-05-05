@@ -471,7 +471,7 @@ class Sidebar extends React.Component {
       position: "absolute",
       padding: "10px",
       zIndex: "3",
-      overflowY: "scroll",
+      overflowY: "auto",
       boxShadow: "rgba(0, 0, 0, 0.1) 0px 0px 10px 2px",
       paddingLeft: "12.5px",
       paddingBottom: "0",
