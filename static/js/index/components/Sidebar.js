@@ -12,7 +12,7 @@ import {
 } from "../config";
 import { store } from "../redux";
 import { SidebarView } from "../state";
-import { formatCity, formatPlan } from "../tag";
+import { formatCity, formatLongTermPlan, formatSummerPlan } from "../tag";
 import { allowResizingWindow } from "../util";
 
 function groupData(responses, getFirstKey, getSecondKey) {
@@ -321,9 +321,9 @@ class Sidebar extends React.Component {
                             type: "SHOW_DETAILS",
                             responses: this.props.allResponses
                               .map((resp) => {
-                                const showLongTerm =
+                                let showLongTerm =
                                   matches(resp) && matches(resp).includes(val);
-                                const showSummer =
+                                let showSummer =
                                   matchesSummer &&
                                   matchesSummer(resp) &&
                                   matchesSummer(resp).includes(val);
@@ -384,8 +384,8 @@ class Sidebar extends React.Component {
         {this.detailItem({
           resp,
           icon: resp.path === "Graduate school" ? "university" : "building",
-          field: (resp) => resp.org,
-          matchSummer: (resp) => resp.summerOrg,
+          field: formatLongTermPlan,
+          matchSummer: formatSummerPlan,
           sidebarView: SidebarView.organizationView,
         })}
         {(resp.summerPlans ||
@@ -502,20 +502,19 @@ class Sidebar extends React.Component {
 
     let sidebarBody = null;
     const locationGroupBy = (resp) => ({
-      key: formatCity(resp.city, resp.state, resp.country),
-      summerKey: formatCity(
-        resp.summerCity,
-        resp.summerState,
-        resp.summerCountry,
-      ),
+      key:
+        formatCity(resp.city, resp.state, resp.country) || "Location unknown",
+      summerKey:
+        formatCity(resp.summerCity, resp.summerState, resp.summerCountry) ||
+        (resp.summerPlans && "Location unknown"),
       icon: "globe-americas",
       summerIcon: "globe-americas",
       noLinkForSummer: false,
       sortAs: (val) => val.split(", ").reverse(),
     });
     const orgGroupBy = (resp) => ({
-      key: formatPlan(resp),
-      summerKey: resp.summerPlans,
+      key: formatLongTermPlan(resp),
+      summerKey: formatSummerPlan(resp),
       icon: resp.path === "Graduate school" ? "university" : "building",
       summerIcon: "calendar-check",
       noLinkForSummer: true,

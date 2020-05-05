@@ -8,9 +8,9 @@ export function formatCity(city, state, country) {
   return [city, state, country].filter(Boolean).join(", ");
 }
 
-export function formatPlan(resp) {
+function formatPlan(path, org) {
   let plan;
-  switch (resp.path) {
+  switch (path) {
     case "Job":
       plan = "Working";
       break;
@@ -24,11 +24,19 @@ export function formatPlan(resp) {
       plan = "No plans yet";
       break;
     default:
-      plan = resp.path;
+      plan = path;
       break;
   }
-  if (resp.org) {
-    plan += " at " + resp.org;
+  if (org) {
+    plan += " at " + org;
   }
   return plan;
+}
+
+export function formatLongTermPlan(resp) {
+  return formatPlan(resp.path, resp.org);
+}
+
+export function formatSummerPlan(resp) {
+  return formatPlan(resp.summerPlans, resp.summerOrg);
 }

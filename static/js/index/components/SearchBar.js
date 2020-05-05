@@ -56,6 +56,7 @@ const searchSources = [
     field: (resp) => resp.path,
     rename: {
       Job: "Job/Internship/Working",
+      "Not sure": "No plans yet/Not sure",
     },
   },
   (resp) => resp.major.split(" + "),
