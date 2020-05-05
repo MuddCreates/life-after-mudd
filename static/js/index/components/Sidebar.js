@@ -475,6 +475,7 @@ class Sidebar extends React.Component {
       boxShadow: "rgba(0, 0, 0, 0.1) 0px 0px 10px 2px",
       paddingLeft: "12.5px",
       paddingBottom: "0",
+      backgroundColor: "white",
     };
     if (this.props.showVertically) {
       Object.assign(style, {
@@ -554,8 +555,11 @@ class Sidebar extends React.Component {
     }
     // The div after the body is a hack because padding-bottom doesn't
     // seem to be respected on Android(??).
+    //
+    // Add class "hint-scrollable" here when it's time to fix up and
+    // re-add the drop shadow.
     return (
-      <div style={style} className="hint-scrollable">
+      <div style={style}>
         {sidebarBody}
         <div style={{ height: "10px" }}></div>
       </div>
