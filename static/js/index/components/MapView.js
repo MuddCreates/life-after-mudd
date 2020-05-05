@@ -85,18 +85,16 @@ class MapView extends React.Component {
                 if (latLong) {
                   this.summerIds.set(summerId++, resp.idx);
                   return (
-                    latLong && (
-                      <Feature
-                        coordinates={[latLong.lng, latLong.lat]}
-                        properties={{
-                          displayed:
-                            this.props.displayedSummerIndices &&
-                            this.props.displayedSummerIndices.has(resp.idx),
-                          summer: true,
-                        }}
-                        key={resp.idx * 2}
-                      />
-                    )
+                    <Feature
+                      coordinates={[latLong.lng, latLong.lat]}
+                      properties={{
+                        displayed:
+                          this.props.displayedSummerIndices &&
+                          this.props.displayedSummerIndices.has(resp.idx),
+                        summer: true,
+                      }}
+                      key={resp.idx * 2}
+                    />
                   );
                 } else {
                   return null;
@@ -137,18 +135,16 @@ class MapView extends React.Component {
                 if (latLong) {
                   this.longTermIds.set(longTermId++, resp.idx);
                   return (
-                    latLong && (
-                      <Feature
-                        coordinates={[latLong.lng, latLong.lat]}
-                        properties={{
-                          displayed:
-                            this.props.displayedLongTermIndices &&
-                            this.props.displayedLongTermIndices.has(resp.idx),
-                          summer: false,
-                        }}
-                        key={resp.idx * 2 + 1}
-                      />
-                    )
+                    <Feature
+                      coordinates={[latLong.lng, latLong.lat]}
+                      properties={{
+                        displayed:
+                          this.props.displayedLongTermIndices &&
+                          this.props.displayedLongTermIndices.has(resp.idx),
+                        summer: false,
+                      }}
+                      key={resp.idx * 2 + 1}
+                    />
                   );
                 } else {
                   return null;
@@ -294,6 +290,9 @@ class MapView extends React.Component {
         return geotags;
       }),
     );
+    if (allGeotags.length === 0) {
+      return;
+    }
     allGeotags.forEach((geotag) => {
       mapLeft = Math.min(mapLeft, geotag.lng);
       mapRight = Math.max(mapRight, geotag.lng);
