@@ -9,8 +9,8 @@ export function formatCity(city, state, country) {
 }
 
 export function formatPlan(resp) {
-  let plan = resp.path;
-  switch (plan) {
+  let plan;
+  switch (resp.path) {
     case "Job":
       plan = "Working";
       break;
@@ -21,7 +21,10 @@ export function formatPlan(resp) {
       plan = "Taking a gap year";
       break;
     case "Not sure":
-      plan = "Not sure what";
+      plan = "No plans yet";
+      break;
+    default:
+      plan = resp.path;
       break;
   }
   if (resp.org) {
