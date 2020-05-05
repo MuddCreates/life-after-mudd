@@ -137,8 +137,10 @@ function getSearchIndex(responses) {
                 vals = [vals];
               }
               return vals.map((val) => {
-                if (val.summer) {
-                  val = val.val;
+                if (val.summer || !(resp.orgLatLong || resp.cityLatLong)) {
+                  if (val.summer) {
+                    val = val.val;
+                  }
                   resp = { ...resp, showLongTerm: false, showSummer: true };
                 } else {
                   resp = { ...resp, showLongTerm: true, showSummer: false };
