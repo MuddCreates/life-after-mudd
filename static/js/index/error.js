@@ -38,9 +38,9 @@ export function failHard(error) {
   console.error("Crashing app due to error:", error);
   try {
     const msg = getErrorMessage(error);
-    const tips = (
+    const tips = (also) => (
       <div style={{ textAlign: "left" }}>
-        You can try:
+        You can {also ? "also" : ""} try:
         <ul>
           <li>
             <a href={window.location.origin + window.location.pathname}>
@@ -53,7 +53,7 @@ export function failHard(error) {
             </a>
           </li>
           <li>
-            <a href="mailto:rrosborough@hmc.edu">emailing the author</a>
+            <a href="mailto:rrosborough@hmc.edu">emailing me</a>
           </li>
         </ul>
       </div>
@@ -85,6 +85,7 @@ export function failHard(error) {
             .
           </p>
         </div>,
+        tips(true),
       );
     } else {
       elt = MessageScreen(
@@ -112,7 +113,7 @@ export function failHard(error) {
             </span>
           </p>
         ) : null,
-        tips,
+        tips(false),
       );
     }
     try {
