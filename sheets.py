@@ -10,20 +10,6 @@ import requests
 
 
 COLUMNS = (
-    ("Timestamp", "timestamp"),
-    ("Email Address", "rawEmail"),
-    ("Your first and last name", "rawName"),
-    ("Your major", "rawMajor"),
-    ("What will you be doing next year?", "rawPath"),
-    ("At what company, school, or organization?", "rawOrg"),
-    ("In what city and state?", "rawCityState"),
-    ("Do you have separate summer plans you'd like to share?", "rawHasSummerPlans"),
-    ("What will you be doing?", "rawSummerPlans"),
-    ("At what company, school, or organization?", "rawSummerOrg",),
-    ("In what city and state?", "rawSummerCityState"),
-    ("Post-graduation email address", "rawPostGradEmail"),
-    ("Anything else you want to share?", "rawComments"),
-    ("", "blank"),
     ("Processed", "processed"),
     ("Email", "email"),
     ("Name", "name"),
@@ -47,6 +33,22 @@ COLUMNS = (
     ("Summer city latitude", "summerCityLat"),
     ("Summer city longitude", "summerCityLong"),
     ("Comments", "comments"),
+    ("", "blank"),
+    ("Timestamp", "timestamp"),
+    ("Email Address", "rawEmail"),
+    ("Your first and last name", "rawName"),
+    ("Your major", "rawMajor"),
+    ("What will you be doing next year?", "rawPath"),
+    ("At what company, school, or organization?", "rawOrg"),
+    ("In what city and state?", "rawCityState"),
+    ("Do you have separate summer plans you'd like to share?", "rawHasSummerPlans"),
+    ("What will you be doing?", "rawSummerPlans"),
+    ("At what company, school, or organization?", "rawSummerOrg",),
+    ("In what city and state?", "rawSummerCityState"),
+    ("Do you want to share more about what you'll be doing?", "rawComments"),
+    ("Post-graduation email address", "rawPostGradEmail"),
+    ("Phone number", "rawPhoneNumber"),
+    ("Show Facebook profile?", "rawShowFacebook"),
 )
 
 
