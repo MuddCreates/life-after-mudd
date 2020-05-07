@@ -118,13 +118,13 @@ const searchSources = [
       name: "San Francisco (SF) Bay Area",
       filter: (resp) => inBayArea(resp.orgLatLong || resp.cityLatLong),
       summerFilter: (resp) =>
-        inBayArea(resp.summerOrgLatLong || resp.citySummerLatLong),
+        inBayArea(resp.summerOrgLatLong || resp.summerCityLatLong),
     },
     {
       name: "Seattle Area",
       filter: (resp) => inSeattleArea(resp.orgLatLong || resp.cityLatLong),
       summerFilter: (resp) =>
-        inSeattleArea(resp.summerOrgLatLong || resp.citySummerLatLong),
+        inSeattleArea(resp.summerOrgLatLong || resp.summerCityLatLong),
     },
   ],
   {
