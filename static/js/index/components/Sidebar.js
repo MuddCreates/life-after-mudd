@@ -554,10 +554,9 @@ class Sidebar extends React.Component {
       summerIcon: "calendar-check",
       noLinkForSummer: true,
       sortAs: (val) => [
-        resp.path !== "Job",
-        resp.path !== "Graduate school",
-        resp.path !== "Gap year",
-        resp.path,
+        !val.startsWith("Working"),
+        !val.startsWith("Studying"),
+        !val.startsWith("Gap year"),
         val,
       ],
     });
