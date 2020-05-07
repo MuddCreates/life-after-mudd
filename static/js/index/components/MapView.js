@@ -14,6 +14,7 @@ import {
 import { store } from "../redux";
 import { SidebarView } from "../state";
 import { allowResizingWindow } from "../util";
+import { doSearch, getSearchIndex } from "./SearchBar";
 
 const CIRCLE_RADIUS = 10;
 const HIGHLIGHT_BBOX_RADIUS = 10;
@@ -219,14 +220,19 @@ class MapView extends React.Component {
           }}
         >
           {[
-            ["Long-term", longTermColor],
-            ["Summer", summerColor],
-          ].map(([name, color], idx) => (
+            ["Long-term", longTermColor, "Show all long-term"],
+            ["Summer", summerColor, "Show all summer"],
+          ].map(([name, color, query], idx) => (
             <div
               key={idx}
               style={{
                 display: "flex",
                 alignItems: "center",
+                cursor: "pointer",
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                doSearch(query, this.props.index);
               }}
             >
               <span
@@ -259,8 +265,10 @@ class MapView extends React.Component {
     }
     this.lastSerial = this.props.serial;
     if (
-      this.props.displayedLongTermIndices.size === 0 &&
-      this.props.displayedSummerIndices.size === 0
+      (!this.props.displayedLongTermIndices ||
+        this.props.displayedLongTermIndices.size === 0) &&
+      (!this.props.displayedSummerIndices ||
+        this.props.displayedSummerIndices.size === 0)
     ) {
       return;
     }
@@ -461,6 +469,7 @@ class MapView extends React.Component {
           sidebarView: SidebarView.summaryView,
         });
       } else {
+        console.log("got a click");
         store.dispatch({
           type: "HIDE_DETAILS",
         });
@@ -471,6 +480,7 @@ class MapView extends React.Component {
 
 export default connect((state) => ({
   responses: state.responses,
+  index: state.responses && getSearchIndex(state.responses),
   displayedLongTermIndices:
     state.displayedResponses &&
     new Set(

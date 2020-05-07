@@ -126,7 +126,7 @@ const searchSources = [
   },
 ];
 
-function getSearchIndex(responses) {
+export function getSearchIndex(responses) {
   const index = new Map();
   searchSources
     .map((source) => {
@@ -242,7 +242,7 @@ function normalize(query) {
     .replace(/ +/g, " ");
 }
 
-function doSearch(query, index) {
+export function doSearch(query, index) {
   store.dispatch({
     type: "SHOW_DETAILS",
     responses: index.get(query).responses,
