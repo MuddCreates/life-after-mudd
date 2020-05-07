@@ -51,13 +51,28 @@ const searchSources = [
   {
     name: "Show all",
     filter: (_) => true,
+    summerFilter: (_) => true,
+  },
+  {
+    name: "Show all long-term",
+    filter: (_) => true,
+  },
+  {
+    name: "Show all summer",
+    summerFilter: (_) => true,
   },
   {
     field: (resp) => resp.path,
     rename: {
       Job: "Job/Internship/Working",
-      "Not sure": "No plans yet/Not sure",
+      "Not sure": "No plans yet/Not sure/Unsure",
     },
+  },
+  {
+    name: "Location unknown",
+    filter: (resp) => resp.path && !(resp.orgLatLong || resp.cityLatLong),
+    summerFilter: (resp) =>
+      resp.summerPlans && !(resp.summerOrgLatLong || resp.summerCityLatLong),
   },
   (resp) => resp.major.split(" + "),
   {
@@ -468,7 +483,9 @@ class SearchBar extends React.Component {
                 }
               }
               if (results.length < 5) {
-                results.push({ text: item });
+                results.push({
+                  text: item,
+                });
               }
             });
           } else {
@@ -480,7 +497,13 @@ class SearchBar extends React.Component {
               "Facebook (FB)",
             ]) {
               if (this.props.index.has(example)) {
-                results.push({ text: example });
+                results.push({
+                  text: example,
+                  html:
+                    example === "Show all"
+                      ? `Show all ${this.props.responses.length}`
+                      : example,
+                });
               }
             }
           }

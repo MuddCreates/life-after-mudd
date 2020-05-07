@@ -15,6 +15,21 @@ import { SidebarView } from "../state";
 import { formatCity, formatLongTermPlan, formatSummerPlan } from "../tag";
 import { allowResizingWindow } from "../util";
 
+function getPathIcon(path) {
+  switch (path) {
+    case "Job":
+      return "building";
+    case "Graduate school":
+      return "university";
+    case "Gap year":
+      return "route";
+    case "Not sure":
+      return "question";
+    default:
+      return "building";
+  }
+}
+
 function groupData(responses, getFirstKey, getSecondKey) {
   const index = {};
   const firstIconIndex = {};
@@ -378,7 +393,7 @@ class Sidebar extends React.Component {
         })}
         {this.detailItem({
           resp,
-          icon: resp.path === "Graduate school" ? "university" : "building",
+          icon: getPathIcon(resp.path),
           field: formatLongTermPlan,
           matchSummer: formatSummerPlan,
           sidebarView: SidebarView.organizationView,
@@ -545,12 +560,16 @@ class Sidebar extends React.Component {
       icon: "globe-americas",
       summerIcon: "globe-americas",
       noLinkForSummer: false,
-      sortAs: (val) => val.split(", ").reverse(),
+      sortAs: (val) => [
+        val === "Location unknown",
+        val.split(", ").length > 2,
+        val.split(", ").reverse(),
+      ],
     });
     const orgGroupBy = (resp) => ({
       key: formatLongTermPlan(resp),
       summerKey: formatSummerPlan(resp),
-      icon: resp.path === "Graduate school" ? "university" : "building",
+      icon: getPathIcon(resp.path),
       summerIcon: "calendar-check",
       noLinkForSummer: true,
       sortAs: (val) => [
