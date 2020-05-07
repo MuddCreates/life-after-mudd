@@ -180,7 +180,9 @@ class Sidebar extends React.Component {
             <span
               className={`fas fa-${firstIcon}`}
               style={{
-                paddingRight: "10px",
+                marginRight: "10px",
+                textAlign: "center",
+                width: "30px",
               }}
             ></span>
             <b
@@ -214,8 +216,10 @@ class Sidebar extends React.Component {
                   <span
                     className={`fas fa-${secondIcon}`}
                     style={{
-                      paddingLeft: `${sidebarIndentWidth}px`,
-                      paddingRight: "10px",
+                      marginLeft: `43px`,
+                      marginRight: "10px",
+                      textAlign: "center",
+                      width: "16px",
                     }}
                   ></span>
                   <span
@@ -253,7 +257,7 @@ class Sidebar extends React.Component {
                         <span
                           className={`fas fa-user-graduate`}
                           style={{
-                            paddingLeft: `${sidebarIndentWidth * 2}px`,
+                            paddingLeft: `85px`,
                             paddingRight: "10px",
                             display: "inline-block",
                           }}
