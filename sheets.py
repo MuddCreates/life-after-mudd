@@ -32,8 +32,15 @@ COLUMNS = (
     ("Summer country", "summerCountry"),
     ("Summer city latitude", "summerCityLat"),
     ("Summer city longitude", "summerCityLong"),
+    ("Post-grad email address", "postGradEmail"),
+    ("Phone number", "phoneNumber"),
+    ("Facebook profile", "facebookProfile"),
+    ("Organization link", "orgLink"),
+    ("Summer organization link", "summerOrgLink"),
     ("Comments", "comments"),
-    ("", "blank"),
+    ("", "sepLeft"),
+    *([("", "filler")] * 8),
+    ("", "sepRight"),
     ("Timestamp", "timestamp"),
     ("Email Address", "rawEmail"),
     ("Your first and last name", "rawName"),
@@ -87,9 +94,8 @@ def read_form_responses(worksheet):
 def write_form_responses(worksheet, responses):
     header = worksheet.row_values(1)
     assert header == [name for name, _ in COLUMNS], header
-    cells = worksheet.range(
-        2, COLUMN_INDICES["blank"] + 2, len(responses) + 1, len(COLUMNS)
-    )
+    num_cols = COLUMN_INDICES["sepLeft"]
+    cells = worksheet.range(2, 1, len(responses) + 1, num_cols)
     for cell in cells:
         cell.value = responses[cell.row - 2][COLUMNS[cell.col - 1][1]]
     worksheet.update_cells(cells)
