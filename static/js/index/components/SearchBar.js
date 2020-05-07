@@ -562,10 +562,10 @@ class SearchBar extends React.Component {
                 });
               }
             });
-            results = _.sortBy(results, ({ text, startsWith }) => [
-              !startsWith,
-              text.length,
-              text,
+            results = _.sortBy(results, [
+              ({ startsWith }) => !startsWith,
+              ({ text }) => text.length,
+              ({ text }) => text,
             ]);
           } else {
             for (const example of [
