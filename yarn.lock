@@ -3280,6 +3280,11 @@ inherits@2.0.3:
   resolved "https://registry.yarnpkg.com/inherits/-/inherits-2.0.3.tgz#633c2c83e3da42a502f52466022480f4208261de"
   integrity sha1-Yzwsg+PaQqUC9SRmAiSA9CCCYd4=
 
+inobounce@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/inobounce/-/inobounce-0.2.0.tgz#adfb6cfa505758f51f8a9f0859768c0a043dd9c3"
+  integrity sha512-eJt1MQEqLKanAFEE5DkSF36d9uyg8kLb/R6ysEF7udJOM5JZXidkhhGv6WoWbEcVdyRqZfYMjv6XbSIz7tD4CQ==
+
 into-stream@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/into-stream/-/into-stream-3.1.0.tgz#96fb0a936c12babd6ff1752a17d05616abd094c6"

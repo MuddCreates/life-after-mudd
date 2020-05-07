@@ -6,6 +6,8 @@ import LoadingOverlay from "react-loading-overlay";
 import { connect } from "react-redux";
 import ScaleLoader from "react-spinners/ScaleLoader";
 
+import "inobounce";
+
 import { failHard } from "../error";
 import { store } from "../redux";
 import { LoadingStatus } from "../state";

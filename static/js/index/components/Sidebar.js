@@ -595,6 +595,7 @@ class Sidebar extends React.Component {
       paddingLeft: "12.5px",
       paddingBottom: "0",
       backgroundColor: "white",
+      WebkitOverflowScrolling: "touch",
     };
     if (this.props.showVertically) {
       Object.assign(style, {

@@ -406,7 +406,14 @@ class SearchBar extends React.Component {
             }}
           ></div>
         </div>
-        <div className="modal fade" tabIndex="-1" id="about-modal">
+        <div
+          className="modal fade"
+          tabIndex="-1"
+          id="about-modal"
+          style={{
+            WebkitOverflowScrolling: "touch",
+          }}
+        >
           <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
