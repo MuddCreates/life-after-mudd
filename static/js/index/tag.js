@@ -20,6 +20,7 @@ function formatPlan(path, org) {
   let plan;
   switch (path) {
     case "Job":
+    case "Internship":
       plan = "Working";
       break;
     case "Graduate school":

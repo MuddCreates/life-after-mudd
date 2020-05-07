@@ -20,9 +20,10 @@ import {
 } from "../tag";
 import { allowResizingWindow } from "../util";
 
-function getPathIcon(path) {
+function getPathIcon({ path, summer }) {
   switch (path) {
     case "Job":
+    case "Internship":
       return "building";
     case "Graduate school":
       return "university";
@@ -31,7 +32,7 @@ function getPathIcon(path) {
     case "Not sure":
       return "question";
     default:
-      return "building";
+      return summer ? "calendar-check" : "building";
   }
 }
 
@@ -422,7 +423,7 @@ class Sidebar extends React.Component {
         })}
         {this.detailItem({
           resp,
-          icon: getPathIcon(resp.path),
+          icon: getPathIcon({ path: resp.path, summer: false }),
           field: formatLongTermPlan,
           matchSummer: formatSummerPlan,
           sidebarView: SidebarView.organizationView,
@@ -449,9 +450,11 @@ class Sidebar extends React.Component {
             </p>
             {this.detailItem({
               resp,
-              icon: "calendar-check",
-              field: (resp) => resp.summerPlans,
-              noLink: true,
+              icon: getPathIcon({ path: resp.summerPlans, summer: true }),
+              field: formatSummerPlan,
+              match: formatLongTermPlan,
+              matchSummer: formatSummerPlan,
+              noLink: !resp.summerOrg,
             })}
             {this.detailItem({
               resp,
@@ -469,14 +472,6 @@ class Sidebar extends React.Component {
                   resp.summerState,
                   resp.summerCountry,
                 ),
-            })}
-            {this.detailItem({
-              resp,
-              icon: "building",
-              field: (resp) => resp.summerOrg,
-              match: (resp) => resp.org,
-              matchSummer: (resp) => resp.summerOrg,
-              sidebarView: SidebarView.organizationView,
             })}
             {this.detailItem({
               resp,
@@ -648,9 +643,9 @@ class Sidebar extends React.Component {
     const orgGroupBy = (resp) => ({
       key: formatLongTermPlan(resp),
       summerKey: formatSummerPlan(resp),
-      icon: getPathIcon(resp.path),
+      icon: getPathIcon({ path: resp.path, summer: false }),
       summerIcon: "calendar-check",
-      noLinkForSummer: true,
+      noLinkForSummer: !resp.summerOrg,
       sortAs: (val) => [
         !val.startsWith("Working"),
         !val.startsWith("Studying"),
