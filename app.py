@@ -159,7 +159,7 @@ def get_data():
                     **{key: r.get(key, "") for key in PUBLIC_KEYS},
                 }
                 for r in responses
-                if r["processed"] == r["timestamp"]
+                if r["processed"]
             ]
         )
     except (OSError, json.JSONDecodeError):
