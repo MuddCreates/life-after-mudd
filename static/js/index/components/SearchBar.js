@@ -1,6 +1,7 @@
 "use strict";
 
 import latinize from "latinize";
+import _ from "lodash";
 import React from "react";
 import { connect } from "react-redux";
 import { UsaStates } from "usa-states";
@@ -544,17 +545,27 @@ class SearchBar extends React.Component {
               .filter((x) => x);
             this.props.index.forEach((_, item) => {
               const normItem = normalize(item);
+              let startsWith = false;
               for (const part of normQuery) {
                 if (!normItem.includes(part)) {
                   return;
+                }
+                if (normItem.startsWith(part)) {
+                  startsWith = true;
                 }
               }
               if (results.length < 5) {
                 results.push({
                   text: item,
+                  startsWith,
                 });
               }
             });
+            results = _.sortBy(results, ({ text, startsWith }) => [
+              !startsWith,
+              text.length,
+              text,
+            ]);
           } else {
             for (const example of [
               "Show all",
