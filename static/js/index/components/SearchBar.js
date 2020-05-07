@@ -245,6 +245,7 @@ export function getSearchIndex(responses) {
 function normalize(query) {
   return latinize(query)
     .toLowerCase()
+    .replace(/\./g, "")
     .replace(/[^a-z ]/g, " ")
     .replace(/ +/g, " ");
 }
