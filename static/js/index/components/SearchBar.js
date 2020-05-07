@@ -15,7 +15,13 @@ require("bootstrap-autocomplete");
 
 import "@fortawesome/fontawesome-free/css/all.css";
 
-import { searchBarHeight, searchBarPadding, searchBarWidth } from "../config";
+import {
+  searchBarHeight,
+  searchBarPadding,
+  searchBarWidth,
+  sidebarHeightFraction,
+  sidebarWidthFraction,
+} from "../config";
 import { failHard } from "../error";
 import { store } from "../redux";
 import { SidebarView } from "../state";
@@ -368,7 +374,29 @@ class SearchBar extends React.Component {
             }}
             type="button"
             className="btn btn-light"
-            onClick={() => window.map && window.map.zoomIn()}
+            onClick={() => {
+              let { lng, lat } = window.map.getCenter();
+              let zoom = window.map.getZoom() + 1;
+              // Correction for sidebar.
+              if (this.props.showingSidebar) {
+                if (this.props.sidebarVertical) {
+                  lng -=
+                    (sidebarWidthFraction / 4) *
+                    (window.map.getBounds().getEast() -
+                      window.map.getBounds().getWest());
+                } else {
+                  lat +=
+                    (sidebarHeightFraction / 4) *
+                    (window.map.getBounds().getNorth() -
+                      window.map.getBounds().getSouth());
+                }
+              }
+              window.map &&
+                window.map.easeTo({
+                  zoom: zoom,
+                  center: { lng, lat },
+                });
+            }}
           >
             <span className="fas fa-plus"></span>
           </button>
@@ -388,7 +416,29 @@ class SearchBar extends React.Component {
             }}
             type="button"
             className="btn btn-light"
-            onClick={() => window.map && window.map.zoomOut()}
+            onClick={() => {
+              let { lng, lat } = window.map.getCenter();
+              let zoom = window.map.getZoom() - 1;
+              // Correction for sidebar.
+              if (this.props.showingSidebar) {
+                if (this.props.sidebarVertical) {
+                  lng +=
+                    (sidebarWidthFraction / 2) *
+                    (window.map.getBounds().getEast() -
+                      window.map.getBounds().getWest());
+                } else {
+                  lat -=
+                    (sidebarHeightFraction / 2) *
+                    (window.map.getBounds().getNorth() -
+                      window.map.getBounds().getSouth());
+                }
+              }
+              window.map &&
+                window.map.easeTo({
+                  zoom: zoom,
+                  center: { lng, lat },
+                });
+            }}
           >
             <span className="fas fa-minus"></span>
           </button>
@@ -594,5 +644,7 @@ export default connect((state) => {
   return {
     responses: state.responses,
     index: state.responses && getSearchIndex(state.responses),
+    sidebarVertical: state.landscape,
+    showingSidebar: state.displayedResponses !== null,
   };
 })(SearchBar);
