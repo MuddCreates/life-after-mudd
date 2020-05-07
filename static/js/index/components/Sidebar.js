@@ -490,7 +490,7 @@ class Sidebar extends React.Component {
         {this.detailItem({
           resp,
           icon: "facebook-messenger",
-          field: () => "Facebook profile",
+          field: (resp) => resp.facebookProfile && "Facebook profile",
           href: resp.facebookProfile,
           brand: true,
         })}
