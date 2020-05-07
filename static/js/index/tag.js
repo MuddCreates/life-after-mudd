@@ -17,23 +17,22 @@ export function formatCitySuffix(city) {
 }
 
 function formatPlan(path, org) {
-  let plan;
+  let plan = path;
   switch (path) {
     case "Job":
     case "Internship":
       plan = "Working";
       break;
     case "Graduate school":
-      plan = "Studying";
+      if (org) {
+        plan = "Studying";
+      }
       break;
     case "Not sure":
       plan = "No plans yet";
       break;
     case "Job and graduate school":
       plan = "Working and studying";
-      break;
-    default:
-      plan = path;
       break;
   }
   if (org) {
