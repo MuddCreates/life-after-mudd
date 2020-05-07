@@ -146,6 +146,7 @@ function fillDefaults(responses) {
     r.postGradEmail = clean(
       r.postGradEmail || r.rawPostGradEmail.replace("g.hmc.edu", "hmc.edu"),
     );
+    r.phoneNumber = clean(r.phoneNumber || r.rawPhoneNumber);
     return r;
   });
 }
@@ -233,6 +234,10 @@ function saveFormData() {
   }
   r.comments = $("#comments-input").val();
   r.postGradEmail = $("#post-grad-email-input").val();
+  r.phoneNumber = $("#phone-number-input").val();
+  r.facebookProfile = $("#facebook-profile-input").val();
+  r.orgLink = $("#organization-link-input").val();
+  r.summerOrgLink = $("#summer-organization-link-input").val();
   r.processed = r.timestamp;
 }
 
@@ -453,6 +458,8 @@ function populateForm() {
   $("#summer-org-raw-input").val(r.rawSummerOrg);
   $("#summer-city-state-raw-input").val(r.rawSummerCityState);
   $("#post-grad-email-raw-input").val(r.rawPostGradEmail);
+  $("#phone-number-raw-input").val(r.rawPhoneNumber);
+  $("#show-facebook-profile-raw-input").val(r.rawShowFacebook);
   $("#name-input").val(r.name);
   $("#email-input").val(r.email);
   $("#major-input").val(r.major);
@@ -469,6 +476,10 @@ function populateForm() {
   $("#comments-raw-input").val(r.rawComments);
   $("#comments-input").val(r.comments);
   $("#post-grad-email-input").val(r.postGradEmail);
+  $("#phone-number-input").val(r.phoneNumber);
+  $("#facebook-profile-input").val(r.facebookProfile);
+  $("#organization-link-input").val(r.orgLink);
+  $("#summer-organization-link-input").val(r.summerOrgLink);
   if (r.cityLat && r.cityLong) {
     $("#city-coords-input").val(`${r.cityLat}, ${r.cityLong}`);
   } else {
