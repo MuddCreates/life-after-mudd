@@ -182,7 +182,11 @@ class Sidebar extends React.Component {
                 paddingRight: "10px",
               }}
             ></span>
-            <b>
+            <b
+              style={{
+                display: "inline-block",
+              }}
+            >
               {noLinkFirst ? (
                 firstKey
               ) : (
@@ -213,23 +217,29 @@ class Sidebar extends React.Component {
                       paddingRight: "10px",
                     }}
                   ></span>
-                  {noLinkSecond ? (
-                    secondKey
-                  ) : (
-                    <a
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        this.doSimpleSearch(
-                          secondGroupBy,
-                          secondKey,
-                          secondKeyView,
-                        );
-                      }}
-                    >
-                      {secondKey}
-                    </a>
-                  )}
+                  <span
+                    style={{
+                      display: "inline-block",
+                    }}
+                  >
+                    {noLinkSecond ? (
+                      secondKey
+                    ) : (
+                      <a
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          this.doSimpleSearch(
+                            secondGroupBy,
+                            secondKey,
+                            secondKeyView,
+                          );
+                        }}
+                      >
+                        {secondKey}
+                      </a>
+                    )}
+                  </span>
                 </p>
                 {responses.map(({ resp, summer }, idx) => {
                   return (
@@ -244,6 +254,7 @@ class Sidebar extends React.Component {
                           style={{
                             paddingLeft: `${sidebarIndentWidth * 2}px`,
                             paddingRight: "10px",
+                            display: "inline-block",
                           }}
                         ></span>
                         <a
@@ -325,7 +336,12 @@ class Sidebar extends React.Component {
             }}
           ></span>{" "}
           {fields(resp).map((val, idx) => (
-            <Fragment key={idx}>
+            <span
+              key={idx}
+              style={{
+                display: "inline-block",
+              }}
+            >
               {idx !== 0 && separator}
               {noLink ? (
                 val
@@ -366,7 +382,7 @@ class Sidebar extends React.Component {
                   {val}
                 </a>
               )}
-            </Fragment>
+            </span>
           ))}
         </p>
       )
