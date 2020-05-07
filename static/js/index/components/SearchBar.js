@@ -160,7 +160,11 @@ export function getSearchIndex(responses) {
                 vals = [vals];
               }
               return vals.map((val) => {
-                if (val.summer || !(resp.orgLatLong || resp.cityLatLong)) {
+                if (
+                  val.summer ||
+                  (!(resp.orgLatLong || resp.cityLatLong) &&
+                    (resp.summerOrgLatLong || resp.summerCityLatLong))
+                ) {
                   if (val.summer) {
                     val = val.val;
                   }

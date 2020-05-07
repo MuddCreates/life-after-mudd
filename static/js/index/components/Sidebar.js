@@ -303,6 +303,7 @@ class Sidebar extends React.Component {
     field,
     match,
     matchSummer,
+    forcePredicate,
     separator,
     noLink,
     sidebarView,
@@ -372,11 +373,15 @@ class Sidebar extends React.Component {
                             responses: this.props.allResponses
                               .map((resp) => {
                                 let showLongTerm =
-                                  matches(resp) && matches(resp).includes(val);
+                                  (matches(resp) &&
+                                    matches(resp).includes(val)) ||
+                                  forcePredicate(resp);
                                 let showSummer =
-                                  matchesSummer &&
-                                  matchesSummer(resp) &&
-                                  matchesSummer(resp).includes(val);
+                                  (matchesSummer &&
+                                    matchesSummer(resp) &&
+                                    matchesSummer(resp).includes(val)) ||
+                                  (forcePredicate(resp) &&
+                                    !(resp.orgLatLong || resp.cityLatLong));
                                 if (showLongTerm || showSummer) {
                                   return { ...resp, showLongTerm, showSummer };
                                 } else {
@@ -430,6 +435,7 @@ class Sidebar extends React.Component {
           icon: getPathIcon({ path: resp.path, summer: false }),
           field: formatLongTermPlan,
           matchSummer: formatSummerPlan,
+          forcePredicate: (other) => !resp.org && resp.path === other.path,
           sidebarView: SidebarView.organizationView,
         })}
         {this.detailItem({
