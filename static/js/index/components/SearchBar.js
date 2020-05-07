@@ -551,8 +551,10 @@ class SearchBar extends React.Component {
                 if (!normItem.includes(part)) {
                   return;
                 }
-                if (normItem.startsWith(part)) {
-                  startsWith = true;
+                for (const itemPart of normItem.split(" ")) {
+                  if (itemPart.startsWith(part)) {
+                    startsWith = true;
+                  }
                 }
               }
               if (results.length < 5) {
