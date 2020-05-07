@@ -48,12 +48,17 @@ export function failHard(error) {
             </a>
           </li>
           <li>
-            <a href="https://github.com/MuddCreates/life-after-mudd/issues">
+            <a
+              href="https://github.com/MuddCreates/life-after-mudd/issues"
+              target="_blank"
+            >
               filing a bug report on GitHub
             </a>
           </li>
           <li>
-            <a href="mailto:rrosborough@hmc.edu">emailing me</a>
+            <a href="mailto:rrosborough@hmc.edu" target="_blank">
+              emailing me
+            </a>
           </li>
         </ul>
       </div>
@@ -79,7 +84,10 @@ export function failHard(error) {
           </ul>
           <p>
             For more information on the bug, see{" "}
-            <a href="https://bbs.archlinux.org/viewtopic.php?pid=1801935#p1801935">
+            <a
+              href="https://bbs.archlinux.org/viewtopic.php?pid=1801935#p1801935"
+              target="_blank"
+            >
               this forum post
             </a>
             .

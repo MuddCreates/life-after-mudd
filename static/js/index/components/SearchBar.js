@@ -68,6 +68,15 @@ const searchSources = [
     summerFilter: (_) => true,
   },
   {
+    field: (resp) => resp.name,
+    view: SidebarView.detailView,
+  },
+  {
+    field: (resp) => [resp.org, { val: resp.summerOrg, summer: true }],
+    alias: { Facebook: "FB" },
+    view: SidebarView.organizationView,
+  },
+  {
     field: (resp) => resp.path,
     rename: {
       Job: "Job/Internship/Working",
@@ -120,15 +129,6 @@ const searchSources = [
   {
     field: (resp) => [resp.country, { val: resp.summerCountry, summer: true }],
     alias: { "United States": "USA" },
-  },
-  {
-    field: (resp) => [resp.org, { val: resp.summerOrg, summer: true }],
-    alias: { Facebook: "FB" },
-    view: SidebarView.organizationView,
-  },
-  {
-    field: (resp) => resp.name,
-    view: SidebarView.detailView,
   },
 ];
 
@@ -378,8 +378,9 @@ class SearchBar extends React.Component {
             onClick={() => {
               let { lng, lat } = window.map.getCenter();
               let zoom = window.map.getZoom() + 1;
+              console.log(zoom);
               // Correction for sidebar.
-              if (this.props.showingSidebar) {
+              if (this.props.showingSidebar && zoom <= 20) {
                 if (this.props.sidebarVertical) {
                   lng -=
                     (sidebarWidthFraction / 4) *
@@ -421,7 +422,7 @@ class SearchBar extends React.Component {
               let { lng, lat } = window.map.getCenter();
               let zoom = window.map.getZoom() - 1;
               // Correction for sidebar.
-              if (this.props.showingSidebar) {
+              if (this.props.showingSidebar && zoom >= 1) {
                 if (this.props.sidebarVertical) {
                   lng +=
                     (sidebarWidthFraction / 2) *
@@ -476,24 +477,32 @@ class SearchBar extends React.Component {
               <div className="modal-body">
                 <p>
                   Created by Radon Rosborough.{" "}
-                  <a href="mailto:rrosborough@hmc.edu">Email me</a> if you have
-                  questions or feedback, if you find any wrong data, or if you
-                  would like to be removed from the map.
+                  <a href="mailto:rrosborough@hmc.edu" target="_blank">
+                    Email me
+                  </a>{" "}
+                  if you have questions or feedback, if you find any wrong data,
+                  or if you would like to be removed from the map.
                 </p>
                 <p>
                   Source code is available{" "}
-                  <a href="https://github.com/MuddCreates/life-after-mudd">
+                  <a
+                    href="https://github.com/MuddCreates/life-after-mudd"
+                    target="_blank"
+                  >
                     on GitHub
                   </a>
                   . I welcome{" "}
-                  <a href="https://github.com/MuddCreates/life-after-mudd/issues">
+                  <a
+                    href="https://github.com/MuddCreates/life-after-mudd/issues"
+                    target="_blank"
+                  >
                     bug reports
                   </a>{" "}
                   or improvements.
                 </p>
                 <p>
                   Data comes from{" "}
-                  <a href="https://forms.gle/PqEHTjpBDGBXfH4W8">
+                  <a href="https://forms.gle/PqEHTjpBDGBXfH4W8" target="_blank">
                     this Google Form
                   </a>
                   . Add your post-graduation plans!
