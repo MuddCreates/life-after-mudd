@@ -305,6 +305,7 @@ class SearchBar extends React.Component {
             style={{
               width: "100%",
               maxWidth: "100%",
+              minWidth: "0",
               position: "absolute",
               left: `${searchBarHeight + searchBarPadding}px`,
             }}
