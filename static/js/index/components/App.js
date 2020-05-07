@@ -1,12 +1,12 @@
 "use strict";
 
+import * as FastClick from "fastclick";
+import "inobounce";
 import $ from "jquery";
 import React from "react";
 import LoadingOverlay from "react-loading-overlay";
 import { connect } from "react-redux";
 import ScaleLoader from "react-spinners/ScaleLoader";
-
-import "inobounce";
 
 import { failHard } from "../error";
 import { store } from "../redux";
@@ -71,6 +71,8 @@ class App extends React.Component {
   componentDidMount() {
     document.addEventListener("keydown", this.keyListener, false);
     window.addEventListener("resize", this.resizeListener);
+    // ??? <https://github.com/ftlabs/fastclick/issues/398>
+    FastClick.FastClick.attach(document.body);
   }
   componentWillUnmount() {
     document.removeEventListener("keydown", this.keyListener, false);
