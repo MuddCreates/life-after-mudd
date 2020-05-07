@@ -342,7 +342,15 @@ class Sidebar extends React.Component {
                 display: "inline-block",
               }}
             >
-              {idx !== 0 && separator}
+              {idx !== 0 && (
+                <span
+                  style={{
+                    whiteSpace: "pre",
+                  }}
+                >
+                  {separator}
+                </span>
+              )}
               {noLink ? (
                 val
               ) : (
