@@ -469,7 +469,6 @@ class MapView extends React.Component {
           sidebarView: SidebarView.summaryView,
         });
       } else {
-        console.log("got a click");
         store.dispatch({
           type: "HIDE_DETAILS",
         });
