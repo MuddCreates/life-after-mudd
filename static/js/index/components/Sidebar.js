@@ -271,6 +271,7 @@ class Sidebar extends React.Component {
     noLink,
     sidebarView,
     href,
+    brand,
   }) {
     const arrayify = (fn) => (resp) => {
       let vals = fn(resp);
@@ -296,7 +297,7 @@ class Sidebar extends React.Component {
           }}
         >
           <span
-            className={`fas fa-${icon}`}
+            className={`${brand ? "fab" : "fas"} fa-${icon}`}
             style={{
               paddingRight: "10px",
               width: "30px",
@@ -364,12 +365,6 @@ class Sidebar extends React.Component {
         </h5>
         {this.detailItem({
           resp,
-          icon: "inbox",
-          field: (resp) => resp.postGradEmail,
-          href: `mailto:${resp.postGradEmail}`,
-        })}
-        {this.detailItem({
-          resp,
           icon: "graduation-cap",
           field: (resp) => resp.major && resp.major.split(" + "),
           separator: " + ",
@@ -387,6 +382,12 @@ class Sidebar extends React.Component {
           field: formatLongTermPlan,
           matchSummer: formatSummerPlan,
           sidebarView: SidebarView.organizationView,
+        })}
+        {this.detailItem({
+          resp,
+          icon: "link",
+          field: (resp) => resp.orgLink,
+          href: resp.orgLink,
         })}
         {(resp.summerPlans ||
           resp.summerCity ||
@@ -433,6 +434,12 @@ class Sidebar extends React.Component {
               matchSummer: (resp) => resp.summerOrg,
               sidebarView: SidebarView.organizationView,
             })}
+            {this.detailItem({
+              resp,
+              icon: "link",
+              field: (resp) => resp.summerOrgLink,
+              href: resp.summerOrgLink,
+            })}
           </>
         )}
         {resp.comments && (
@@ -460,6 +467,33 @@ class Sidebar extends React.Component {
             <span>{resp.comments}</span>
           </p>
         )}
+        <p
+          style={{
+            marginTop: "25px",
+            marginBottom: "8px",
+          }}
+        >
+          <b>Contact</b>
+        </p>
+        {this.detailItem({
+          resp,
+          icon: "inbox",
+          field: (resp) => resp.postGradEmail,
+          href: `mailto:${resp.postGradEmail}`,
+        })}
+        {this.detailItem({
+          resp,
+          icon: "phone",
+          field: (resp) => resp.phoneNumber,
+          href: `tel:${resp.phoneNumber}`,
+        })}
+        {this.detailItem({
+          resp,
+          icon: "facebook-messenger",
+          field: () => "Facebook profile",
+          href: resp.facebookProfile,
+          brand: true,
+        })}
       </div>
     );
   }
