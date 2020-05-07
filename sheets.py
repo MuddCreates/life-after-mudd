@@ -48,7 +48,10 @@ COLUMNS = (
     ("What will you be doing next year?", "rawPath"),
     ("At what company, school, or organization?", "rawOrg"),
     ("In what city and state?", "rawCityState"),
-    ("Do you have separate summer plans you'd like to share?", "rawHasSummerPlans"),
+    (
+        "Would you also like to share where you'll be for the summer?",
+        "rawHasSummerPlans",
+    ),
     ("What will you be doing?", "rawSummerPlans"),
     ("At what company, school, or organization?", "rawSummerOrg",),
     ("In what city and state?", "rawSummerCityState"),
