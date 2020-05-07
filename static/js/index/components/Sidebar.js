@@ -12,7 +12,12 @@ import {
 } from "../config";
 import { store } from "../redux";
 import { SidebarView } from "../state";
-import { formatCity, formatLongTermPlan, formatSummerPlan } from "../tag";
+import {
+  formatCity,
+  formatCitySuffix,
+  formatLongTermPlan,
+  formatSummerPlan,
+} from "../tag";
 import { allowResizingWindow } from "../util";
 
 function getPathIcon(path) {
@@ -509,6 +514,55 @@ class Sidebar extends React.Component {
           href: resp.facebookProfile,
           brand: true,
         })}
+        {(resp.email === this.props.email || this.props.email === "*") && (
+          <>
+            <p
+              style={{
+                marginTop: "25px",
+                marginBottom: "8px",
+              }}
+            >
+              <b>Update your response</b>
+            </p>
+            <p>
+              To update your information, simply{" "}
+              <a href="https://forms.gle/PqEHTjpBDGBXfH4W8" target="_blank">
+                fill out the form again
+              </a>
+              .
+              {!resp.comments && resp.path !== "Not sure" && (
+                <>
+                  {" "}
+                  <i>
+                    Why not update the comments section to tell people{" "}
+                    {resp.path === "Job"
+                      ? "what you'll be doing at " +
+                        (resp.org || "your new job")
+                      : resp.path === "Graduate school"
+                      ? "what program you'll be enrolled in at " +
+                        (resp.org.startsWith("University") ? "the " : "") +
+                        (resp.org || "grad school")
+                      : resp.path === "Gap year"
+                      ? "what you'll be doing during your gap year" +
+                        formatCitySuffix(resp.city)
+                      : resp.org
+                      ? "what you'll be up to at " + resp.org
+                      : "what you'll be up to" + formatCitySuffix(resp.city)}
+                    ?
+                  </i>
+                </>
+              )}
+            </p>
+            <p>
+              If you want to be removed from the map, or you have any other
+              concerns, just{" "}
+              <a href="mailto:rrosborough@hmc.edu" target="_blank">
+                shoot me an email
+              </a>
+              .
+            </p>
+          </>
+        )}
       </div>
     );
   }
@@ -627,4 +681,5 @@ export default connect((state) => ({
   allResponses: state.responses,
   cachedWindowWidth: state.cachedWindowWidth,
   cachedWindowHeight: state.cachedWindowHeight,
+  email: state.email,
 }))(Sidebar);

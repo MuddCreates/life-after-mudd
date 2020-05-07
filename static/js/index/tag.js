@@ -8,6 +8,14 @@ export function formatCity(city, state, country) {
   return [city, state, country].filter(Boolean).join(", ");
 }
 
+export function formatCitySuffix(city) {
+  if (city) {
+    return " in " + city;
+  } else {
+    return "";
+  }
+}
+
 function formatPlan(path, org) {
   let plan;
   switch (path) {

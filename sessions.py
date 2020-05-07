@@ -3,7 +3,8 @@ import sys
 
 import redis
 
-# Redis key used to store the set of known-good tokens.
+# Redis key used to store the set of known-good tokens (hash table
+# from tokens to email addresses).
 SET_NAME = "TOKENS"
 
 # How many seconds it takes before we forget about OAuth tokens we
@@ -28,13 +29,13 @@ else:
     print("Redis URL unset, disabling OAuth caching", file=sys.stderr)
 
 
-def add_token(token, expiration_seconds=OAUTH_CACHE_TIMEOUT):
-    if r:
-        r.sadd(SET_NAME, token)
+def add_token(token, email, expiration_seconds=OAUTH_CACHE_TIMEOUT):
+    r and r.hset(SET_NAME, token, email)
 
 
 def check_token(token):
     if r:
-        return r.sismember(SET_NAME, token)
-    else:
-        return False
+        b = r.hget(SET_NAME, token)
+        if b:
+            return b.decode()
+    return None

@@ -129,7 +129,8 @@ def get_data():
             raise TypeError
     except (KeyError, TypeError, json.JSONDecodeError):
         return "Request did not include token", 400
-    if not sessions.check_token(token):
+    email = sessions.check_token(token)
+    if not email:
         try:
             # This API call takes about 125ms in my testing. Could be
             # optimized by doing our own JWT validation, probably. But
@@ -149,7 +150,8 @@ def get_data():
                 raise ValueError("Wrong issuer: {}".format(idinfo["iss"]))
             if idinfo["hd"] != "g.hmc.edu":
                 raise ValueError("Wrong domain: {}".format(idinfo["hd"]))
-            sessions.add_token(token)
+            email = idinfo["email"]
+            sessions.add_token(token, email)
         except ValueError as e:
             # Be careful changing. This is a magic string for the front end
             return "Bad token: {}".format(e), 401
@@ -157,14 +159,20 @@ def get_data():
         with open("data.json") as f:
             responses = json.load(f)
         return flask.jsonify(
-            [
-                {
-                    "postGradEmail": r.get("postGradEmail", "") or r.get("email", ""),
-                    **{key: r.get(key, "") for key in PUBLIC_KEYS},
-                }
-                for r in responses
-                if r["processed"]
-            ]
+            {
+                "responses": [
+                    {
+                        "postGradEmail": r.get("postGradEmail", "")
+                        or r.get("email", ""),
+                        **{key: r.get(key, "") for key in PUBLIC_KEYS},
+                    }
+                    for r in responses
+                    if r["processed"]
+                ],
+                "email": email.replace("g.hmc.edu", "hmc.edu")
+                if not ADMIN_ENABLED
+                else "*",
+            }
         )
     except (OSError, json.JSONDecodeError):
         return "Data not available", 500

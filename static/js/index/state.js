@@ -52,6 +52,8 @@ export const initialState = {
   // Cached window size, pixels.
   cachedWindowWidth: window.innerWidth,
   cachedWindowHeight: window.innerHeight,
+  // Email address of authenticated user.
+  email: null,
 };
 
 let wasSearchPreviouslyFocused = false;
@@ -127,6 +129,8 @@ export const reducer = (state = initialState, action) => {
       }
       wasSearchPreviouslyFocused = searchFocused;
       return state;
+    case "SET_EMAIL":
+      return { ...state, email: action.email };
     default:
       return state;
   }

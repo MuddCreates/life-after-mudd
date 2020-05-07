@@ -84,7 +84,12 @@ export const fetchAction = thunk(async (dispatch) => {
       throw new Error(`Got status ${response.status} from API` + explanation);
     }
   } else {
-    const responses = cleanResponses(await response.json());
+    let { responses, email } = await response.json();
+    responses = cleanResponses(responses);
+    dispatch({
+      type: "SET_EMAIL",
+      email,
+    });
     dispatch({
       type: "SHOW_DATA",
       responses,
