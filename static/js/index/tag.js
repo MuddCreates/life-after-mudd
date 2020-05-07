@@ -17,11 +17,11 @@ function formatPlan(path, org) {
     case "Graduate school":
       plan = "Studying";
       break;
-    case "Gap year":
-      plan = "Taking a gap year";
-      break;
     case "Not sure":
       plan = "No plans yet";
+      break;
+    case "Job and graduate school":
+      plan = "Working and studying";
       break;
     default:
       plan = path;
