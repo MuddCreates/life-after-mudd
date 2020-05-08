@@ -375,12 +375,13 @@ class Sidebar extends React.Component {
                                 let showLongTerm =
                                   (matches(resp) &&
                                     matches(resp).includes(val)) ||
-                                  forcePredicate(resp);
+                                  (forcePredicate && forcePredicate(resp));
                                 let showSummer =
                                   (matchesSummer &&
                                     matchesSummer(resp) &&
                                     matchesSummer(resp).includes(val)) ||
-                                  (forcePredicate(resp) &&
+                                  (forcePredicate &&
+                                    forcePredicate(resp) &&
                                     !(resp.orgLatLong || resp.cityLatLong));
                                 if (showLongTerm || showSummer) {
                                   return { ...resp, showLongTerm, showSummer };
