@@ -12,17 +12,18 @@ import sheets
 import sessions
 
 ADMIN_ENABLED = bool(os.environ.get("LAM_ADMIN_ENABLED"))
+ANALYTICS_ENABLED = bool(os.environ.get("LAM_ANALYTICS_ENABLED"))
 AUTOFETCH_ENABLED = bool(os.environ.get("LAM_AUTOFETCH_ENABLED"))
 TLS_ENABLED = bool(os.environ.get("LAM_TLS_ENABLED"))
 
-app = flask.Flask(__name__)
+app = flask.Flask(__name__, template_folder=".")
 if TLS_ENABLED:
     flask_talisman.Talisman(app, content_security_policy=None)
 
 
 @app.route("/")
 def get_index():
-    return flask.send_file("dist/index.html")
+    return flask.render_template("dist/index.html", analytics_enabled=ANALYTICS_ENABLED)
 
 
 @app.route("/admin")

@@ -17,4 +17,4 @@ EXPOSE 8080
 # an internal buffer forever, so you never get to see the logs (but
 # only in production). Fun fun fun. What a great idea. Why didn't I
 # think of that.
-CMD HOME=/root PYTHONUNBUFFERED=1 poetry run make app-prod HOST=0.0.0.0 LAM_TLS_ENABLED=1
+CMD HOME=/root PYTHONUNBUFFERED=1 poetry run make app-prod HOST=0.0.0.0 LAM_TLS_ENABLED=1 LAM_ANALYTICS_ENABLED=1
