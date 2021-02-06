@@ -33,7 +33,8 @@
     "redux-thunk": "^2.3.0",
     "regenerator-runtime": "^0.13.3",
     "reselect": "^4.0.0",
-    "usa-states": "^0.0.5"
+    "usa-states": "^0.0.5",
+    "uuid": "^8.3.2"
   },
   "babel": {
     "plugins": [

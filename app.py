@@ -26,6 +26,11 @@ def get_index():
     return flask.render_template("dist/index.html", analytics_enabled=ANALYTICS_ENABLED)
 
 
+@app.route("/oauth")
+def get_oauth_redirect():
+    return flask.send_file("dist/oauth.html")
+
+
 @app.route("/admin")
 def get_admin():
     if ADMIN_ENABLED:
