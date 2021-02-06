@@ -1,4 +1,4 @@
-FROM ubuntu:eoan
+FROM ubuntu:focal
 
 COPY scripts/docker-install-system.bash /tmp/
 RUN /tmp/docker-install-system.bash
