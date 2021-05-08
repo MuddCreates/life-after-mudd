@@ -1,13 +1,21 @@
 #!/usr/bin/env python3
 
+import itertools as it
 import json
+import operator as op
 import os
+import pprint as pp
 import sys
 
 import gspread
 import oauth2client.service_account
 import requests
 
+# map worksheet names to class years
+SHEET_CLASS = {
+    "Class of 2021": "2021",
+    "Class of 2020": "2020",
+}
 
 COLUMNS = (
     ("Processed", "processed"),
@@ -59,13 +67,18 @@ COLUMNS = (
     ("Post-graduation email address", "rawPostGradEmail"),
     ("Phone number", "rawPhoneNumber"),
     ("Show Facebook profile?", "rawShowFacebook"),
+    (
+        "Check here if you don't want other HMC classes to see your map data",
+        "optOutMapData",
+    ),
 )
 
 
 COLUMN_INDICES = {key: idx for idx, (_, key) in enumerate(COLUMNS)}
+OAUTH_PRIVATE_KEY_PATH = ".oauth-private-key.json"
 
 
-def get_worksheet():
+def get_worksheets():
     # https://gspread.readthedocs.io/en/latest/oauth2.html#using-signed-credentials
     scopes = [
         "https://spreadsheets.google.com/feeds",
@@ -73,34 +86,47 @@ def get_worksheet():
     ]
     env_key = os.environ.get("LAM_OAUTH_PRIVATE_KEY")
     if env_key:
-        creds = oauth2client.service_account.ServiceAccountCredentials.from_json_keyfile_dict(
-            json.loads(env_key), scopes
-        )
+        client = gspread.service_account_from_dict(json.loads(env_key), scopes)
     else:
-        creds = oauth2client.service_account.ServiceAccountCredentials.from_json_keyfile_name(
-            ".oauth-private-key.json", scopes,
+        client = gspread.service_account(
+            OAUTH_PRIVATE_KEY_PATH,
+            scopes,
         )
-    return gspread.authorize(creds).open("Life After Mudd").get_worksheet(0)
+
+    sheets = client.open("Life After Mudd").worksheets()
+    assert {sh.title for sh in sheets} == {*SHEET_CLASS.keys()}
+
+    return sheets
 
 
 def read_form_responses(worksheet):
     header, *rows = worksheet.get_all_values()
     expected_header = [name for name, _ in COLUMNS]
     if header != expected_header:
-        for x, y in zip(expected_header, header):
-            if x != y:
-                print("expected {}, got {}".format(x, y), file=sys.stderr)
+        pp.pprint(
+            [
+                (i, a, b)
+                for i, (a, b) in enumerate(
+                    it.zip_longest(expected_header, header)
+                )
+                if a != b
+            ],
+            file=sys.stderr,
+        )
         assert False
     return [{key: value for (_, key), value in zip(COLUMNS, row)} for row in rows]
 
 
-def write_form_responses(worksheet, responses):
+def write_form_responses(worksheet: gspread.Worksheet, responses):
     header = worksheet.row_values(1)
     assert header == [name for name, _ in COLUMNS], header
     num_cols = COLUMN_INDICES["sepLeft"]
+    if not responses:
+        return
     cells = worksheet.range(2, 1, len(responses) + 1, num_cols)
     for cell in cells:
-        cell.value = responses[cell.row - 2][COLUMNS[cell.col - 1][1]]
+        _, key = COLUMNS[cell.col - 1]
+        cell.value = responses[cell.row - 2][key]
     worksheet.update_cells(cells)
 
 
@@ -114,8 +140,10 @@ def get_unprocessed(responses):
 
 def download_form_responses():
     print("Downloading form responses...", file=sys.stderr)
-    worksheet = get_worksheet()
-    responses = read_form_responses(worksheet)
+    worksheets = get_worksheets()
+    responses = {
+        SHEET_CLASS[ws.title]: read_form_responses(ws) for ws in worksheets
+    }
     messenger_key = os.environ.get("MESSENGER_PAGE_KEY")
     messenger_user_id = os.environ.get("MESSENGER_USER_ID")
     if messenger_key and messenger_user_id:
@@ -172,8 +200,10 @@ def download_form_responses():
 def upload_form_responses():
     with open("data.json") as f:
         responses = json.load(f)
-    worksheet = get_worksheet()
-    write_form_responses(worksheet, responses)
+    sheets = get_worksheets()
+    assert {*SHEET_CLASS.values()} == {*responses.keys()}
+    for sheet in sheets:
+        write_form_responses(sheet, responses[SHEET_CLASS[sheet.title]])
 
 
 if __name__ == "__main__":
