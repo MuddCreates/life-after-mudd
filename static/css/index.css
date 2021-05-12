@@ -31,3 +31,23 @@
   background-size: 100% 114px, 100% 114px, 100% 40px, 100% 40px;
   background-attachment: local, local, scroll, scroll;
 }
+
+#year-select select:focus {
+  outline: 2px solid rgba(10, 180, 230, 0.5);
+}
+
+#year-select::after {
+  position: absolute;
+  content: "";
+  top: 50%;
+  right: 0.5rem;
+  z-index: 20;
+  opacity: 0.5;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+  border: 5px solid transparent;
+  border-radius: 3px;
+  margin-top: -2px;
+  border-top-color: black;
+}
