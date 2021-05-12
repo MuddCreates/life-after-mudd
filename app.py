@@ -166,15 +166,18 @@ def get_data():
             responses = json.load(f)
         return flask.jsonify(
             {
-                "responses": [
-                    {
-                        "postGradEmail": r.get("postGradEmail", "")
-                        or r.get("email", ""),
-                        **{key: r.get(key, "") for key in PUBLIC_KEYS},
-                    }
-                    for r in responses
-                    if r["processed"]
-                ],
+                "responses": {
+                    year: [
+                        {
+                            "postGradEmail": r.get("postGradEmail", "")
+                            or r.get("email", ""),
+                            **{key: r.get(key, "") for key in PUBLIC_KEYS},
+                        }
+                        for r in batch
+                        if r["processed"]
+                    ]
+                    for year, batch in responses.items()
+                },
                 "email": email.replace("g.hmc.edu", "hmc.edu")
                 if not ADMIN_ENABLED
                 else "*",
