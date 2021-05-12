@@ -477,28 +477,34 @@ class MapView extends React.Component {
   };
 }
 
-export default connect((state) => ({
-  responses: state.responses,
-  index: state.responses && getSearchIndex(state.responses),
-  displayedLongTermIndices:
-    state.displayedResponses &&
-    new Set(
-      state.displayedResponses
-        .filter(
-          (resp) => !resp.hasOwnProperty("showLongTerm") || resp.showLongTerm,
-        )
-        .map((resp) => resp.idx),
-    ),
-  displayedSummerIndices:
-    state.displayedResponses &&
-    new Set(
-      state.displayedResponses
-        .filter((resp) => !resp.hasOwnProperty("showSummer") || resp.showSummer)
-        .map((resp) => resp.idx),
-    ),
-  displayedResponses: state.displayedResponses,
-  serial: state.mapViewSerial,
-  sidebarVertical: state.landscape,
-  cachedWindowWidth: state.cachedWindowWidth,
-  cachedWindowHeight: state.cachedWindowHeight,
-}))(MapView);
+export default connect((state) => {
+  const responses =
+    state.responses && state.classYear && state.responses[state.classYear];
+  return {
+    responses,
+    index: responses && getSearchIndex(responses),
+    displayedLongTermIndices:
+      state.displayedResponses &&
+      new Set(
+        state.displayedResponses
+          .filter(
+            (resp) => !resp.hasOwnProperty("showLongTerm") || resp.showLongTerm,
+          )
+          .map((resp) => resp.idx),
+      ),
+    displayedSummerIndices:
+      state.displayedResponses &&
+      new Set(
+        state.displayedResponses
+          .filter(
+            (resp) => !resp.hasOwnProperty("showSummer") || resp.showSummer,
+          )
+          .map((resp) => resp.idx),
+      ),
+    displayedResponses: state.displayedResponses,
+    serial: state.mapViewSerial,
+    sidebarVertical: state.landscape,
+    cachedWindowWidth: state.cachedWindowWidth,
+    cachedWindowHeight: state.cachedWindowHeight,
+  };
+})(MapView);

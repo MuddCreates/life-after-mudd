@@ -257,8 +257,8 @@ function normalize(query) {
 export function doSearch(query, index) {
   store.dispatch({
     type: "SHOW_DETAILS",
-    responses: index.get(query).responses,
-    sidebarView: index.get(query).view,
+    responses: index.get(query)?.responses,
+    sidebarView: index.get(query)?.view,
   });
   store.dispatch({
     type: "UPDATE_MAP_VIEW_ZOOM",
@@ -669,9 +669,16 @@ class SearchBar extends React.Component {
 }
 
 export default connect((state) => {
+  const responses =
+    state.responses && state.classYear && state.responses[state.classYear];
+  const years = Object.keys(state.responses || {}).map((year) =>
+    parseInt(year, 10),
+  );
   return {
-    responses: state.responses,
-    index: state.responses && getSearchIndex(state.responses),
+    responses,
+    years,
+    classYear: state.classYear,
+    index: responses && getSearchIndex(responses),
     sidebarVertical: state.landscape,
     showingSidebar: state.displayedResponses !== null,
   };

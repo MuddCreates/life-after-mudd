@@ -40,3 +40,13 @@ export function inLandscapeMode() {
 export function allowResizingWindow() {
   return navigator.userAgent.toLowerCase().indexOf("android") === -1;
 }
+
+export const findClassYearByEmail = (data, email) => {
+  for (const year in data) {
+    for (const response of data[year]) {
+      if (response.email == email) return parseInt(year, 10);
+    }
+  }
+  // fallback: if no match, return latest
+  return Math.max(...Object.keys(data).map((s) => parseInt(s, 10)));
+};
