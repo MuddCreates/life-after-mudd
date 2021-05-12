@@ -13,8 +13,10 @@ gunicorn = "^20.0.4"
 flask-talisman = "^0.7.0"
 google-auth = "^1.11.3"
 redis = "^3.4.1"
+click = "^7.1.2"
 
 [tool.poetry.dev-dependencies]
+pyls-black = "^0.4.6"
 
 [build-system]
 requires = ["poetry>=0.12"]

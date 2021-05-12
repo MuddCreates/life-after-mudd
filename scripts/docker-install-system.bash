@@ -56,6 +56,6 @@ pip3 --disable-pip-version-check install -U keyrings.alt
 
 # Use Poetry to install project dependencies. Use the most recent
 # version because it just fixes *so* many bugs compared to pre-1.0.
-pip3 --disable-pip-version-check install poetry==1.0.0
+pip3 --disable-pip-version-check install poetry
 
 rm "$0"
