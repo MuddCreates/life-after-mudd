@@ -23,7 +23,14 @@ if TLS_ENABLED:
 
 @app.route("/")
 def get_index():
-    return flask.render_template("dist/index.html", analytics_enabled=ANALYTICS_ENABLED)
+    return flask.render_template(
+        "dist/index.html", analytics_enabled=ANALYTICS_ENABLED
+    )
+
+
+@app.route("/<path:path>")
+def serve_static(path):
+    return flask.send_from_directory("/", path)
 
 
 @app.route("/oauth")
