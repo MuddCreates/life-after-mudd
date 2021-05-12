@@ -22,6 +22,7 @@ import {
   searchBarWidth,
   sidebarHeightFraction,
   sidebarWidthFraction,
+  yearSelectWidth,
 } from "../config";
 import { failHard } from "../error";
 import { store } from "../redux";
@@ -352,6 +353,49 @@ class SearchBar extends React.Component {
           >
             <span className="fas fa-info-circle"></span>
           </button>
+          <div
+            id="year-select"
+            style={{
+              position: "absolute",
+              ...(this.props.sidebarVertical
+                ? {
+                    left: `${
+                      searchBarHeight + searchBarWidth + 2 * searchBarPadding
+                    }px`,
+                  }
+                : {
+                    left: `${searchBarHeight + searchBarPadding}px`,
+                    top: `${searchBarHeight + searchBarPadding}px`,
+                  }),
+            }}
+          >
+            <select
+              style={{
+                backgroundColor: "white",
+                border: "none",
+                padding: "6px",
+                height: `${searchBarHeight}px`,
+                width: `${yearSelectWidth}px`,
+                appearance: "none",
+                minWidth: 0,
+                boxShadow: "rgba(0, 0, 0, 0.1) 0px 0px 10px 2px",
+                borderRadius: "4px",
+              }}
+              value={this.props.classYear || ""}
+              onChange={(e) =>
+                store.dispatch({
+                  type: "SET_YEAR",
+                  year: parseInt(e.target.value, 10),
+                })
+              }
+            >
+              {this.props.years.map((year) => (
+                <option key={year} value={year}>
+                  Class of {year}
+                </option>
+              ))}
+            </select>
+          </div>
           <div
             style={{
               position: "absolute",

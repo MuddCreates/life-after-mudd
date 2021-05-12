@@ -5,11 +5,7 @@ import React from "react";
 import { Fragment } from "react";
 import { connect } from "react-redux";
 
-import {
-  sidebarIndentWidth,
-  sidebarWidthFraction,
-  sidebarHeightFraction,
-} from "../config";
+import { sidebarWidthFraction, sidebarHeightFraction } from "../config";
 import { store } from "../redux";
 import { SidebarView } from "../state";
 import {
