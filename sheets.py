@@ -137,9 +137,10 @@ def write_form_responses(worksheet: gspread.Worksheet, responses):
 
 def get_unprocessed(responses):
     names = set()
-    for response in responses:
-        if response["processed"] != response["timestamp"]:
-            names.add(response["rawName"])
+    for batch in responses.values():
+        for response in batch:
+            if response["processed"] != response["timestamp"]:
+                names.add(response["rawName"])
     return names
 
 
