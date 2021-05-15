@@ -9,3 +9,4 @@
 /node_modules/
 /data.json
 /yarn-error.log
+.parcel-cache

@@ -2,7 +2,11 @@
 
 import $ from "jquery";
 
-import { allowResizingWindow, inLandscapeMode } from "./util";
+import {
+  allowResizingWindow,
+  inLandscapeMode,
+  findClassYearByEmail,
+} from "./util";
 
 // Enum that indicates whether a loading spinner is displayed
 // overlaying the map, and if so what message is shown.
@@ -54,6 +58,8 @@ export const initialState = {
   cachedWindowHeight: window.innerHeight,
   // Email address of authenticated user.
   email: null,
+  // Detected class year of authenticated user.
+  classYear: null,
 };
 
 let wasSearchPreviouslyFocused = false;
@@ -85,6 +91,10 @@ export const reducer = (state = initialState, action) => {
         loadingStatus: LoadingStatus.none,
         responses: action.responses,
         displayedResponses: null,
+        // update class-year only if not already manually set
+        classYear:
+          state.classYear ||
+          (state.email && findClassYearByEmail(action.responses, state.email)),
       };
     case "SHOW_DETAILS":
       return {
@@ -130,7 +140,16 @@ export const reducer = (state = initialState, action) => {
       wasSearchPreviouslyFocused = searchFocused;
       return state;
     case "SET_EMAIL":
-      return { ...state, email: action.email };
+      return {
+        ...state,
+        email: action.email,
+        // update class-year only if not already manually set
+        classYear:
+          state.classYear ||
+          (state.data && findClassYearByEmail(state.data, action.email)),
+      };
+    case "SET_YEAR":
+      return { ...state, classYear: action.year };
     default:
       return state;
   }

@@ -23,18 +23,20 @@ function parseLatLong(long, lat) {
 // version suitable for use on the frontend. May reuse storage of the
 // original objects and array.
 function cleanResponses(responses) {
-  responses.map((response, idx) => {
-    response.cityLatLong = parseLatLong(response.cityLong, response.cityLat);
-    response.orgLatLong = parseLatLong(response.orgLong, response.orgLat);
-    response.summerCityLatLong = parseLatLong(
-      response.summerCityLong,
-      response.summerCityLat,
-    );
-    response.summerOrgLatLong = parseLatLong(
-      response.summerOrgLong,
-      response.summerOrgLat,
-    );
-    response.idx = idx;
+  Object.values(responses).forEach((batch) => {
+    batch.forEach((response, idx) => {
+      response.cityLatLong = parseLatLong(response.cityLong, response.cityLat);
+      response.orgLatLong = parseLatLong(response.orgLong, response.orgLat);
+      response.summerCityLatLong = parseLatLong(
+        response.summerCityLong,
+        response.summerCityLat,
+      );
+      response.summerOrgLatLong = parseLatLong(
+        response.summerOrgLong,
+        response.summerOrgLat,
+      );
+      response.idx = idx;
+    });
   });
   return responses;
 }

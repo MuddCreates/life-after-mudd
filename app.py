@@ -23,7 +23,14 @@ if TLS_ENABLED:
 
 @app.route("/")
 def get_index():
-    return flask.render_template("dist/index.html", analytics_enabled=ANALYTICS_ENABLED)
+    return flask.render_template(
+        "dist/index.html", analytics_enabled=ANALYTICS_ENABLED
+    )
+
+
+@app.route("/<path:path>")
+def serve_static(path):
+    return flask.send_from_directory("/", path)
 
 
 @app.route("/oauth")
@@ -166,15 +173,18 @@ def get_data():
             responses = json.load(f)
         return flask.jsonify(
             {
-                "responses": [
-                    {
-                        "postGradEmail": r.get("postGradEmail", "")
-                        or r.get("email", ""),
-                        **{key: r.get(key, "") for key in PUBLIC_KEYS},
-                    }
-                    for r in responses
-                    if r["processed"]
-                ],
+                "responses": {
+                    year: [
+                        {
+                            "postGradEmail": r.get("postGradEmail", "")
+                            or r.get("email", ""),
+                            **{key: r.get(key, "") for key in PUBLIC_KEYS},
+                        }
+                        for r in batch
+                        if r["processed"]
+                    ]
+                    for year, batch in responses.items()
+                },
                 "email": email.replace("g.hmc.edu", "hmc.edu")
                 if not ADMIN_ENABLED
                 else "*",

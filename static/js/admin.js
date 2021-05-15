@@ -333,10 +333,11 @@ function resetMap(map) {
 
 let firstTime = true;
 
-function initPage() {
+const populateResponses = () => {
   const responses = $("body").data("responses");
+  const year = $("body").data("year");
   $("#response-dropdown").find("option").remove();
-  responses.forEach((response, idx) => {
+  responses[year].forEach((response, idx) => {
     $("#response-dropdown").append(
       $("<option>", {
         value: idx,
@@ -344,15 +345,39 @@ function initPage() {
       }),
     );
   });
+};
+
+function initPage() {
+  const responses = $("body").data("responses");
+  const year = $("body").data("year");
+  $("#year-dropdown").find("option").remove();
+  Object.keys(responses).forEach((y) => {
+    $("#year-dropdown").append(
+      $("<option>", {
+        value: y,
+        text: y,
+        selected: parseInt(y, 10) === year,
+      }),
+    );
+  });
+  populateResponses();
+
   if (!firstTime) {
     return;
   } else {
     firstTime = false;
   }
+  $("#year-dropdown").on("change", () => {
+    const year = parseInt($("#year-dropdown").val(), 10);
+    $("body").data("year", year);
+    $("body").data("idx", getDefaultIndex($("body").data("responses")[year]));
+    populateResponses();
+    populateForm();
+  });
   $("#response-dropdown").on("change", () => {
     const idx = parseInt($("#response-dropdown").val());
     $("body").data("idx", idx);
-    populateForm(idx);
+    populateForm();
   });
   $("#next-button").on("click", submitForm);
   $("#response-form").on("submit", submitForm);
@@ -435,70 +460,73 @@ function initPage() {
 
 function populateForm() {
   const responses = $("body").data("responses");
+  const year = $("body").data("year");
   const idx = $("body").data("idx");
   $("#response-dropdown").val(idx);
-  const r = responses[idx];
+  const r = responses[year][idx];
   {
     const btn = $("#next-button")[0];
     btn.classList.remove("btn-primary");
     btn.classList.remove("btn-warning");
-    if (r.processed) {
+    if (r?.processed) {
       btn.classList.add("btn-warning");
     } else {
       btn.classList.add("btn-primary");
     }
   }
-  $("#name-raw-input").val(r.rawName);
-  $("#email-raw-input").val(r.rawEmail);
-  $("#major-raw-input").val(r.rawMajor);
-  $("#path-raw-input").val(r.rawPath);
-  $("#org-raw-input").val(r.rawOrg);
-  $("#city-state-raw-input").val(r.rawCityState);
-  $("#summer-plans-raw-input").val(r.rawSummerPlans);
-  $("#summer-org-raw-input").val(r.rawSummerOrg);
-  $("#summer-city-state-raw-input").val(r.rawSummerCityState);
-  $("#post-grad-email-raw-input").val(r.rawPostGradEmail);
-  $("#phone-number-raw-input").val(r.rawPhoneNumber);
-  $("#show-facebook-profile-raw-input").val(r.rawShowFacebook);
-  $("#name-input").val(r.name);
-  $("#email-input").val(r.email);
-  $("#major-input").val(r.major);
-  $("#path-input").val(r.path);
-  $("#org-input").val(r.org);
-  $("#city-input").val(r.city);
-  $("#state-input").val(r.state);
-  $("#country-input").val(r.country);
-  $("#summer-plans-input").val(r.summerPlans);
-  $("#summer-org-input").val(r.summerOrg);
-  $("#summer-city-input").val(r.summerCity);
-  $("#summer-state-input").val(r.summerState);
-  $("#summer-country-input").val(r.summerCountry);
-  $("#comments-raw-input").val(r.rawComments);
-  $("#comments-input").val(r.comments);
-  $("#post-grad-email-input").val(r.postGradEmail);
-  $("#phone-number-input").val(r.phoneNumber);
-  $("#facebook-profile-input").val(r.facebookProfile);
-  $("#organization-link-input").val(r.orgLink);
-  $("#summer-organization-link-input").val(r.summerOrgLink);
-  if (r.cityLat && r.cityLong) {
-    $("#city-coords-input").val(`${r.cityLat}, ${r.cityLong}`);
+  $("#name-raw-input").val(r?.rawName);
+  $("#email-raw-input").val(r?.rawEmail);
+  $("#major-raw-input").val(r?.rawMajor);
+  $("#path-raw-input").val(r?.rawPath);
+  $("#org-raw-input").val(r?.rawOrg);
+  $("#city-state-raw-input").val(r?.rawCityState);
+  $("#summer-plans-raw-input").val(r?.rawSummerPlans);
+  $("#summer-org-raw-input").val(r?.rawSummerOrg);
+  $("#summer-city-state-raw-input").val(r?.rawSummerCityState);
+  $("#post-grad-email-raw-input").val(r?.rawPostGradEmail);
+  $("#phone-number-raw-input").val(r?.rawPhoneNumber);
+  $("#show-facebook-profile-raw-input").val(r?.rawShowFacebook);
+  $("#name-input").val(r?.name);
+  $("#email-input").val(r?.email);
+  $("#major-input").val(r?.major);
+  $("#path-input").val(r?.path);
+  $("#org-input").val(r?.org);
+  $("#city-input").val(r?.city);
+  $("#state-input").val(r?.state);
+  $("#country-input").val(r?.country);
+  $("#summer-plans-input").val(r?.summerPlans);
+  $("#summer-org-input").val(r?.summerOrg);
+  $("#summer-city-input").val(r?.summerCity);
+  $("#summer-state-input").val(r?.summerState);
+  $("#summer-country-input").val(r?.summerCountry);
+  $("#comments-raw-input").val(r?.rawComments);
+  $("#comments-input").val(r?.comments);
+  $("#post-grad-email-input").val(r?.postGradEmail);
+  $("#phone-number-input").val(r?.phoneNumber);
+  $("#facebook-profile-input").val(r?.facebookProfile);
+  $("#organization-link-input").val(r?.orgLink);
+  $("#summer-organization-link-input").val(r?.summerOrgLink);
+  if (r?.cityLat && r?.cityLong) {
+    $("#city-coords-input").val(`${r?.cityLat}, ${r?.cityLong}`);
   } else {
     $("#city-coords-input").val("");
   }
-  if (r.orgLat && r.orgLong) {
-    $("#org-coords-input").val(`${r.orgLat}, ${r.orgLong}`);
+  if (r?.orgLat && r?.orgLong) {
+    $("#org-coords-input").val(`${r?.orgLat}, ${r?.orgLong}`);
   } else {
     $("#org-coords-input").val("");
   }
-  if (r.summerCityLat && r.summerCityLong) {
+  if (r?.summerCityLat && r?.summerCityLong) {
     $("#summer-city-coords-input").val(
-      `${r.summerCityLat}, ${r.summerCityLong}`,
+      `${r?.summerCityLat}, ${r?.summerCityLong}`,
     );
   } else {
     $("#summer-city-coords-input").val("");
   }
-  if (r.summerOrgLat && r.summerOrgLong) {
-    $("#summer-org-coords-input").val(`${r.summerOrgLat}, ${r.summerOrgLong}`);
+  if (r?.summerOrgLat && r?.summerOrgLong) {
+    $("#summer-org-coords-input").val(
+      `${r?.summerOrgLat}, ${r?.summerOrgLong}`,
+    );
   } else {
     $("#summer-org-coords-input").val("");
   }
@@ -506,14 +534,19 @@ function populateForm() {
   $("#summer-city-map").data("onFirstResult", () =>
     locateOrg({ summer: true }),
   );
-  locateCity({ processed: r.processed === r.timestamp, summer: false });
-  locateCity({ processed: r.processed === r.timestamp, summer: true });
+  locateCity({ processed: r?.processed === r?.timestamp, summer: false });
+  locateCity({ processed: r?.processed === r?.timestamp, summer: true });
 }
 
+const getLatestYear = (responses) =>
+  Math.max(...Object.keys(responses).map((year) => parseInt(year, 10)));
+
 function setup(responses) {
-  responses = fillDefaults(responses);
+  for (const year in responses) responses[year] = fillDefaults(responses[year]);
+  const year = getLatestYear(responses);
+  $("body").data("year", year);
   $("body").data("responses", responses);
-  $("body").data("idx", getDefaultIndex(responses));
+  $("body").data("idx", getDefaultIndex(responses[year]));
   initPage();
   populateForm();
 }

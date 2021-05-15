@@ -29,3 +29,5 @@ export const searchBarWidth = 333;
 // adding the search bar desired width to twice its padding. Again,
 // change this if the CSS hacks in SearchBar.js are modified.
 export const minLandscapeWidth = searchBarWidth + 40;
+
+export const yearSelectWidth = 130;
