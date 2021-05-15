@@ -111,7 +111,7 @@ def read_form_responses(worksheet):
                 )
                 if a != b
             ],
-            file=sys.stderr,
+            stream=sys.stderr
         )
         assert False
     return [{key: value for (_, key), value in zip(COLUMNS, row)} for row in rows]
