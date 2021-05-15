@@ -50,7 +50,7 @@ COLUMNS = (
     *([("", "filler")] * 8),
     ("", "sepRight"),
     ("Timestamp", "timestamp"),
-    ("Email Address", "rawEmail"),
+    ("Email", "rawEmail"),
     ("Your first and last name", "rawName"),
     ("Your major", "rawMajor"),
     ("What will you be doing next year?", "rawPath"),
@@ -61,7 +61,10 @@ COLUMNS = (
         "rawHasSummerPlans",
     ),
     ("What will you be doing?", "rawSummerPlans"),
-    ("At what company, school, or organization?", "rawSummerOrg",),
+    (
+        "At what company, school, or organization?",
+        "rawSummerOrg",
+    ),
     ("In what city and state?", "rawSummerCityState"),
     ("Do you want to share more about what you'll be doing?", "rawComments"),
     ("Post-graduation email address", "rawPostGradEmail"),
@@ -111,10 +114,12 @@ def read_form_responses(worksheet):
                 )
                 if a != b
             ],
-            file=sys.stderr,
+            stream=sys.stderr,
         )
         assert False
-    return [{key: value for (_, key), value in zip(COLUMNS, row)} for row in rows]
+    return [
+        {key: value for (_, key), value in zip(COLUMNS, row)} for row in rows
+    ]
 
 
 def write_form_responses(worksheet: gspread.Worksheet, responses):
@@ -132,9 +137,10 @@ def write_form_responses(worksheet: gspread.Worksheet, responses):
 
 def get_unprocessed(responses):
     names = set()
-    for response in responses:
-        if response["processed"] != response["timestamp"]:
-            names.add(response["rawName"])
+    for batch in responses.values():
+        for response in batch:
+            if response["processed"] != response["timestamp"]:
+                names.add(response["rawName"])
     return names
 
 
@@ -190,7 +196,10 @@ def download_form_responses():
         else:
             print("(no change since last time)", file=sys.stderr)
     else:
-        print("(no Messenger credentials, skipping notification)", file=sys.stderr)
+        print(
+            "(no Messenger credentials, skipping notification)",
+            file=sys.stderr,
+        )
     with open("data.json.tmp", "w") as f:
         json.dump(responses, f)
     os.rename("data.json.tmp", "data.json")

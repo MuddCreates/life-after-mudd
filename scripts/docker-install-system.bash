@@ -9,6 +9,7 @@ apt-get install -y curl gnupg
 rm -rf /var/lib/apt/lists/*
 
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+curl -sSL https://deb.nodesource.com/setup_16.x | bash
 
 tee -a /etc/apt/sources.list.d/yarn.list >/dev/null <<"EOF"
 deb https://dl.yarnpkg.com/debian/ stable main
@@ -41,7 +42,7 @@ python3-venv
 yarn
 
 # to install deps for react-mapbox-gl fork
-npm
+nodejs
 
 "
 

@@ -189,8 +189,9 @@ function initMap(id) {
 
 function saveFormData() {
   const responses = $("body").data("responses");
+  const year = $("body").data("year");
   const idx = $("body").data("idx");
-  const r = responses[idx];
+  const r = responses[year][idx];
   r.name = $("#name-input").val();
   r.email = $("#email-input").val();
   r.major = $("#major-input").val();
@@ -245,7 +246,8 @@ function submitForm() {
   saveFormData();
   const responses = $("body").data("responses");
   setData(responses);
-  $("body").data("idx", getDefaultIndex(responses));
+  const year = $("body").data("year");
+  $("body").data("idx", getDefaultIndex(responses[year]));
   populateForm();
 }
 
@@ -431,10 +433,11 @@ function initPage() {
     setButton.on("click", () => setCoords());
     map.data("search").on("result", (response) => {
       const responses = $("body").data("responses");
+      const year = $("body").data("year");
       const idx = $("body").data("idx");
       const [longitude, latitude] = response.result.center;
       map.data("search").setProximity({ latitude, longitude });
-      if (!coordsInput.val() && !responses[idx].processed) {
+      if (!coordsInput.val() && !responses[year][idx].processed) {
         setCoords({ latitude, longitude });
       }
       if (map.data("onFirstResult")) {
