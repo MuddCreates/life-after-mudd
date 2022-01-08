@@ -4,8 +4,11 @@ Small webapp that visualizes where Harvey Mudd's Class of 2020 will be
 after graduation, using data from [this Google
 Form](https://forms.gle/PqEHTjpBDGBXfH4W8).
 
+Current maintainers are [**@kwshi**](https://github.com/kwshi) and
+[**@daphne-poon**](https://github.com/daphne-poon).
+
 First install [Docker](https://www.docker.com/). Then, to run:
-* Obtain Google Drive API key from **@raxod502** and place it in
+* Obtain Google Drive API key from project maintainers and place it in
   `.oauth-private-key.json`.
 * Set up project and dependencies inside a Docker container (with
   source synchronized with repo checkout), `make docker`.
