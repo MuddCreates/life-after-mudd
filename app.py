@@ -49,7 +49,9 @@ def get_admin():
 @app.route("/<path>")
 def get_static_file(path):
     if not path.endswith(".html"):
-        return flask.send_from_directory("dist", path)
+        response = flask.send_from_directory("dist", path)
+        response.cache_control.max_age = 0
+        return response
     flask.abort(404)
 
 
