@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
+## pyright: strict
 
 import itertools as it
 import json
-import operator as op
 import os
 import pprint as pp
 import sys
 
 import gspread
-import oauth2client.service_account
 import requests
 
 # map worksheet names to class years
@@ -17,7 +16,7 @@ SHEET_CLASS = {
     "Class of 2020": "2020",
 }
 
-COLUMNS = (
+COLUMNS: tuple[tuple[str, str], ...] = (
     ("Processed", "processed"),
     ("Email", "email"),
     ("Name", "name"),
@@ -81,7 +80,7 @@ COLUMN_INDICES = {key: idx for idx, (_, key) in enumerate(COLUMNS)}
 OAUTH_PRIVATE_KEY_PATH = ".oauth-private-key.json"
 
 
-def get_worksheets():
+def get_worksheets() -> list[gspread.Worksheet]:
     # https://gspread.readthedocs.io/en/latest/oauth2.html#using-signed-credentials
     scopes = [
         "https://spreadsheets.google.com/feeds",
@@ -128,6 +127,7 @@ def write_form_responses(worksheet: gspread.Worksheet, responses):
     num_cols = COLUMN_INDICES["sepLeft"]
     if not responses:
         return
+
     cells = worksheet.range(2, 1, len(responses) + 1, num_cols)
     for cell in cells:
         _, key = COLUMNS[cell.col - 1]
