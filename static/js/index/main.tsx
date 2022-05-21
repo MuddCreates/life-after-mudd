@@ -4,7 +4,7 @@
 // https://babeljs.io/docs/en/next/babel-polyfill.html
 import "regenerator-runtime/runtime";
 
-import React from "react";
+import * as React from "react";
 import { render } from "react-dom";
 import { Provider } from "react-redux";
 
@@ -30,7 +30,7 @@ main().catch(failHard);
 
 // Fix Parcel's broken HMR, see
 // <https://github.com/parcel-bundler/parcel/issues/3299#issuecomment-518919533>.
-if (module.hot) {
-  module.hot.dispose(() => {});
-  module.hot.accept(() => {});
-}
+//if (module.hot) {
+//  module.hot.dispose(() => {});
+//  module.hot.accept(() => {});
+//}

@@ -31,26 +31,26 @@ async function setData(data) {
   }
 }
 
-function normalizeWhitespace(str) {
+function normalizeWhitespace(str: string) {
   let parts = str.split(/\s+/);
   parts = parts.filter((part) => part);
   return parts.join(" ");
 }
 
 // Taken from <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions>
-function escapeRegExp(string) {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
+function escapeRegExp(str: string) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
 }
 
-function containsWordCaseInsensitive(string, pattern) {
-  return !!string.match(new RegExp("\\b" + escapeRegExp(pattern) + "\\b", "i"));
+function containsWordCaseInsensitive(str: string, pattern: string) {
+  return !!str.match(new RegExp("\\b" + escapeRegExp(pattern) + "\\b", "i"));
 }
 
-function reverseString(string) {
+function reverseString(string: string) {
   return [...string].reverse().join("");
 }
 
-function deleteLastWordCaseInsensitive(string, pattern) {
+function deleteLastWordCaseInsensitive(string: string, pattern: string) {
   return reverseString(
     reverseString(string).replace(
       new RegExp("\\b" + escapeRegExp(reverseString(pattern)) + "\\b", "i"),
@@ -59,11 +59,11 @@ function deleteLastWordCaseInsensitive(string, pattern) {
   );
 }
 
-function capitalize(string) {
+function capitalize(string: string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-function parseCityStateCountry(cityState) {
+function parseCityStateCountry(cityState: string) {
   if (!cityState.trim()) {
     return { city: "", state: "", country: "" };
   }
@@ -92,7 +92,7 @@ function parseCityStateCountry(cityState) {
   };
 }
 
-function clean(field) {
+function clean(field: string) {
   field = field.trim();
   if (["N/A", "NA"].indexOf(field.toUpperCase()) != -1) {
     field = "";
@@ -100,7 +100,7 @@ function clean(field) {
   return field;
 }
 
-function fillDefaults(responses) {
+function fillDefaults(responses: any[]) {
   return responses.map((r) => {
     r = { ...r };
     // Make it so form response updates are automatically queued for

@@ -1,19 +1,19 @@
-"use strict";
-
 import { minLandscapeWidth, sidebarWidthFraction } from "./config";
 import { failHard } from "./error";
+import { Action } from "./lib/action";
+import { Response } from "./lib/response";
 
 // Given a Redux action, wrap it with error handling so that if an
 // exception occurs, the app crashes and displays an error message.
 // Works with both synchronous and asynchronous actions.
-export function thunk(action) {
-  return (dispatch) => {
+export function thunk(
+  action: (dispatch: (action: Action) => void) => Promise<unknown>,
+) {
+  return (dispatch: (action: Action) => void) => {
     try {
       let result = action(dispatch);
       // https://stackoverflow.com/a/38339199/3538165
-      if (Promise.resolve(result) === result) {
-        result = result.catch(failHard);
-      }
+      if (Promise.resolve(result) === result) result = result.catch(failHard);
       return result;
     } catch (error) {
       failHard(error);
@@ -41,12 +41,14 @@ export function allowResizingWindow() {
   return navigator.userAgent.toLowerCase().indexOf("android") === -1;
 }
 
-export const findClassYearByEmail = (data, email) => {
-  for (const year in data) {
-    for (const response of data[year]) {
-      if (response.email == email) return parseInt(year, 10);
-    }
-  }
+export const findClassYearByEmail = (
+  data: Record<string, Response[]>,
+  email: string,
+) => {
+  for (const year in data)
+    for (const response of data[year])
+      if (response.email === email) return parseInt(year, 10);
+
   // fallback: if no match, return latest
   return Math.max(...Object.keys(data).map((s) => parseInt(s, 10)));
 };

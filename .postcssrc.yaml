@@ -1,0 +1,5 @@
+parser: "postcss-scss"
+plugins:
+  autoprefixer: {}
+  postcss-nested: {}
+  postcss-modules: {}

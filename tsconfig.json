@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "target": "esnext",
+    "allowJs": true,
+    "esModuleInterop": true,
+    "jsx": "react-jsx",
+    "strict": true,
+    "paths": {
+      "$/*": ["static/js/index/*"]
+    },
+    "plugins": [{ "name": "typescript-plugin-css-modules" }]
+  }
+}

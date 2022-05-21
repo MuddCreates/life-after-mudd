@@ -4,48 +4,53 @@ import Cookies from "js-cookie";
 
 import { oauthSetupAction } from "./oauth";
 import { thunk } from "./util";
+import { ActionType } from "./lib/action";
+
+import { ApiResponse, Response } from "./lib/response";
 
 // Given a latitude and longitude (in reverse order), where both
 // values are strings, parse them into floats and return an object
 // with keys long and lat. If either parsing fails, return null
 // instead.
-function parseLatLong(long, lat) {
+const parseLatLong = (long: string, lat: string) => {
   const longF = parseFloat(long);
   const latF = parseFloat(lat);
-  if (!Number.isNaN(longF) && !Number.isNaN(latF)) {
-    return { lng: longF, lat: latF };
-  } else {
-    return null;
-  }
-}
+  return !Number.isNaN(longF) && !Number.isNaN(latF)
+    ? { lng: longF, lat: latF }
+    : null;
+};
 
 // Given the list of responses from the API, return a cleaned-up
 // version suitable for use on the frontend. May reuse storage of the
 // original objects and array.
-function cleanResponses(responses) {
-  Object.values(responses).forEach((batch) => {
-    batch.forEach((response, idx) => {
-      response.cityLatLong = parseLatLong(response.cityLong, response.cityLat);
-      response.orgLatLong = parseLatLong(response.orgLong, response.orgLat);
-      response.summerCityLatLong = parseLatLong(
-        response.summerCityLong,
-        response.summerCityLat,
-      );
-      response.summerOrgLatLong = parseLatLong(
-        response.summerOrgLong,
-        response.summerOrgLat,
-      );
-      response.idx = idx;
-    });
-  });
-  return responses;
-}
+const cleanResponses = (
+  responses: Record<string, ApiResponse[]>,
+): Record<string, Response[]> =>
+  Object.fromEntries(
+    Object.entries(responses).map(([year, batch]) => [
+      year,
+      batch.map((response, idx) => ({
+        ...response,
+        idx,
+        cityLatLong: parseLatLong(response.cityLong, response.cityLat),
+        orgLatLong: parseLatLong(response.orgLong, response.orgLat),
+        summerCityLatLong: parseLatLong(
+          response.summerCityLong,
+          response.summerCityLat,
+        ),
+        summerOrgLatLong: parseLatLong(
+          response.summerOrgLong,
+          response.summerOrgLat,
+        ),
+      })),
+    ]),
+  );
 
 // Make the UI say it's fetching the data. Then make an API request.
 // Once it returns, clean it up and show the data on the map in the
 // UI.
 export const fetchAction = thunk(async (dispatch) => {
-  dispatch({ type: "FETCHING_DATA" });
+  dispatch({ type: ActionType.fetchingData });
 
   let oauthToken = Cookies.get("oauthToken");
   const response = await fetch("/api/v1/data", {
@@ -73,21 +78,21 @@ export const fetchAction = thunk(async (dispatch) => {
     Cookies.remove("oauthToken");
 
     // Handle a bad OAuth token cookie by rerunning the oauthSetupAction phase
-    if (err.startsWith("Bad token")) {
+    if (err?.startsWith("Bad token")) {
       dispatch(oauthSetupAction);
     } else {
       throw new Error(`Got status ${response.status} from API` + explanation);
     }
   } else {
-    let { responses, email } = await response.json();
-    responses = cleanResponses(responses);
+    const { responses, email } = await response.json();
+    const newResponses = cleanResponses(responses);
     dispatch({
-      type: "SET_EMAIL",
+      type: ActionType.setEmail,
       email,
     });
     dispatch({
-      type: "SHOW_DATA",
-      responses,
+      type: ActionType.showData,
+      responses: newResponses,
     });
   }
 });

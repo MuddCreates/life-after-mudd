@@ -1,0 +1,25 @@
+.sidebar {
+  position: absolute;
+  padding: 10px;
+  z-index: 3;
+  overflow-y: auto;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 10px 2px;
+  padding-left: 12.5px;
+  padding-bottom: 0;
+  background-color: white;
+  -webkit-overflow-scrolling: touch;
+
+  bottom: 0;
+  height: 45%;
+  left: 0;
+  right: 0;
+}
+
+@media (orientation: landscape) and (min-width: 40rem) {
+  .sidebar {
+    width: 30%;
+    top: 0;
+    height: auto;
+    left: auto;
+  }
+}
