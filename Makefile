@@ -39,8 +39,8 @@ app-prod: ## Start webserver for production
 
 .PHONY: app-dev
 app-dev: ## Start webserver in admin mode, with live-reload
-	LAM_ADMIN_ENABLED=1 watchexec -r -e py					\
-		"flask run --host $${HOST:-127.0.0.1} --port $${PORT:-8080}"
+	FLASK_ENV=development LAM_ADMIN_ENABLED=1 \
+		flask run --host "$${HOST:-127.0.0.1}" --port "$${PORT:-8080}"
 
 .PHONY: image
 image: ## Build Docker image for deployment
