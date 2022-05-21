@@ -7,7 +7,7 @@ import { useSelector } from "../hooks/redux";
 import { SidebarView } from "../lib/state";
 import { formatCity, formatLongTermPlan, formatSummerPlan } from "../tag";
 
-const locationGroupBy: GroupBy = (resp) => ({
+const locationGroupBy: GroupBy<[boolean, boolean, string[]]> = (resp) => ({
   key: formatCity(resp.city, resp.state, resp.country) || "Location unknown",
   summerKey:
     formatCity(resp.summerCity, resp.summerState, resp.summerCountry) ||
@@ -22,7 +22,7 @@ const locationGroupBy: GroupBy = (resp) => ({
   ],
 });
 
-const orgGroupBy: GroupBy = (resp) => ({
+const orgGroupBy: GroupBy<[boolean, boolean, boolean, string]> = (resp) => ({
   key: formatLongTermPlan(resp),
   summerKey: formatSummerPlan(resp),
   icon: getPathIcon({ path: resp.path, summer: false }),
